@@ -1,2 +1,4 @@
 # 项目排除路径
 /out/
+/.idea/
+/YolBi_Inject.iml
