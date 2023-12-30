@@ -1,8 +1,6 @@
 package cn.yapeteam.yolbi;
 
 import cn.yapeteam.yolbi.event.EventManager;
-import cn.yapeteam.yolbi.event.Listener;
-import cn.yapeteam.yolbi.event.impl.render.EventRender3D;
 import lombok.Getter;
 
 @Getter
@@ -14,11 +12,6 @@ public class YolBi {
 
     private YolBi() {
         eventManager = new EventManager();
-        eventManager.register(this);
-    }
 
-    @Listener
-    private void onRender(EventRender3D e) {
-        System.out.println(e.getPartialTicks());
     }
 }
