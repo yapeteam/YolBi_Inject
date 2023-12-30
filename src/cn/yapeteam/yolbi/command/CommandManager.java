@@ -1,6 +1,7 @@
 package cn.yapeteam.yolbi.command;
 
 import cn.yapeteam.yolbi.YolBi;
+import cn.yapeteam.yolbi.command.impl.CommandToggle;
 import cn.yapeteam.yolbi.event.Listener;
 import cn.yapeteam.yolbi.event.impl.player.EventChat;
 import lombok.Getter;
@@ -14,6 +15,7 @@ public class CommandManager {
 
     public CommandManager() {
         YolBi.instance.getEventManager().register(this);
+        commands.add(new CommandToggle());
     }
 
     @Listener
@@ -25,7 +27,8 @@ public class CommandManager {
             String[] args = parseMessage(message);
             commands.forEach(c -> c.process(args));
         }
-        if (message.startsWith("@")) e.setMessage(message.substring(1));
+        if (message.startsWith("@"))
+            e.setMessage(message.substring(1));
     }
 
     private static String[] parseMessage(String message) {

@@ -15,6 +15,6 @@ public class MixinEntityPlayerSP {
         YolBi.instance.getEventManager().post(event);
         if (event.isCancelled()) return;
         message = event.getMessage();
-        boolean ignored = message.isEmpty();
+        boolean ignored = message.isEmpty();//占位
     }
 }
