@@ -1,5 +1,6 @@
 package cn.yapeteam.yolbi.a_pretoload;
 
+import cn.yapeteam.yolbi.YolBi;
 import cn.yapeteam.yolbi.a_pretoload.logger.Logger;
 import cn.yapeteam.yolbi.a_pretoload.utils.ClassUtils;
 import org.objectweb.asm.Opcodes;
@@ -37,6 +38,7 @@ public class Loader {
             MixinManager.init();
             Logger.warn("Start transforming!");
             MixinManager.load(instrumentation);
+            Logger.success("Welcome {} ver {}", YolBi.name, YolBi.version);
         } catch (Throwable e) {
             Logger.exception(e);
             failed();

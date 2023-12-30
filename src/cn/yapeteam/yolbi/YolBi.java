@@ -1,6 +1,5 @@
 package cn.yapeteam.yolbi;
 
-import cn.yapeteam.yolbi.a_pretoload.logger.Logger;
 import cn.yapeteam.yolbi.event.EventManager;
 import cn.yapeteam.yolbi.event.Listener;
 import cn.yapeteam.yolbi.event.impl.render.EventRender3D;
@@ -14,7 +13,6 @@ public class YolBi {
     private final EventManager eventManager;
 
     private YolBi() {
-        Logger.success("Welcome {} ver {}", name, version);
         eventManager = new EventManager();
         eventManager.register(this);
     }
