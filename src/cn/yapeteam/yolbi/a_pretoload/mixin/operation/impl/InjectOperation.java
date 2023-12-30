@@ -2,21 +2,25 @@ package cn.yapeteam.yolbi.a_pretoload.mixin.operation.impl;
 
 import cn.yapeteam.yolbi.a_pretoload.Loader;
 import cn.yapeteam.yolbi.a_pretoload.Mapper;
+import cn.yapeteam.yolbi.a_pretoload.logger.Logger;
+import cn.yapeteam.yolbi.a_pretoload.mixin.Mixin;
 import cn.yapeteam.yolbi.a_pretoload.mixin.annotations.Inject;
 import cn.yapeteam.yolbi.a_pretoload.mixin.annotations.Local;
 import cn.yapeteam.yolbi.a_pretoload.mixin.annotations.Target;
 import cn.yapeteam.yolbi.a_pretoload.mixin.operation.Operation;
 import cn.yapeteam.yolbi.a_pretoload.mixin.utils.DescParser;
-import cn.yapeteam.yolbi.a_pretoload.mixin.Mixin;
 import cn.yapeteam.yolbi.a_pretoload.utils.ASMUtils;
-import cn.yapeteam.yolbi.a_pretoload.logger.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.*;
 
-import java.util.*;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class InjectOperation implements Operation {
@@ -71,7 +75,7 @@ public class InjectOperation implements Operation {
             public void visitLocalVariable(String varName, String descriptor, String signature, Label start, Label end, int index) {
                 if (name.equals(varName))
                     varIndex[0] = index;
-                super.visitLocalVariable(name, descriptor, signature, start, end, index);
+                super.visitLocalVariable(varName, descriptor, signature, start, end, index);
             }
         });
         return varIndex[0];
@@ -91,6 +95,20 @@ public class InjectOperation implements Operation {
         return parameters;
     }
 
+    private static boolean isLoadOpe(int opcode) {
+        for (Field field : Opcodes.class.getFields()) {
+            if (field.getName().endsWith("LOAD")) {
+                try {
+                    if ((int) field.get(null) == opcode) {
+                        return true;
+                    }
+                } catch (IllegalAccessException ignored) {
+                }
+            }
+        }
+        return false;
+    }
+
     private static void processLocalValues(MethodNode source, MethodNode target) {
         Map<Integer, Integer> varMap = new HashMap<>();
         ArrayList<String[]> sourceParameters = getLocalParameters(source);
@@ -100,9 +118,9 @@ public class InjectOperation implements Operation {
                     getLocalVarIndex(target, sourceParameter[1])
             );
         }
-        for (int i = 0; i < sourceParameters.size(); i++) {
+        for (int i = 0; i < source.instructions.size(); i++) {
             AbstractInsnNode instruction = source.instructions.get(i);
-            if (instruction instanceof VarInsnNode) {
+            if (instruction instanceof VarInsnNode && isLoadOpe(instruction.getOpcode())) {
                 VarInsnNode varInsnNode = (VarInsnNode) instruction;
                 Integer index = varMap.get(varInsnNode.var);
                 if (index != null)

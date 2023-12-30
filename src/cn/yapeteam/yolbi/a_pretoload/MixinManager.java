@@ -4,6 +4,10 @@ import cn.yapeteam.yolbi.a_pretoload.logger.Logger;
 import cn.yapeteam.yolbi.a_pretoload.mixin.Transformer;
 import cn.yapeteam.yolbi.a_pretoload.mixin.annotations.Mixin;
 import cn.yapeteam.yolbi.a_pretoload.utils.ClassUtils;
+import cn.yapeteam.yolbi.injections.MixinEntityPlayerSP;
+import cn.yapeteam.yolbi.injections.MixinEntityRenderer;
+import cn.yapeteam.yolbi.injections.MixinGuiIngame;
+import cn.yapeteam.yolbi.injections.MixinMinecraft;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -20,9 +24,10 @@ public class MixinManager {
 
     public static void init() throws Throwable {
         transformer = new Transformer(MixinManager::getClassBytes);
-        add(ClassUtils.getClass("cn.yapeteam.yolbi.injections.MixinMinecraft"));
-        add(ClassUtils.getClass("cn.yapeteam.yolbi.injections.MixinGuiIngame"));
-        add(ClassUtils.getClass("cn.yapeteam.yolbi.injections.MixinEntityPlayerSP"));
+        add(MixinMinecraft.class);
+        add(MixinGuiIngame.class);
+        add(MixinEntityPlayerSP.class);
+        add(MixinEntityRenderer.class);
     }
 
     public static byte[] getClassBytes(String name) throws Throwable {
@@ -49,7 +54,6 @@ public class MixinManager {
     private static final File dir = new File("generatedClasses");
 
     public static void load(Instrumentation instrumentation) throws Throwable {
-        dir.mkdirs();
         Map<String, byte[]> map = transformer.transform();
         for (Class<?> mixin : mixins) {
             String value = mixin.getAnnotation(Mixin.class).value();
