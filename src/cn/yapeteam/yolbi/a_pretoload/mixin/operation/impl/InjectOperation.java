@@ -129,7 +129,7 @@ public class InjectOperation implements Operation {
         }
     }
 
-    private static void insert(MethodNode source, MethodNode target, Inject info) {
+    private static void insert(MethodNode source, MethodNode target, Inject info) throws Throwable {
         AbstractInsnNode targetNode = findTargetInsnNode(target, info);
         AbstractInsnNode[] block = getBlock(targetNode, target.instructions);
         Target.Shift shift = info.target().shift();
@@ -177,7 +177,11 @@ public class InjectOperation implements Operation {
             }
             processReturnLabel(injection, info);
             processLocalValues(injection, targetMethod);
-            insert(injection, targetMethod, info);
+            try {
+                insert(injection, targetMethod, info);
+            } catch (Throwable e) {
+                Logger.exception(e);
+            }
         }
     }
 
@@ -226,17 +230,18 @@ public class InjectOperation implements Operation {
     //Examples:
     //"net/minecraft/client/Minecraft.pickBlockWithNBT(Lnet/minecraft/item/Item;ILnet/minecraft/tileentity/TileEntity;)Lnet/minecraft/item/ItemStack;" -> "ave.a(Lzw;ILakw;)Lzx;"
     //"net/minecraft/init/Items.skull Lnet/minecraft/item/Item;" -> "zy.bX Lzw;"
-    private static String mapOperation(String ope) {
+    private static String mapOperation(String ope) throws Throwable {
         boolean isMethod = !ope.contains(" ");
         String[] values = parseOpe(ope);
         String[] res = new String[3];
         res[0] = Mapper.map(null, values[0], null, Mapper.Type.Class);
-        res[1] = Mapper.map(values[1].startsWith("*") ? null : values[0], values[1].startsWith("*") ? values[1].substring(1) : values[1], values[2], isMethod ? Mapper.Type.Method : Mapper.Type.Field);
+        res[1] = isMethod ? Mapper.mapMethodWithSuper(values[0], values[1], values[2]) : Mapper.mapFieldWithSuper(values[0], values[1], values[2]);
+        //res[1] = Mapper.map(values[1].startsWith("*") ? null : values[0], values[1].startsWith("*") ? values[1].substring(1) : values[1], values[2], isMethod ? Mapper.Type.Method : Mapper.Type.Field);
         res[2] = DescParser.mapDesc(values[2]);
         return res[0] + "." + res[1] + (isMethod ? "" : " ") + res[2];
     }
 
-    private static AbstractInsnNode findTargetInsnNode(MethodNode target, Inject info) {
+    private static AbstractInsnNode findTargetInsnNode(MethodNode target, Inject info) throws Throwable {
         Target targetInfo = info.target();
         String targetOpe = targetInfo.target().isEmpty() ? "" : mapOperation(targetInfo.target());
         int opcode = getOperationCode(targetInfo.value());

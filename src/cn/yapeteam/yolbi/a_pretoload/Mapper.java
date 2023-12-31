@@ -11,6 +11,8 @@ import org.objectweb.asm.tree.ClassNode;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class Mapper {
     @Getter
@@ -116,6 +118,36 @@ public class Mapper {
         return name;
     }
 
+    public static String mapMethodMultiOwners(String[] owners, String name, String desc) {
+        for (String owner : owners) {
+            String mapped = map(owner, name, desc, Type.Method);
+            if (!mapped.equals(name)) return mapped;
+        }
+        return name;
+    }
+
+    public static String mapFieldMultiOwners(String[] owners, String name, String desc) {
+        for (String owner : owners) {
+            String mapped = map(owner, name, desc, Type.Field);
+            if (!mapped.equals(name)) return mapped;
+        }
+        return name;
+    }
+
+    public static String[] getMethodOwners(String name, String desc) {
+        List<Map> maps = mappings.stream().filter(map -> map.type == Type.Method && map.name.equals(name) && map.desc.equals(desc)).collect(Collectors.toList());
+        List<String> owners = new ArrayList<>();
+        for (Map map : maps) owners.add(map.owner);
+        return owners.toArray(new String[0]);
+    }
+
+    public static String[] getFieldOwners(String name, String desc) {
+        List<Map> maps = mappings.stream().filter(map -> map.type == Type.Field && map.name.equals(name) && map.desc.equals(desc)).collect(Collectors.toList());
+        List<String> owners = new ArrayList<>();
+        for (Map map : maps) owners.add(map.owner);
+        return owners.toArray(new String[0]);
+    }
+
     public static Mode guessMappingMode() throws Throwable {
         byte[] bytes = ClassUtils.getClassBytes("net.minecraft.client.Minecraft");
         if (bytes == null) return Mode.Vanilla;
@@ -123,6 +155,36 @@ public class Mapper {
         if (node.methods.stream().anyMatch(m -> m.name.equals("runTick")))
             return Mode.None;
         return Mode.Searge;
+    }
+
+    public static String mapMethodWithSuper(String owner, String name, String desc) throws Throwable {
+        ClassNode node = ASMUtils.node(ClassUtils.getClassBytes(Mapper.getObfClass(owner)));
+        if (node == null) {
+            return map(owner, name, desc, Type.Method);
+        }
+        String superName = node.superName;
+        for (String methodOwner : Mapper.getMethodOwners(name, desc)) {
+            if (Mapper.getObfClass(methodOwner).equals(superName)) {
+                superName = methodOwner;
+                break;
+            }
+        }
+        return Mapper.mapMethodMultiOwners(new String[]{owner, superName}, name, desc);
+    }
+
+    public static String mapFieldWithSuper(String owner, String name, String desc) throws Throwable {
+        ClassNode node = ASMUtils.node(ClassUtils.getClassBytes(Mapper.getObfClass(owner)));
+        if (node == null) {
+            return map(owner, name, desc, Type.Field);
+        }
+        String superName = node.superName;
+        for (String methodOwner : Mapper.getFieldOwners(name, desc)) {
+            if (Mapper.getObfClass(methodOwner).equals(superName)) {
+                superName = methodOwner;
+                break;
+            }
+        }
+        return Mapper.mapFieldMultiOwners(new String[]{owner, superName}, name, desc);
     }
 
     public static String getObfClass(String name) {

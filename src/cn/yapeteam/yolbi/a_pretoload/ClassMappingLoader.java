@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 
 @SuppressWarnings("unused")
 public class ClassMappingLoader {
-    public static void loadClass(byte[] bytes) {
+    public static void loadClass(byte[] bytes) throws Throwable {
         ClassNode node = ASMUtils.node(bytes);
         node.superName = Mapper.getObfClass(node.superName);
         List<String> interfaces = new ArrayList<>();
@@ -22,7 +22,7 @@ public class ClassMappingLoader {
             interfaces.add(Mapper.getObfClass(anInterface));
         node.interfaces = interfaces;
         for (MethodNode method : node.methods)
-            method(method);
+            method(method, node);
         for (FieldNode field : node.fields)
             field(field);
         bytes = ASMUtils.rewriteClass(node);
@@ -69,11 +69,11 @@ public class ClassMappingLoader {
         return Mapper.getMappings().stream().anyMatch(m -> m.getType() == Mapper.Type.Class && m.getName().equals(type));
     }
 
-    public static void method(MethodNode source) {
+    public static void method(MethodNode source, ClassNode parent) throws Throwable {
         if (source.visibleAnnotations != null) {
             for (AnnotationNode visibleAnnotation : source.visibleAnnotations) {
                 if (visibleAnnotation.desc.substring(1, visibleAnnotation.desc.length() - 1).equals(ASMUtils.slash(Super.class.getName()))) {
-                    source.name = Mapper.map(null, source.name, null, Mapper.Type.Method);
+                    source.name = Mapper.map(parent.superName, source.name, null, Mapper.Type.Method);
                     break;
                 }
             }
@@ -84,7 +84,7 @@ public class ClassMappingLoader {
             if (instruction instanceof MethodInsnNode) {
                 MethodInsnNode methodInsnNode = (MethodInsnNode) instruction;
                 if (hasType(methodInsnNode.owner)) {
-                    methodInsnNode.name = Mapper.map(methodInsnNode.owner, methodInsnNode.name, methodInsnNode.desc, Mapper.Type.Method);
+                    methodInsnNode.name = Mapper.mapMethodWithSuper(methodInsnNode.owner, methodInsnNode.name, methodInsnNode.desc);
                     methodInsnNode.owner = Mapper.getObfClass(methodInsnNode.owner);
                 }
                 if (hasType(parseDesc(methodInsnNode.desc))) methodInsnNode.desc = desc(methodInsnNode.desc);
@@ -96,7 +96,7 @@ public class ClassMappingLoader {
             } else if (instruction instanceof FieldInsnNode) {
                 FieldInsnNode fieldInsnNode = (FieldInsnNode) instruction;
                 if (hasType(fieldInsnNode.owner)) {
-                    fieldInsnNode.name = Mapper.map(fieldInsnNode.owner, fieldInsnNode.name, null, Mapper.Type.Field);
+                    fieldInsnNode.name = Mapper.mapFieldWithSuper(fieldInsnNode.owner, fieldInsnNode.name, fieldInsnNode.desc);
                     fieldInsnNode.owner = Mapper.map(null, fieldInsnNode.owner, null, Mapper.Type.Class);
                 }
                 if (hasType(parseDesc(fieldInsnNode.desc)))

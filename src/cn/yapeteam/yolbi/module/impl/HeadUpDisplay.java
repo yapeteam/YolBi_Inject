@@ -7,6 +7,7 @@ import cn.yapeteam.yolbi.font.cfont.CFontRenderer;
 import cn.yapeteam.yolbi.module.Module;
 import cn.yapeteam.yolbi.module.ModuleCategory;
 import cn.yapeteam.yolbi.module.ModuleInfo;
+import net.minecraft.client.renderer.GlStateManager;
 
 import java.util.Comparator;
 import java.util.List;
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
 public class HeadUpDisplay extends Module {
     @Listener
     private void onRender(EventRender2D e) {
+        GlStateManager.color(1, 1, 1, 1);
         CFontRenderer fontRenderer = YolBi.instance.getFontManager().getJelloRegular18();
         fontRenderer.drawString(YolBi.name + " " + YolBi.version, 2, 2, -1, true);
         List<Module> activeModules = YolBi.instance.getModuleManager().getModules().stream().filter(Module::isEnabled).sorted(Comparator.comparingInt(m -> m.getName().length())).collect(Collectors.toList());
