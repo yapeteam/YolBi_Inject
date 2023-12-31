@@ -18,6 +18,7 @@ public class ModuleManager {
     public ModuleManager() {
         try {
             Field loadedClasses = ClassLoader.class.getDeclaredField("classes");
+            loadedClasses.setAccessible(true);
             Vector<Class<?>> vector = (Vector<Class<?>>) loadedClasses.get(Module.class.getClassLoader());
             for (Class<?> aClass : vector)
                 if (aClass.getSuperclass() == Module.class && aClass.getAnnotation(ModuleInfo.class) != null && aClass.getAnnotation(Deprecated.class) == null)
