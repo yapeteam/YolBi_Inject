@@ -18,5 +18,7 @@ public class YolBi {
         eventManager = new EventManager();
         commandManager = new CommandManager();
         moduleManager = new ModuleManager();
+        eventManager.register(commandManager);
+        eventManager.register(moduleManager);
     }
 }

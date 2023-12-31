@@ -1,6 +1,5 @@
 package cn.yapeteam.yolbi.module;
 
-import cn.yapeteam.yolbi.YolBi;
 import cn.yapeteam.yolbi.a_pretoload.logger.Logger;
 import cn.yapeteam.yolbi.event.Listener;
 import cn.yapeteam.yolbi.event.impl.game.EventKey;
@@ -27,7 +26,6 @@ public class ModuleManager {
             Logger.exception(e);
         }
         modules.sort((m1, m2) -> -Integer.compare(m2.getName().charAt(0), m1.getName().charAt(0)));
-        YolBi.instance.getEventManager().register(this);
     }
 
     @Listener

@@ -1,6 +1,5 @@
 package cn.yapeteam.yolbi.command;
 
-import cn.yapeteam.yolbi.YolBi;
 import cn.yapeteam.yolbi.command.impl.CommandBind;
 import cn.yapeteam.yolbi.command.impl.CommandToggle;
 import cn.yapeteam.yolbi.event.Listener;
@@ -15,7 +14,6 @@ public class CommandManager {
     private final ArrayList<AbstractCommand> commands = new ArrayList<>();
 
     public CommandManager() {
-        YolBi.instance.getEventManager().register(this);
         commands.add(new CommandToggle());
         commands.add(new CommandBind());
     }
