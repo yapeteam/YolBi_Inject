@@ -12174,7 +12174,7 @@ MD: ek/a (Lek;)Lio/netty/channel/Channel; net/minecraft/network/NetworkManager/a
 MD: ek/a (Lel;)V net/minecraft/network/NetworkManager/setConnectionState (Lnet/minecraft/network/EnumConnectionState;)V
 MD: ek/a (Lep;)V net/minecraft/network/NetworkManager/setNetHandler (Lnet/minecraft/network/INetHandler;)V
 MD: ek/a (Leu;)V net/minecraft/network/NetworkManager/closeChannel (Lnet/minecraft/util/IChatComponent;)V
-MD: ek/a (Lff;)V net/minecraft/network/NetworkManager/func_179290_a (Lnet/minecraft/network/Packet;)V
+MD: ek/a (Lff;)V net/minecraft/network/NetworkManager/sendPacket (Lnet/minecraft/network/Packet;)V
 MD: ek/a (Lff;Lio/netty/util/concurrent/GenericFutureListener;[Lio/netty/util/concurrent/GenericFutureListener;)V net/minecraft/network/NetworkManager/sendPacket (Lnet/minecraft/network/Packet;Lio/netty/util/concurrent/GenericFutureListener;[Lio/netty/util/concurrent/GenericFutureListener;)V
 MD: ek/a (Lff;[Lio/netty/util/concurrent/GenericFutureListener;)V net/minecraft/network/NetworkManager/dispatchPacket (Lnet/minecraft/network/Packet;[Lio/netty/util/concurrent/GenericFutureListener;)V
 MD: ek/a (Lio/netty/channel/ChannelHandlerContext;Lff;)V net/minecraft/network/NetworkManager/channelRead0 (Lio/netty/channel/ChannelHandlerContext;Lnet/minecraft/network/Packet;)V

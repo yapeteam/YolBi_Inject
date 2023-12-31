@@ -3,6 +3,7 @@ package cn.yapeteam.yolbi.module;
 import cn.yapeteam.yolbi.a_pretoload.logger.Logger;
 import cn.yapeteam.yolbi.event.Listener;
 import cn.yapeteam.yolbi.event.impl.game.EventKey;
+import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
@@ -11,6 +12,7 @@ import java.util.List;
 import java.util.Vector;
 import java.util.stream.Collectors;
 
+@Getter
 @SuppressWarnings("unchecked")
 public class ModuleManager {
     private final List<Module> modules = new ArrayList<>();
@@ -34,6 +36,7 @@ public class ModuleManager {
 
     @Listener
     private void onKey(EventKey e) {
+        System.out.println(e.getKey());
         modules.stream().filter(m -> m.getKey() == e.getKey()).collect(Collectors.toList()).forEach(Module::toggle);
     }
 
@@ -50,7 +53,7 @@ public class ModuleManager {
                     module.setKey(info.key());
                 modules.add(module);
             } catch (Throwable e) {
-                System.err.println("Failed to load Module: " + aClass.getSimpleName());
+                Logger.error("Failed to load Module: {}", aClass.getSimpleName());
                 Logger.exception(e);
             }
         }
