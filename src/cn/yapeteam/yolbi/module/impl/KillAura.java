@@ -14,6 +14,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.MathHelper;
+import net.minecraft.world.World;
 import org.lwjgl.input.Keyboard;
 
 import java.awt.*;
@@ -77,17 +78,20 @@ public class KillAura extends Module {
     private void onUpdate(EventUpdate e) throws Throwable {
         if (mc.thePlayer == null || mc.theWorld == null) return;
         if (target != null && target.getDistanceToEntity(mc.thePlayer) <= range.getValue()) {
-            if (System.currentTimeMillis() - rotationTimer >= 200)
+            if (System.currentTimeMillis() - rotationTimer >= 500) {
                 rotate = getNeededRotations(target);
-            ((Entity) mc.thePlayer).rotationYaw += (float) (rotate[0] - ((Entity) mc.thePlayer).rotationYaw) / 1.1f;
-            ((Entity) mc.thePlayer).rotationPitch += (float) (rotate[1] - ((Entity) mc.thePlayer).rotationPitch) / 1.1f;
+                rotate[0] += (newRandom().nextInt(10) - 5) / 2f;
+                rotate[1] += (newRandom().nextInt(10) - 5) / 2f;
+            }
+            ((Entity) mc.thePlayer).rotationYaw += (float) (rotate[0] - ((Entity) mc.thePlayer).rotationYaw) / 1.2f;
+            ((Entity) mc.thePlayer).rotationPitch += (float) (rotate[1] - ((Entity) mc.thePlayer).rotationPitch) / 1.2f;
             if (System.currentTimeMillis() - tim >= (1000 / delay)) {
                 delay = random(min.getValue(), max.getValue());
                 tim = System.currentTimeMillis();
                 clickMouse.invoke(mc);
             }
         } else if (target == null) {
-            List<Entity> entityList = new ArrayList<>(mc.theWorld.loadedEntityList);
+            List<Entity> entityList = new ArrayList<>(((World) mc.theWorld).loadedEntityList);
             entityList = entityList.stream().filter(entity -> entity != mc.thePlayer && entity instanceof EntityLivingBase && entity.getDistanceToEntity(mc.thePlayer) <= range.getValue()).sorted(Comparator.comparingInt(entity -> (int) entity.getDistanceToEntity(mc.thePlayer))).collect(Collectors.toList());
             if (!entityList.isEmpty()) target = entityList.get(0);
         } else if (target.getDistanceToEntity(mc.thePlayer) > range.getValue()) target = null;
