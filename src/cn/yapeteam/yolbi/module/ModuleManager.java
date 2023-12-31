@@ -20,9 +20,12 @@ public class ModuleManager {
             Field loadedClasses = ClassLoader.class.getDeclaredField("classes");
             loadedClasses.setAccessible(true);
             Vector<Class<?>> vector = (Vector<Class<?>>) loadedClasses.get(Module.class.getClassLoader());
-            for (Class<?> aClass : vector)
+            //noinspection ForLoopReplaceableByForEach
+            for (int i = 0; i < vector.size(); i++) {
+                Class<?> aClass = vector.get(i);
                 if (aClass.getSuperclass() == Module.class && aClass.getAnnotation(ModuleInfo.class) != null && aClass.getAnnotation(Deprecated.class) == null)
                     registerModule((Class<? extends Module>) aClass);
+            }
         } catch (Throwable e) {
             Logger.exception(e);
         }
