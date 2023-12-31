@@ -1,13 +1,21 @@
 package cn.yapeteam.yolbi.utils;
 
+import cn.yapeteam.yolbi.a_pretoload.Mapper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.util.AxisAlignedBB;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
+import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Map;
 
 import static net.minecraft.client.renderer.GlStateManager.disableBlend;
 import static net.minecraft.client.renderer.GlStateManager.enableTexture2D;
@@ -385,4 +393,276 @@ public class RenderUtil {
         GL11.glVertex2d(left, top);
         GL11.glEnd();
     }
+
+    public static final Field renderPosX, renderPosY, renderPosZ;
+
+    static {
+        try {
+            renderPosX = RenderManager.class.getDeclaredField(Mapper.map("net.minecraft.client.renderer.entity.RenderManager", "renderPosX", null, Mapper.Type.Field));
+            renderPosY = RenderManager.class.getDeclaredField(Mapper.map("net.minecraft.client.renderer.entity.RenderManager", "renderPosY", null, Mapper.Type.Field));
+            renderPosZ = RenderManager.class.getDeclaredField(Mapper.map("net.minecraft.client.renderer.entity.RenderManager", "renderPosZ", null, Mapper.Type.Field));
+            renderPosX.setAccessible(true);
+            renderPosY.setAccessible(true);
+            renderPosZ.setAccessible(true);
+        } catch (NoSuchFieldException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static double getRenderPos(Field field, Object obj) {
+        try {
+            return (double) field.get(obj);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void drawEntityBox(final EntityLivingBase entity, final Color color, final boolean outline, final boolean box, final float outlineWidth, float partialTicks) {
+        final RenderManager renderManager = mc.getRenderManager();
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        enableGlCap(GL_BLEND);
+        disableGlCap(GL_TEXTURE_2D, GL_DEPTH_TEST);
+        glDepthMask(false);
+
+        final double x = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * partialTicks
+                         - getRenderPos(renderPosX, renderManager);
+        final double y = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * partialTicks
+                         - getRenderPos(renderPosY, renderManager);
+        final double z = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * partialTicks
+                         - getRenderPos(renderPosZ, renderManager);
+
+        final AxisAlignedBB entityBox = entity.getEntityBoundingBox();
+        final AxisAlignedBB axisAlignedBB = new AxisAlignedBB(
+                entityBox.minX - entity.posX + x - 0.05D,
+                entityBox.minY - entity.posY + y,
+                entityBox.minZ - entity.posZ + z - 0.05D,
+                entityBox.maxX - entity.posX + x + 0.05D,
+                entityBox.maxY - entity.posY + y + 0.15D,
+                entityBox.maxZ - entity.posZ + z + 0.05D
+        );
+
+        if (outline) {
+            glLineWidth(outlineWidth);
+            enableGlCap(GL_LINE_SMOOTH);
+            glColor(color.getRed(), color.getGreen(), color.getBlue(), box ? 170 : 255);
+            drawSelectionBoundingBox(axisAlignedBB);
+        }
+
+        if (box) {
+            glColor(color.getRed(), color.getGreen(), color.getBlue(), outline ? 26 : 35);
+            drawFilledBox(axisAlignedBB);
+        }
+
+        GlStateManager.resetColor();
+        glDepthMask(true);
+        resetCaps();
+    }
+
+    public static void drawFilledBox(final AxisAlignedBB axisAlignedBB) {
+        final Tessellator tessellator = Tessellator.getInstance();
+        final WorldRenderer worldRenderer = tessellator.getWorldRenderer();
+
+        worldRenderer.begin(7, DefaultVertexFormats.POSITION);
+        worldRenderer.pos(axisAlignedBB.minX, axisAlignedBB.minY, axisAlignedBB.minZ).endVertex();
+        worldRenderer.pos(axisAlignedBB.minX, axisAlignedBB.maxY, axisAlignedBB.minZ).endVertex();
+        worldRenderer.pos(axisAlignedBB.maxX, axisAlignedBB.minY, axisAlignedBB.minZ).endVertex();
+        worldRenderer.pos(axisAlignedBB.maxX, axisAlignedBB.maxY, axisAlignedBB.minZ).endVertex();
+        worldRenderer.pos(axisAlignedBB.maxX, axisAlignedBB.minY, axisAlignedBB.maxZ).endVertex();
+        worldRenderer.pos(axisAlignedBB.maxX, axisAlignedBB.maxY, axisAlignedBB.maxZ).endVertex();
+        worldRenderer.pos(axisAlignedBB.minX, axisAlignedBB.minY, axisAlignedBB.maxZ).endVertex();
+        worldRenderer.pos(axisAlignedBB.minX, axisAlignedBB.maxY, axisAlignedBB.maxZ).endVertex();
+
+        worldRenderer.pos(axisAlignedBB.maxX, axisAlignedBB.maxY, axisAlignedBB.minZ).endVertex();
+        worldRenderer.pos(axisAlignedBB.maxX, axisAlignedBB.minY, axisAlignedBB.minZ).endVertex();
+        worldRenderer.pos(axisAlignedBB.minX, axisAlignedBB.maxY, axisAlignedBB.minZ).endVertex();
+        worldRenderer.pos(axisAlignedBB.minX, axisAlignedBB.minY, axisAlignedBB.minZ).endVertex();
+        worldRenderer.pos(axisAlignedBB.minX, axisAlignedBB.maxY, axisAlignedBB.maxZ).endVertex();
+        worldRenderer.pos(axisAlignedBB.minX, axisAlignedBB.minY, axisAlignedBB.maxZ).endVertex();
+        worldRenderer.pos(axisAlignedBB.maxX, axisAlignedBB.maxY, axisAlignedBB.maxZ).endVertex();
+        worldRenderer.pos(axisAlignedBB.maxX, axisAlignedBB.minY, axisAlignedBB.maxZ).endVertex();
+
+        worldRenderer.pos(axisAlignedBB.minX, axisAlignedBB.maxY, axisAlignedBB.minZ).endVertex();
+        worldRenderer.pos(axisAlignedBB.maxX, axisAlignedBB.maxY, axisAlignedBB.minZ).endVertex();
+        worldRenderer.pos(axisAlignedBB.maxX, axisAlignedBB.maxY, axisAlignedBB.maxZ).endVertex();
+        worldRenderer.pos(axisAlignedBB.minX, axisAlignedBB.maxY, axisAlignedBB.maxZ).endVertex();
+        worldRenderer.pos(axisAlignedBB.minX, axisAlignedBB.maxY, axisAlignedBB.minZ).endVertex();
+        worldRenderer.pos(axisAlignedBB.minX, axisAlignedBB.maxY, axisAlignedBB.maxZ).endVertex();
+        worldRenderer.pos(axisAlignedBB.maxX, axisAlignedBB.maxY, axisAlignedBB.maxZ).endVertex();
+        worldRenderer.pos(axisAlignedBB.maxX, axisAlignedBB.maxY, axisAlignedBB.minZ).endVertex();
+
+        worldRenderer.pos(axisAlignedBB.minX, axisAlignedBB.minY, axisAlignedBB.minZ).endVertex();
+        worldRenderer.pos(axisAlignedBB.maxX, axisAlignedBB.minY, axisAlignedBB.minZ).endVertex();
+        worldRenderer.pos(axisAlignedBB.maxX, axisAlignedBB.minY, axisAlignedBB.maxZ).endVertex();
+        worldRenderer.pos(axisAlignedBB.minX, axisAlignedBB.minY, axisAlignedBB.maxZ).endVertex();
+        worldRenderer.pos(axisAlignedBB.minX, axisAlignedBB.minY, axisAlignedBB.minZ).endVertex();
+        worldRenderer.pos(axisAlignedBB.minX, axisAlignedBB.minY, axisAlignedBB.maxZ).endVertex();
+        worldRenderer.pos(axisAlignedBB.maxX, axisAlignedBB.minY, axisAlignedBB.maxZ).endVertex();
+        worldRenderer.pos(axisAlignedBB.maxX, axisAlignedBB.minY, axisAlignedBB.minZ).endVertex();
+
+        worldRenderer.pos(axisAlignedBB.minX, axisAlignedBB.minY, axisAlignedBB.minZ).endVertex();
+        worldRenderer.pos(axisAlignedBB.minX, axisAlignedBB.maxY, axisAlignedBB.minZ).endVertex();
+        worldRenderer.pos(axisAlignedBB.minX, axisAlignedBB.minY, axisAlignedBB.maxZ).endVertex();
+        worldRenderer.pos(axisAlignedBB.minX, axisAlignedBB.maxY, axisAlignedBB.maxZ).endVertex();
+        worldRenderer.pos(axisAlignedBB.maxX, axisAlignedBB.minY, axisAlignedBB.maxZ).endVertex();
+        worldRenderer.pos(axisAlignedBB.maxX, axisAlignedBB.maxY, axisAlignedBB.maxZ).endVertex();
+        worldRenderer.pos(axisAlignedBB.maxX, axisAlignedBB.minY, axisAlignedBB.minZ).endVertex();
+        worldRenderer.pos(axisAlignedBB.maxX, axisAlignedBB.maxY, axisAlignedBB.minZ).endVertex();
+
+        worldRenderer.pos(axisAlignedBB.minX, axisAlignedBB.maxY, axisAlignedBB.maxZ).endVertex();
+        worldRenderer.pos(axisAlignedBB.minX, axisAlignedBB.minY, axisAlignedBB.maxZ).endVertex();
+        worldRenderer.pos(axisAlignedBB.minX, axisAlignedBB.maxY, axisAlignedBB.minZ).endVertex();
+        worldRenderer.pos(axisAlignedBB.minX, axisAlignedBB.minY, axisAlignedBB.minZ).endVertex();
+        worldRenderer.pos(axisAlignedBB.maxX, axisAlignedBB.maxY, axisAlignedBB.minZ).endVertex();
+        worldRenderer.pos(axisAlignedBB.maxX, axisAlignedBB.minY, axisAlignedBB.minZ).endVertex();
+        worldRenderer.pos(axisAlignedBB.maxX, axisAlignedBB.maxY, axisAlignedBB.maxZ).endVertex();
+        worldRenderer.pos(axisAlignedBB.maxX, axisAlignedBB.minY, axisAlignedBB.maxZ).endVertex();
+        tessellator.draw();
+    }
+
+    public static void drawSelectionBoundingBox(AxisAlignedBB boundingBox) {
+        Tessellator tessellator = Tessellator.getInstance();
+        WorldRenderer worldrenderer = tessellator.getWorldRenderer();
+
+        worldrenderer.begin(GL_LINE_STRIP, DefaultVertexFormats.POSITION);
+
+        // Lower Rectangle
+        worldrenderer.pos(boundingBox.minX, boundingBox.minY, boundingBox.minZ).endVertex();
+        worldrenderer.pos(boundingBox.minX, boundingBox.minY, boundingBox.maxZ).endVertex();
+        worldrenderer.pos(boundingBox.maxX, boundingBox.minY, boundingBox.maxZ).endVertex();
+        worldrenderer.pos(boundingBox.maxX, boundingBox.minY, boundingBox.minZ).endVertex();
+        worldrenderer.pos(boundingBox.minX, boundingBox.minY, boundingBox.minZ).endVertex();
+
+        // Upper Rectangle
+        worldrenderer.pos(boundingBox.minX, boundingBox.maxY, boundingBox.minZ).endVertex();
+        worldrenderer.pos(boundingBox.minX, boundingBox.maxY, boundingBox.maxZ).endVertex();
+        worldrenderer.pos(boundingBox.maxX, boundingBox.maxY, boundingBox.maxZ).endVertex();
+        worldrenderer.pos(boundingBox.maxX, boundingBox.maxY, boundingBox.minZ).endVertex();
+        worldrenderer.pos(boundingBox.minX, boundingBox.maxY, boundingBox.minZ).endVertex();
+
+        // Upper Rectangle
+        worldrenderer.pos(boundingBox.minX, boundingBox.maxY, boundingBox.maxZ).endVertex();
+        worldrenderer.pos(boundingBox.minX, boundingBox.minY, boundingBox.maxZ).endVertex();
+
+        worldrenderer.pos(boundingBox.maxX, boundingBox.minY, boundingBox.maxZ).endVertex();
+        worldrenderer.pos(boundingBox.maxX, boundingBox.maxY, boundingBox.maxZ).endVertex();
+
+        worldrenderer.pos(boundingBox.maxX, boundingBox.maxY, boundingBox.minZ).endVertex();
+        worldrenderer.pos(boundingBox.maxX, boundingBox.minY, boundingBox.minZ).endVertex();
+
+        tessellator.draw();
+    }
+
+    public static void resetCaps(final String scale) {
+        if (!glCapMap.containsKey(scale)) {
+            return;
+        }
+        Map<Integer, Boolean> map = glCapMap.get(scale);
+        map.forEach(RenderUtil::setGlState);
+        map.clear();
+    }
+
+    public static void resetCaps() {
+        resetCaps("COMMON");
+    }
+
+    public static void enableGlCap(final int cap, final String scale) {
+        setGlCap(cap, true, scale);
+    }
+
+    public static void enableGlCap(final int cap) {
+        enableGlCap(cap, "COMMON");
+    }
+
+    public static void disableGlCap(final int cap, final String scale) {
+        setGlCap(cap, false, scale);
+    }
+
+    public static void disableGlCap(final int cap) {
+        disableGlCap(cap, "COMMON");
+    }
+
+
+    public static void enableGlCap(final int... caps) {
+        for (int cap : caps) {
+            setGlCap(cap, true, "COMMON");
+        }
+    }
+
+    public static void disableGlCap(final int... caps) {
+        for (int cap : caps) {
+            setGlCap(cap, false, "COMMON");
+        }
+    }
+
+    private static final Map<String, Map<Integer, Boolean>> glCapMap = new HashMap<>();
+
+    public static void setGlCap(final int cap, final boolean state, final String scale) {
+        if (!glCapMap.containsKey(scale)) {
+            glCapMap.put(scale, new HashMap<>());
+        }
+        glCapMap.get(scale).put(cap, glGetBoolean(cap));
+        setGlState(cap, state);
+    }
+
+    public static void setGlCap(final int cap, final boolean state) {
+        setGlCap(cap, state, "COMMON");
+    }
+
+    public static void setGlState(final int cap, final boolean state) {
+        if (state)
+            glEnable(cap);
+        else
+            glDisable(cap);
+    }
+
+    public static void glColor(final int red, final int green, final int blue, final int alpha) {
+        GlStateManager.color(red / 255F, green / 255F, blue / 255F, alpha / 255F);
+    }
+
+    public static void glColor(final Color color) {
+        final float red = color.getRed() / 255F;
+        final float green = color.getGreen() / 255F;
+        final float blue = color.getBlue() / 255F;
+        final float alpha = color.getAlpha() / 255F;
+
+        GlStateManager.color(red, green, blue, alpha);
+    }
+
+    public static void glColor(final Color color, final int alpha) {
+        glColor(color, alpha / 255F);
+    }
+
+    public static void glColor(final Color color, final float alpha) {
+        final float red = color.getRed() / 255F;
+        final float green = color.getGreen() / 255F;
+        final float blue = color.getBlue() / 255F;
+
+        GlStateManager.color(red, green, blue, alpha);
+    }
+
+    public static void glColor(final int hex) {
+        final float alpha = (hex >> 24 & 0xFF) / 255F;
+        final float red = (hex >> 16 & 0xFF) / 255F;
+        final float green = (hex >> 8 & 0xFF) / 255F;
+        final float blue = (hex & 0xFF) / 255F;
+
+        GlStateManager.color(red, green, blue, alpha);
+    }
+
+    public static void glColor(final int hex, final int alpha) {
+        final float red = (hex >> 16 & 0xFF) / 255F;
+        final float green = (hex >> 8 & 0xFF) / 255F;
+        final float blue = (hex & 0xFF) / 255F;
+
+        GlStateManager.color(red, green, blue, alpha / 255F);
+    }
+
+    public static void glColor(final int hex, final float alpha) {
+        final float red = (hex >> 16 & 0xFF) / 255F;
+        final float green = (hex >> 8 & 0xFF) / 255F;
+        final float blue = (hex & 0xFF) / 255F;
+
+        GlStateManager.color(red, green, blue, alpha);
+    }
+
 }

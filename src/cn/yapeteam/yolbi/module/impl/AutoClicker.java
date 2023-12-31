@@ -19,7 +19,7 @@ import java.util.Random;
 
 @ModuleInfo(name = "AutoClicker", category = ModuleCategory.COMBAT, key = Keyboard.KEY_F)
 public class AutoClicker extends Module {
-    private final NumberValue<Integer> min = new NumberValue<>("mix", 10, 0, 100, 1);
+    private final NumberValue<Integer> min = new NumberValue<>("min", 10, 0, 100, 1);
     private final NumberValue<Integer> max = new NumberValue<>("max", 10, 0, 100, 1);
 
     public AutoClicker() {
@@ -44,7 +44,7 @@ public class AutoClicker extends Module {
 
     @Listener
     private void onUpdate(EventUpdate e) {
-        if (!Mouse.isButtonDown(0)) return;
+        if (!Mouse.isButtonDown(0) || mc.currentScreen != null) return;
         if (System.currentTimeMillis() - tim >= (1000 / delay)) {
             delay = random(min.getValue(), max.getValue());
             tim = System.currentTimeMillis();
@@ -65,5 +65,10 @@ public class AutoClicker extends Module {
         int mi = Integer.parseInt(String.valueOf(minCPS).replace(".", "/").split("/")[0]), ma = Integer.parseInt(String.valueOf(maxCPS).replace(".", "/").split("/")[0]);
         if (maxCPS - minCPS <= 0) return mi;
         return new Random((long) (Math.random() * 1000)).nextInt((ma - mi)) + mi;
+    }
+
+    @Override
+    public String getSuffix() {
+        return min.getValue() + "~" + max.getValue() + ":" + delay;
     }
 }

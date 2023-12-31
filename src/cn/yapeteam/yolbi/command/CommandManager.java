@@ -2,6 +2,7 @@ package cn.yapeteam.yolbi.command;
 
 import cn.yapeteam.yolbi.command.impl.CommandBind;
 import cn.yapeteam.yolbi.command.impl.CommandToggle;
+import cn.yapeteam.yolbi.command.impl.CommandValue;
 import cn.yapeteam.yolbi.event.Listener;
 import cn.yapeteam.yolbi.event.impl.player.EventChat;
 import lombok.Getter;
@@ -16,6 +17,7 @@ public class CommandManager {
     public CommandManager() {
         commands.add(new CommandToggle());
         commands.add(new CommandBind());
+        commands.add(new CommandValue());
     }
 
     @Listener

@@ -2,11 +2,15 @@ package cn.yapeteam.yolbi.a_pretoload;
 
 import cn.yapeteam.yolbi.a_pretoload.logger.Logger;
 import cn.yapeteam.yolbi.a_pretoload.mixin.annotations.Super;
+import cn.yapeteam.yolbi.a_pretoload.mixin.utils.DescParser;
 import cn.yapeteam.yolbi.a_pretoload.utils.ASMUtils;
+import org.objectweb.asm.Handle;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
 
+import java.io.File;
 import java.lang.reflect.Method;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -14,6 +18,15 @@ import java.util.regex.Pattern;
 
 @SuppressWarnings("unused")
 public class ClassMappingLoader {
+    public static void main(String[] args) throws Throwable {
+        Mapper.setMode(Mapper.Mode.Vanilla);
+        ResourceManager.add("joined.srg", Files.readAllBytes(new File("resources/joined.srg").toPath()));
+        ResourceManager.add("fields.csv", Files.readAllBytes(new File("resources/fields.csv").toPath()));
+        ResourceManager.add("methods.csv", Files.readAllBytes(new File("resources/methods.csv").toPath()));
+        Mapper.readMappings();
+        loadClass(Files.readAllBytes(new File("cn.yapeteam.yolbi.module.impl.KillAura").toPath()));
+    }
+
     public static void loadClass(byte[] bytes) throws Throwable {
         ClassNode node = ASMUtils.node(bytes);
         node.superName = Mapper.getObfClass(node.superName);
@@ -107,6 +120,19 @@ public class ClassMappingLoader {
                     Type type = (Type) ldcInsnNode.cst;
                     String name = type.getClassName();
                     ldcInsnNode.cst = Type.getType("L" + type.getClassName().replace(name, Mapper.getObfClass(name)).replace('.', '/') + ";");
+                }
+            } else if (instruction instanceof InvokeDynamicInsnNode) {
+                InvokeDynamicInsnNode invokeDynamicInsnNode = (InvokeDynamicInsnNode) instruction;
+                for (int i = 0; i < invokeDynamicInsnNode.bsmArgs.length; i++) {
+                    Object bsmArg = invokeDynamicInsnNode.bsmArgs[i];
+                    if (bsmArg instanceof Handle) {
+                        Handle handle = (Handle) bsmArg;
+                        invokeDynamicInsnNode.bsmArgs[i] = new Handle(handle.getTag(), handle.getOwner(), handle.getName(), DescParser.mapDesc(handle.getDesc()), handle.isInterface());
+                    } else if (bsmArg instanceof Type) {
+                        Type type = (Type) bsmArg;
+                        String desc = type.toString();
+                        invokeDynamicInsnNode.bsmArgs[i] = Type.getType(DescParser.mapDesc(desc));
+                    }
                 }
             }
         }
