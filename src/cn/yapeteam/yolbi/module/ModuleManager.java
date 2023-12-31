@@ -36,7 +36,6 @@ public class ModuleManager {
 
     @Listener
     private void onKey(EventKey e) {
-        System.out.println(e.getKey());
         modules.stream().filter(m -> m.getKey() == e.getKey()).collect(Collectors.toList()).forEach(Module::toggle);
     }
 
