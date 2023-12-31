@@ -2,6 +2,7 @@ package cn.yapeteam.yolbi;
 
 import cn.yapeteam.yolbi.command.CommandManager;
 import cn.yapeteam.yolbi.event.EventManager;
+import cn.yapeteam.yolbi.font.FontManager;
 import cn.yapeteam.yolbi.module.ModuleManager;
 import lombok.Getter;
 
@@ -13,11 +14,13 @@ public class YolBi {
     private final EventManager eventManager;
     private final CommandManager commandManager;
     private final ModuleManager moduleManager;
+    private final FontManager fontManager;
 
     private YolBi() {
         eventManager = new EventManager();
         commandManager = new CommandManager();
         moduleManager = new ModuleManager();
+        fontManager = new FontManager();
         eventManager.register(commandManager);
         eventManager.register(moduleManager);
     }

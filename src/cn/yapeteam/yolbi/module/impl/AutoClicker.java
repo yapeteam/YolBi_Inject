@@ -17,12 +17,12 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Random;
 
-@ModuleInfo(name = "Clicker", category = ModuleCategory.COMBAT, key = Keyboard.KEY_F)
-public class Clicker extends Module {
+@ModuleInfo(name = "AutoClicker", category = ModuleCategory.COMBAT, key = Keyboard.KEY_F)
+public class AutoClicker extends Module {
     private final NumberValue<Integer> min = new NumberValue<>("mix", 10, 0, 100, 1);
     private final NumberValue<Integer> max = new NumberValue<>("max", 10, 0, 100, 1);
 
-    public Clicker() {
+    public AutoClicker() {
         addValues(min, max);
         try {
             clickMouse = Minecraft.class.getDeclaredMethod(Mapper.map("net/minecraft/client/Minecraft", "clickMouse", "()V", Mapper.Type.Method));
