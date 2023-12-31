@@ -79,8 +79,8 @@ public class KillAura extends Module {
         if (target != null && target.getDistanceToEntity(mc.thePlayer) <= range.getValue()) {
             if (System.currentTimeMillis() - rotationTimer >= 200)
                 rotate = getNeededRotations(target);
-            ((Entity) mc.thePlayer).rotationYaw += (float) ((rotate[0] - ((Entity) mc.thePlayer).rotationYaw) / 2f + (newRandom().nextInt(10) - 5) / 20f);
-            ((Entity) mc.thePlayer).rotationPitch += (float) ((rotate[1] - ((Entity) mc.thePlayer).rotationPitch) / 2f + (newRandom().nextInt(10) - 5) / 20f);
+            ((Entity) mc.thePlayer).rotationYaw += (float) (rotate[0] - ((Entity) mc.thePlayer).rotationYaw) / 1.1f;
+            ((Entity) mc.thePlayer).rotationPitch += (float) (rotate[1] - ((Entity) mc.thePlayer).rotationPitch) / 1.1f;
             if (System.currentTimeMillis() - tim >= (1000 / delay)) {
                 delay = random(min.getValue(), max.getValue());
                 tim = System.currentTimeMillis();
