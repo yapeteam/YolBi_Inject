@@ -170,7 +170,7 @@ public class Mapper {
                 java.util.Map.Entry<String, Map> entry = owners.entrySet().stream().filter(m ->
                                 map(null, m.getKey(), null, Type.Class).equals(finalTheClass.getName().replace('.', '/')))
                         .findFirst().orElse(null);
-                if (entry != null) return entry.getValue().obf;
+                if (entry != null) return applyMode(entry.getValue());
                 theClass = theClass.getSuperclass();
             }
         }
