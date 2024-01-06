@@ -5,14 +5,16 @@ import cn.yapeteam.yolbi.a_pretoload.utils.ClassUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import net.minecraft.entity.EntityLivingBase;
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.tree.ClassNode;
 
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Objects;
 
 public class Mapper {
     @Getter
@@ -118,36 +120,6 @@ public class Mapper {
         return name;
     }
 
-    public static String mapMethodMultiOwners(String[] owners, String name, String desc) {
-        for (String owner : owners) {
-            String mapped = map(owner, name, desc, Type.Method);
-            if (!mapped.equals(name)) return mapped;
-        }
-        return name;
-    }
-
-    public static String mapFieldMultiOwners(String[] owners, String name, String desc) {
-        for (String owner : owners) {
-            String mapped = map(owner, name, desc, Type.Field);
-            if (!mapped.equals(name)) return mapped;
-        }
-        return name;
-    }
-
-    public static String[] getMethodOwners(String name, String desc) {
-        List<Map> maps = mappings.stream().filter(map -> map.type == Type.Method && map.name.equals(name) && map.desc.equals(desc)).collect(Collectors.toList());
-        List<String> owners = new ArrayList<>();
-        for (Map map : maps) owners.add(map.owner);
-        return owners.toArray(new String[0]);
-    }
-
-    public static String[] getFieldOwners(String name, String desc) {
-        List<Map> maps = mappings.stream().filter(map -> map.type == Type.Field && map.name.equals(name) && map.desc.equals(desc)).collect(Collectors.toList());
-        List<String> owners = new ArrayList<>();
-        for (Map map : maps) owners.add(map.owner);
-        return owners.toArray(new String[0]);
-    }
-
     public static Mode guessMappingMode() throws Throwable {
         byte[] bytes = ClassUtils.getClassBytes("net.minecraft.client.Minecraft");
         if (bytes == null) return Mode.Vanilla;
@@ -157,34 +129,56 @@ public class Mapper {
         return Mode.Searge;
     }
 
-    public static String mapMethodWithSuper(String owner, String name, String desc) throws Throwable {
-        ClassNode node = ASMUtils.node(ClassUtils.getClassBytes(Mapper.getObfClass(owner)));
-        if (node == null) {
-            return map(owner, name, desc, Type.Method);
+    public static byte[] readStream(InputStream inStream) throws Exception {
+        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+        byte[] buffer = new byte[1024];
+        int len;
+        while ((len = inStream.read(buffer)) != -1) {
+            outStream.write(buffer, 0, len);
         }
-        String superName = node.superName;
-        for (String methodOwner : Mapper.getMethodOwners(name, desc)) {
-            if (Mapper.getObfClass(methodOwner).equals(superName)) {
-                superName = methodOwner;
-                break;
-            }
-        }
-        return Mapper.mapMethodMultiOwners(new String[]{owner, superName}, name, desc);
+        outStream.close();
+        inStream.close();
+        return outStream.toByteArray();
     }
 
-    public static String mapFieldWithSuper(String owner, String name, String desc) throws Throwable {
-        ClassNode node = ASMUtils.node(ClassUtils.getClassBytes(Mapper.getObfClass(owner)));
-        if (node == null) {
-            return map(owner, name, desc, Type.Field);
-        }
-        String superName = node.superName;
-        for (String methodOwner : Mapper.getFieldOwners(name, desc)) {
-            if (Mapper.getObfClass(methodOwner).equals(superName)) {
-                superName = methodOwner;
-                break;
+    public static void main(String[] args) throws Throwable {
+        ResourceManager.resources.put("joined.srg", readStream(Objects.requireNonNull(Mapper.class.getResourceAsStream("/joined.srg"))));
+        ResourceManager.resources.put("fields.csv", readStream(Objects.requireNonNull(Mapper.class.getResourceAsStream("/fields.csv"))));
+        ResourceManager.resources.put("methods.csv", readStream(Objects.requireNonNull(Mapper.class.getResourceAsStream("/methods.csv"))));
+        readMappings();
+        setMode(Mode.Vanilla);
+        System.out.println(mapFieldWithSuper(EntityLivingBase.class.getName(), "posX", null));
+    }
+
+    public static String mapWithSuper(String owner, String name, String desc, Type type) {
+        owner = owner.replace('.', '/');
+        name = name.replace('.', '/');
+        String finalName = name;
+        java.util.Map<String, Map> owners = new HashMap<>();
+        mappings.stream().filter(m ->
+                m.type == type && m.name.equals(finalName) && (desc == null || m.desc.equals(desc))
+        ).forEach(m -> owners.put(m.owner, m));
+        String mappedOwner = map(null, owner, null, Type.Class);
+        Class<?> theClass = ClassUtils.getClass(mappedOwner);
+        while (theClass != Object.class) {
+            if (theClass != null) {
+                Class<?> finalTheClass = theClass;
+                java.util.Map.Entry<String, Map> entry = owners.entrySet().stream().filter(m ->
+                                map(null, m.getKey(), null, Type.Class).equals(finalTheClass.getName().replace('.', '/')))
+                        .findFirst().orElse(null);
+                if (entry != null) return entry.getValue().obf;
+                theClass = theClass.getSuperclass();
             }
         }
-        return Mapper.mapFieldMultiOwners(new String[]{owner, superName}, name, desc);
+        return name;
+    }
+
+    public static String mapMethodWithSuper(String owner, String name, String desc) {
+        return mapWithSuper(owner, name, desc, Type.Method);
+    }
+
+    public static String mapFieldWithSuper(String owner, String name, String desc) {
+        return mapWithSuper(owner, name, desc, Type.Field);
     }
 
     public static String getObfClass(String name) {

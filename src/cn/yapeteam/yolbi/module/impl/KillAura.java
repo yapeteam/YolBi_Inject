@@ -14,7 +14,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.MathHelper;
-import net.minecraft.world.World;
 import org.lwjgl.input.Keyboard;
 
 import java.awt.*;
@@ -25,7 +24,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-@SuppressWarnings("RedundantCast")
 @ModuleInfo(name = "KillAura", category = ModuleCategory.COMBAT, key = Keyboard.KEY_R)
 public class KillAura extends Module {
     public KillAura() {
@@ -52,8 +50,8 @@ public class KillAura extends Module {
         tim = System.currentTimeMillis();
         rotationTimer = System.currentTimeMillis();
         rotate = new double[2];
-        rotate[0] = ((Entity) mc.thePlayer).rotationYaw;
-        rotate[1] = ((Entity) mc.thePlayer).rotationPitch;
+        rotate[0] = mc.thePlayer.rotationYaw;
+        rotate[1] = mc.thePlayer.rotationPitch;
     }
 
     @Override
@@ -83,15 +81,15 @@ public class KillAura extends Module {
                 rotate[0] += (newRandom().nextInt(10) - 5) / 2f;
                 rotate[1] += (newRandom().nextInt(10) - 5) / 2f;
             }
-            ((Entity) mc.thePlayer).rotationYaw += (float) (rotate[0] - ((Entity) mc.thePlayer).rotationYaw) / 1.2f;
-            ((Entity) mc.thePlayer).rotationPitch += (float) (rotate[1] - ((Entity) mc.thePlayer).rotationPitch) / 1.2f;
+            mc.thePlayer.rotationYaw += (float) (rotate[0] - mc.thePlayer.rotationYaw) / 1.2f;
+            mc.thePlayer.rotationPitch += (float) (rotate[1] - mc.thePlayer.rotationPitch) / 1.2f;
             if (System.currentTimeMillis() - tim >= (1000 / delay)) {
                 delay = random(min.getValue(), max.getValue());
                 tim = System.currentTimeMillis();
                 clickMouse.invoke(mc);
             }
         } else if (target == null) {
-            List<Entity> entityList = new ArrayList<>(((World) mc.theWorld).loadedEntityList);
+            List<Entity> entityList = new ArrayList<>(mc.theWorld.loadedEntityList);
             entityList = entityList.stream().filter(entity -> entity != mc.thePlayer && entity instanceof EntityLivingBase && entity.getDistanceToEntity(mc.thePlayer) <= range.getValue()).sorted(Comparator.comparingInt(entity -> (int) entity.getDistanceToEntity(mc.thePlayer))).collect(Collectors.toList());
             if (!entityList.isEmpty()) target = entityList.get(0);
         } else if (target.getDistanceToEntity(mc.thePlayer) > range.getValue()) target = null;
@@ -105,9 +103,9 @@ public class KillAura extends Module {
     }
 
     public double[] getNeededRotations(Entity entityIn) {
-        double d0 = entityIn.posX - ((Entity) mc.thePlayer).posX;
-        double d1 = entityIn.posZ - ((Entity) mc.thePlayer).posZ;
-        double d2 = entityIn.posY + entityIn.getEyeHeight() - (((Entity) mc.thePlayer).getEntityBoundingBox().minY + ((Entity) mc.thePlayer).getEyeHeight());
+        double d0 = entityIn.posX - mc.thePlayer.posX;
+        double d1 = entityIn.posZ - mc.thePlayer.posZ;
+        double d2 = entityIn.posY + entityIn.getEyeHeight() - (mc.thePlayer.getEntityBoundingBox().minY + ((Entity) mc.thePlayer).getEyeHeight());
         double d3 = MathHelper.sqrt_double(d0 * d0 + d1 * d1);
         double f = (MathHelper.atan2(d1, d0) * 180.0 / Math.PI) - 90.0f;
         double f1 = (-(MathHelper.atan2(d2, d3) * 180.0 / Math.PI));

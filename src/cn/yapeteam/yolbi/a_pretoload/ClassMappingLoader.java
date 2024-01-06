@@ -86,7 +86,7 @@ public class ClassMappingLoader {
         if (source.visibleAnnotations != null) {
             for (AnnotationNode visibleAnnotation : source.visibleAnnotations) {
                 if (visibleAnnotation.desc.substring(1, visibleAnnotation.desc.length() - 1).equals(ASMUtils.slash(Super.class.getName()))) {
-                    source.name = Mapper.map(parent.superName, source.name, null, Mapper.Type.Method);
+                    source.name = Mapper.mapWithSuper(parent.superName, source.name, null, Mapper.Type.Method);
                     break;
                 }
             }

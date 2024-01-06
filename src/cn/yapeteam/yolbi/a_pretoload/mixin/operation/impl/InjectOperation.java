@@ -48,7 +48,7 @@ public class InjectOperation implements Operation {
     }
 
     private static MethodNode findTargetMethod(List<MethodNode> list, String owner, String name, String desc) {
-        name = Mapper.map(owner, name, desc, Mapper.Type.Method);
+        name = Mapper.mapWithSuper(owner, name, desc, Mapper.Type.Method);
         desc = DescParser.mapDesc(desc);
         String finalName = name;
         String finalDesc = desc;
@@ -172,7 +172,7 @@ public class InjectOperation implements Operation {
             if (info == null) continue;
             MethodNode targetMethod = findTargetMethod(target.methods, mixin.getTargetName(), info.method(), info.desc());
             if (targetMethod == null) {
-                Logger.error("No method found: {} in {}", Mapper.map(mixin.getTargetName(), info.method(), info.desc(), Mapper.Type.Method) + DescParser.mapDesc(info.desc()), target.name);
+                Logger.error("No method found: {} in {}", Mapper.mapWithSuper(mixin.getTargetName(), info.method(), info.desc(), Mapper.Type.Method) + DescParser.mapDesc(info.desc()), target.name);
                 return;
             }
             processReturnLabel(injection, info);
