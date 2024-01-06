@@ -17,7 +17,6 @@ import java.util.HashMap;
 import java.util.Objects;
 
 public class Mapper {
-    @Getter
     @AllArgsConstructor
     public static class Map {
         private final String owner, name, desc, obf;
@@ -102,22 +101,12 @@ public class Mapper {
      * @return ObfName
      */
     public static String map(@Nullable String owner, String name, @Nullable String desc, Type type) {
-        switch (mode) {
-            case Vanilla:
-                return mappings.stream().filter(m ->
-                        (m.type == type) &&
-                        (type == Type.Class || owner == null || m.owner.equals(owner.replace('.', '/'))) &&
-                        (m.name.equals(name.replace('.', '/'))) &&
-                        (type == Type.Class || desc == null || m.desc.equals(desc))
-                ).findFirst().orElse(new Map(null, null, null, name, null)).obf;
-            case None:
-                return name;
-            case Searge:
-                if (type == Type.Class)
-                    return name;
-                return searges.get(name);
-        }
-        return name;
+        return applyMode(mappings.stream().filter(m ->
+                (m.type == type) &&
+                (type == Type.Class || owner == null || m.owner.equals(owner.replace('.', '/'))) &&
+                (m.name.equals(name.replace('.', '/'))) &&
+                (type == Type.Class || desc == null || m.desc.equals(desc))
+        ).findFirst().orElse(new Map(owner, name, desc, name, type)));
     }
 
     public static Mode guessMappingMode() throws Throwable {
@@ -148,6 +137,20 @@ public class Mapper {
         readMappings();
         setMode(Mode.Vanilla);
         System.out.println(mapFieldWithSuper(EntityLivingBase.class.getName(), "posX", null));
+    }
+
+    public static String applyMode(Map map) {
+        switch (mode) {
+            case Vanilla:
+                return map.obf;
+            case None:
+                return map.name;
+            case Searge:
+                if (map.type == Type.Class)
+                    return map.name;
+                return searges.get(map.name);
+        }
+        return map.name;
     }
 
     public static String mapWithSuper(String owner, String name, String desc, Type type) {
