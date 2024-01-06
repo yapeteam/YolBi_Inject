@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.Objects;
 
 public class Mapper {
+    @Getter
     @AllArgsConstructor
     public static class Map {
         private final String owner, name, desc, obf;
