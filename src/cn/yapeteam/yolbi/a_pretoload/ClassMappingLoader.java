@@ -1,32 +1,29 @@
 package cn.yapeteam.yolbi.a_pretoload;
 
 import cn.yapeteam.yolbi.a_pretoload.logger.Logger;
+import cn.yapeteam.yolbi.a_pretoload.mixin.annotations.Mixin;
+import cn.yapeteam.yolbi.a_pretoload.mixin.annotations.Shadow;
 import cn.yapeteam.yolbi.a_pretoload.mixin.annotations.Super;
 import cn.yapeteam.yolbi.a_pretoload.mixin.utils.DescParser;
 import cn.yapeteam.yolbi.a_pretoload.utils.ASMUtils;
+import lombok.AllArgsConstructor;
 import org.objectweb.asm.Handle;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @SuppressWarnings("unused")
 public class ClassMappingLoader {
-    public static void main(String[] args) throws Throwable {
-        Mapper.setMode(Mapper.Mode.Vanilla);
-        ResourceManager.add("joined.srg", Files.readAllBytes(new File("resources/joined.srg").toPath()));
-        ResourceManager.add("fields.csv", Files.readAllBytes(new File("resources/fields.csv").toPath()));
-        ResourceManager.add("methods.csv", Files.readAllBytes(new File("resources/methods.csv").toPath()));
-        Mapper.readMappings();
-        loadClass(Files.readAllBytes(new File("cn.yapeteam.yolbi.module.impl.KillAura").toPath()));
-    }
-
     public static void loadClass(byte[] bytes) throws Throwable {
         ClassNode node = ASMUtils.node(bytes);
         node.superName = Mapper.getObfClass(node.superName);
@@ -34,11 +31,37 @@ public class ClassMappingLoader {
         for (String anInterface : node.interfaces)
             interfaces.add(Mapper.getObfClass(anInterface));
         node.interfaces = interfaces;
+        ArrayList<Name_Desc> methodShadows = new ArrayList<>();
+        ArrayList<Name_Desc> fieldShadows = new ArrayList<>();
+        String targetName = null;
+        if (node.visibleAnnotations != null) {
+            targetName = ASMUtils.getAnnotationValue(
+                    node.visibleAnnotations.stream()
+                            .filter(a -> a.desc.contains(ASMUtils.slash(Mixin.class.getName())))
+                            .findFirst().orElse(null), "value"
+            );
+            if (targetName != null) {
+                for (MethodNode method : node.methods) {
+                    if (Shadow.Helper.hasAnnotation(method)) {
+                        System.out.println(method.name);
+                        methodShadows.add(new Name_Desc(method.name, method.desc));
+                    }
+                }
+                for (FieldNode field : node.fields) {
+                    if (Shadow.Helper.hasAnnotation(field))
+                        fieldShadows.add(new Name_Desc(field.name, field.desc));
+                }
+                targetName = targetName.replace('.', '/');
+            }
+        }
         for (MethodNode method : node.methods)
-            method(method, node);
+            method(method, node, methodShadows, fieldShadows, targetName);
         for (FieldNode field : node.fields)
             field(field);
         bytes = ASMUtils.rewriteClass(node);
+        //Files.write(new File(node.name.replace('/', '.')).toPath(), bytes);
+        if (node.name.startsWith("cn/yapeteam/yolbi/injections"))
+            ResourceManager.resources.put(node.name.replace('/', '.'), bytes);
         try {
             ClassLoader loader = ClassLoader.getSystemClassLoader();
             Method method = ClassLoader.class.getDeclaredMethod("defineClass", byte[].class, int.class, int.class);
@@ -82,10 +105,37 @@ public class ClassMappingLoader {
         return Mapper.getMappings().stream().anyMatch(m -> m.getType() == Mapper.Type.Class && m.getName().equals(type));
     }
 
-    public static void method(MethodNode source, ClassNode parent) throws Throwable {
+    public static byte[] readStream(InputStream inStream) throws Exception {
+        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+        byte[] buffer = new byte[1024];
+        int len;
+        while ((len = inStream.read(buffer)) != -1) {
+            outStream.write(buffer, 0, len);
+        }
+        outStream.close();
+        inStream.close();
+        return outStream.toByteArray();
+    }
+
+    public static void main(String[] args) throws Throwable {
+        Mapper.setMode(Mapper.Mode.None);
+        ResourceManager.add("joined.srg", Files.readAllBytes(new File("resources/joined.srg").toPath()));
+        ResourceManager.add("fields.csv", Files.readAllBytes(new File("resources/fields.csv").toPath()));
+        ResourceManager.add("methods.csv", Files.readAllBytes(new File("resources/methods.csv").toPath()));
+        Mapper.readMappings();
+        loadClass(readStream(Objects.requireNonNull(ClassMappingLoader.class.getResourceAsStream("/cn/yapeteam/yolbi/injections/MixinEntityPlayerSP.class"))));
+    }
+
+    @AllArgsConstructor
+    public static class Name_Desc {
+        public String name, desc;
+    }
+
+
+    public static void method(MethodNode source, ClassNode parent, ArrayList<Name_Desc> methodShadows, ArrayList<Name_Desc> fieldShadows, String targetName) throws Throwable {
         if (source.visibleAnnotations != null) {
             for (AnnotationNode visibleAnnotation : source.visibleAnnotations) {
-                if (visibleAnnotation.desc.substring(1, visibleAnnotation.desc.length() - 1).equals(ASMUtils.slash(Super.class.getName()))) {
+                if (Super.Helper.isAnnotation(visibleAnnotation)) {
                     source.name = Mapper.mapWithSuper(parent.superName, source.name, null, Mapper.Type.Method);
                     break;
                 }
@@ -96,6 +146,8 @@ public class ClassMappingLoader {
         for (AbstractInsnNode instruction : source.instructions) {
             if (instruction instanceof MethodInsnNode) {
                 MethodInsnNode methodInsnNode = (MethodInsnNode) instruction;
+                if (methodShadows.stream().anyMatch(m -> m.name.equals(methodInsnNode.name) && m.desc.equals(methodInsnNode.desc)))
+                    methodInsnNode.owner = targetName;
                 if (hasType(methodInsnNode.owner)) {
                     methodInsnNode.name = Mapper.mapMethodWithSuper(methodInsnNode.owner, methodInsnNode.name, methodInsnNode.desc);
                     methodInsnNode.owner = Mapper.getObfClass(methodInsnNode.owner);
@@ -108,6 +160,8 @@ public class ClassMappingLoader {
                 typeInsnNode.desc = Mapper.map(null, typeInsnNode.desc, null, Mapper.Type.Class);
             } else if (instruction instanceof FieldInsnNode) {
                 FieldInsnNode fieldInsnNode = (FieldInsnNode) instruction;
+                if (fieldShadows.stream().anyMatch(m -> m.name.equals(fieldInsnNode.name) && m.desc.equals(fieldInsnNode.desc)))
+                    fieldInsnNode.owner = targetName;
                 if (hasType(fieldInsnNode.owner)) {
                     fieldInsnNode.name = Mapper.mapFieldWithSuper(fieldInsnNode.owner, fieldInsnNode.name, fieldInsnNode.desc);
                     fieldInsnNode.owner = Mapper.map(null, fieldInsnNode.owner, null, Mapper.Type.Class);

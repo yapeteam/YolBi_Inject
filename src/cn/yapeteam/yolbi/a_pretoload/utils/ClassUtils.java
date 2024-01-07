@@ -1,5 +1,7 @@
 package cn.yapeteam.yolbi.a_pretoload.utils;
 
+import cn.yapeteam.yolbi.a_pretoload.ResourceManager;
+
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.Instrumentation;
 import java.security.ProtectionDomain;
@@ -35,6 +37,8 @@ public class ClassUtils {
 
     public static byte[] getClassBytes(String name) throws Throwable {
         name = name.replace('/', '.');
+        byte[] bytes = ResourceManager.resources.get(name);
+        if (bytes != null) return bytes;
         if (!classBytes.containsKey(name)) {
             Class<?> theClass = getClass(name);
             if (theClass == null) return null;

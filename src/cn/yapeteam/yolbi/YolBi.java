@@ -4,11 +4,12 @@ import cn.yapeteam.yolbi.command.CommandManager;
 import cn.yapeteam.yolbi.event.EventManager;
 import cn.yapeteam.yolbi.font.FontManager;
 import cn.yapeteam.yolbi.module.ModuleManager;
+import cn.yapeteam.yolbi.module.impl.HeadUpDisplay;
 import lombok.Getter;
 
 @Getter
 public class YolBi {
-    public static final YolBi instance = new YolBi();
+    public static YolBi instance = new YolBi();
     public static final String name = "YolBi Lite";
     public static final String version = "0.1.1";
     private final EventManager eventManager;
@@ -23,5 +24,7 @@ public class YolBi {
         fontManager = new FontManager();
         eventManager.register(commandManager);
         eventManager.register(moduleManager);
+        instance = this;
+        moduleManager.getModule(HeadUpDisplay.class).setEnabled(true);
     }
 }

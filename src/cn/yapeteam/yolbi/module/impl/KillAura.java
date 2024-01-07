@@ -3,6 +3,7 @@ package cn.yapeteam.yolbi.module.impl;
 import cn.yapeteam.yolbi.a_pretoload.Mapper;
 import cn.yapeteam.yolbi.a_pretoload.logger.Logger;
 import cn.yapeteam.yolbi.event.Listener;
+import cn.yapeteam.yolbi.event.impl.player.EventMotion;
 import cn.yapeteam.yolbi.event.impl.player.EventUpdate;
 import cn.yapeteam.yolbi.event.impl.render.EventRender3D;
 import cn.yapeteam.yolbi.module.Module;
@@ -13,6 +14,7 @@ import cn.yapeteam.yolbi.utils.RenderUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.network.play.client.C02PacketUseEntity;
 import net.minecraft.util.MathHelper;
 import org.lwjgl.input.Keyboard;
 
@@ -39,7 +41,7 @@ public class KillAura extends Module {
     private Entity target = null;
     private final NumberValue<Double> range = new NumberValue<>("range", 3d, 1d, 6d, 0.1d);
     private final NumberValue<Integer> min = new NumberValue<>("min", 10, 0, 100, 1);
-    private final NumberValue<Integer> max = new NumberValue<>("max", 10, 0, 100, 1);
+    private final NumberValue<Integer> max = new NumberValue<>("max", 20, 0, 100, 1);
     private Method clickMouse = null;
 
     private long delay = 0, tim = 0;
@@ -52,6 +54,8 @@ public class KillAura extends Module {
         rotate = new double[2];
         rotate[0] = mc.thePlayer.rotationYaw;
         rotate[1] = mc.thePlayer.rotationPitch;
+        yaw = mc.thePlayer.rotationYaw;
+        pitch = mc.thePlayer.rotationPitch;
     }
 
     @Override
@@ -71,9 +75,10 @@ public class KillAura extends Module {
 
     private long rotationTimer;
     private double[] rotate;
+    private double yaw, pitch;
 
     @Listener
-    private void onUpdate(EventUpdate e) throws Throwable {
+    private void onUpdate(EventUpdate e) {
         if (mc.thePlayer == null || mc.theWorld == null) return;
         if (target != null && target.getDistanceToEntity(mc.thePlayer) <= range.getValue()) {
             if (System.currentTimeMillis() - rotationTimer >= 500) {
@@ -81,12 +86,14 @@ public class KillAura extends Module {
                 rotate[0] += (newRandom().nextInt(10) - 5) / 2f;
                 rotate[1] += (newRandom().nextInt(10) - 5) / 2f;
             }
-            mc.thePlayer.rotationYaw += (float) (rotate[0] - mc.thePlayer.rotationYaw) / 1.2f;
-            mc.thePlayer.rotationPitch += (float) (rotate[1] - mc.thePlayer.rotationPitch) / 1.2f;
+            yaw += (float) (rotate[0] - yaw) / 1.2f;
+            pitch += (float) (rotate[1] - pitch) / 1.2f;
             if (System.currentTimeMillis() - tim >= (1000 / delay)) {
                 delay = random(min.getValue(), max.getValue());
                 tim = System.currentTimeMillis();
-                clickMouse.invoke(mc);
+                //clickMouse.invoke(mc);
+                mc.thePlayer.swingItem();
+                mc.getNetHandler().getNetworkManager().sendPacket(new C02PacketUseEntity(target, C02PacketUseEntity.Action.ATTACK));
             }
         } else if (target == null) {
             List<Entity> entityList = new ArrayList<>(mc.theWorld.loadedEntityList);
@@ -94,6 +101,12 @@ public class KillAura extends Module {
             if (!entityList.isEmpty()) target = entityList.get(0);
         } else if (target.getDistanceToEntity(mc.thePlayer) > range.getValue()) target = null;
         if (target != null && (target.isDead || !target.isEntityAlive())) target = null;
+    }
+
+    @Listener
+    private void onMotion(EventMotion e) {
+        e.setYaw((float) yaw);
+        e.setPitch((float) pitch);
     }
 
     @Listener
@@ -110,5 +123,10 @@ public class KillAura extends Module {
         double f = (MathHelper.atan2(d1, d0) * 180.0 / Math.PI) - 90.0f;
         double f1 = (-(MathHelper.atan2(d2, d3) * 180.0 / Math.PI));
         return new double[]{f, f1};
+    }
+
+    @Override
+    public String getSuffix() {
+        return range.getValue() + " | " + min.getValue() + "~" + max.getValue() + " : " + delay;
     }
 }

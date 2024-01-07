@@ -44,17 +44,19 @@ public class Converter {
         File classes = new File("classes");
         File packageDir = new File("out/production/YolBi_Inject/cn");
         File resources = new File("resources");
-        //classes
         ArrayList<Group<String, ArrayList<String>, ArrayList<String>>> classList = new ArrayList<>();
+        ArrayList<Pair<String, ArrayList<String>>> ResourceList = new ArrayList<>();
+        //classes
         FileVisitor<Path> visitor = new SimpleFileVisitor<Path>() {
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                 byte[] bytes = Files.readAllBytes(file);
                 String name = ASMUtils.readClassName(bytes).replace('/', '.');
+                ArrayList<String> hex = convertToHex(new ByteArrayInputStream(bytes));
                 classList.add(new Group<>(
                         name,
                         ClinitParser.parse(new ByteArrayInputStream(bytes), new ArrayList<>()),
-                        convertToHex(new ByteArrayInputStream(bytes))
+                        hex
                 ));
                 System.out.println(name);
                 return FileVisitResult.CONTINUE;
@@ -88,7 +90,6 @@ public class Converter {
         }
         Files.write(classesCpp.toPath(), Collections.singleton(finalStr));
         //resources
-        ArrayList<Pair<String, ArrayList<String>>> ResourceList = new ArrayList<>();
         Files.walkFileTree(resources.toPath(), new SimpleFileVisitor<Path>() {
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
