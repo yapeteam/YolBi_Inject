@@ -26,6 +26,8 @@ public class MixinManager {
         add(MixinEntityPlayerSP.class);
         add(MixinEntityRenderer.class);
         add(MixinPlayerControllerMP.class);
+        add(MixinBlock.class);
+        add(MixinEntityLivingBase.class);
     }
 
     public static byte[] getClassBytes(String name) throws Throwable {

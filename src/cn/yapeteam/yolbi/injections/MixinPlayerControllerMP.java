@@ -25,7 +25,7 @@ public class MixinPlayerControllerMP {
             hasReturn = false,
             target = @Target("HEAD")
             )
-    public void attackEntity(@Local(source="targetEntity",index=2) Entity targetEntity) {
+    public void attackEntity(EntityPlayer playerIn, Entity targetEntity) {
         if (targetEntity != null) {
             EventAttack attackEvent = new EventAttack(targetEntity);
             YolBi.instance.getEventManager().post(attackEvent);

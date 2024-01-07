@@ -4,6 +4,7 @@ import cn.yapeteam.yolbi.YolBi;
 import cn.yapeteam.yolbi.a_pretoload.mixin.annotations.*;
 import cn.yapeteam.yolbi.event.impl.player.EventChat;
 import cn.yapeteam.yolbi.event.impl.player.EventMotion;
+import cn.yapeteam.yolbi.event.impl.player.EventMove;
 import cn.yapeteam.yolbi.event.impl.player.EventUpdate;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -176,4 +177,26 @@ public class MixinEntityPlayerSP extends EntityPlayerSP {
         message = event.getMessage();
         boolean ignored = message.isEmpty();//占位
     }
+
+
+    @Inject(
+            method = "moveEntity",
+            desc = "(DDD)V",
+            hasReturn = true,
+            target = @Target("HEAD")
+    )
+    public void moveEntity(double x, double y, double z) {
+        EventMove event = new EventMove(x, y, z);
+
+        YolBi.instance.getEventManager().post(event);
+
+        if (event.isCancelled()) {
+            super.moveEntity(0, 0, 0);
+        } else {
+            super.moveEntity(event.getX(), event.getY(), event.getZ());
+        }
+    }
+
+
+
 }
