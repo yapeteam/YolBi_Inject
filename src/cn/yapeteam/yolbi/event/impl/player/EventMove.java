@@ -14,6 +14,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
+@Deprecated
 public class EventMove extends CancellableEvent {
 
     private double x, y, z;

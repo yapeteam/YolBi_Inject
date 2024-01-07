@@ -1,4 +1,4 @@
-package cn.yapeteam.yolbi.module.impl;
+package cn.yapeteam.yolbi.module.impl.script;
 
 import cn.yapeteam.yolbi.event.Listener;
 import cn.yapeteam.yolbi.event.impl.player.EventAttack;
@@ -12,7 +12,7 @@ import org.lwjgl.input.Keyboard;
  * @since 2024/1/7 21:06
  * IntelliJ IDEA
  */
-@ModuleInfo(name = "Attacktest", category = ModuleCategory.COMBAT, key = Keyboard.KEY_Z)
+@ModuleInfo(name = "Attacktest", category = ModuleCategory.SCRIPT, key = Keyboard.KEY_Z)
 public class Attacktest extends Module {
     @Listener
     public void attack(EventAttack e) {

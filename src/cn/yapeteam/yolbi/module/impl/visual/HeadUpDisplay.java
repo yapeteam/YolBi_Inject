@@ -1,4 +1,4 @@
-package cn.yapeteam.yolbi.module.impl;
+package cn.yapeteam.yolbi.module.impl.visual;
 
 import cn.yapeteam.yolbi.YolBi;
 import cn.yapeteam.yolbi.event.Listener;

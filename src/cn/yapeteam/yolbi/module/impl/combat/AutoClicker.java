@@ -1,4 +1,4 @@
-package cn.yapeteam.yolbi.module.impl;
+package cn.yapeteam.yolbi.module.impl.combat;
 
 import cn.yapeteam.yolbi.a_pretoload.Mapper;
 import cn.yapeteam.yolbi.a_pretoload.logger.Logger;

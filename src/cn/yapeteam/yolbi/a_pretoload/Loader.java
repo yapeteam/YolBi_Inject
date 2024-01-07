@@ -3,6 +3,10 @@ package cn.yapeteam.yolbi.a_pretoload;
 import cn.yapeteam.yolbi.YolBi;
 import cn.yapeteam.yolbi.a_pretoload.logger.Logger;
 import cn.yapeteam.yolbi.a_pretoload.utils.ClassUtils;
+import cn.yapeteam.yolbi.notification.Notification;
+import cn.yapeteam.yolbi.notification.NotificationType;
+import cn.yapeteam.yolbi.utils.animation.Animation;
+import cn.yapeteam.yolbi.utils.animation.Easing;
 import org.objectweb.asm.Opcodes;
 
 import java.awt.*;
@@ -39,6 +43,13 @@ public class Loader {
             Logger.warn("Start transforming!");
             MixinManager.load(instrumentation);
             Logger.success("Welcome {} ver {}", YolBi.name, YolBi.version);
+            YolBi.instance.getNotificationManager().post(
+                    new Notification(
+                            "Injected successfully",
+                            new Animation(Easing.EASE_IN_OUT_CIRC, 15000L),
+                            NotificationType.INIT
+                    )
+            );
         } catch (Throwable e) {
             Logger.exception(e);
             failed();

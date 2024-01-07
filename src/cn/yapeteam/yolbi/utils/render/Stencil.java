@@ -1,4 +1,4 @@
-package cn.yapeteam.yolbi.utils;
+package cn.yapeteam.yolbi.utils.render;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;

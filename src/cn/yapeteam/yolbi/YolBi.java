@@ -4,7 +4,8 @@ import cn.yapeteam.yolbi.command.CommandManager;
 import cn.yapeteam.yolbi.event.EventManager;
 import cn.yapeteam.yolbi.font.FontManager;
 import cn.yapeteam.yolbi.module.ModuleManager;
-import cn.yapeteam.yolbi.module.impl.HeadUpDisplay;
+import cn.yapeteam.yolbi.module.impl.visual.HeadUpDisplay;
+import cn.yapeteam.yolbi.notification.NotificationManager;
 import lombok.Getter;
 
 @Getter
@@ -16,6 +17,7 @@ public class YolBi {
     private final CommandManager commandManager;
     private final ModuleManager moduleManager;
     private final FontManager fontManager;
+    private final NotificationManager notificationManager;
 
     private YolBi() {
         eventManager = new EventManager();
@@ -26,5 +28,6 @@ public class YolBi {
         eventManager.register(moduleManager);
         instance = this;
         moduleManager.getModule(HeadUpDisplay.class).setEnabled(true);
+        notificationManager = new NotificationManager();
     }
 }

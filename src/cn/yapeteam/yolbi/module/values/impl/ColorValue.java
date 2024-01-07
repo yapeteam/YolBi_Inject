@@ -2,7 +2,7 @@ package cn.yapeteam.yolbi.module.values.impl;
 
 import cn.yapeteam.yolbi.module.values.Value;
 import cn.yapeteam.yolbi.module.values.Visibility;
-import cn.yapeteam.yolbi.utils.RenderUtil;
+import cn.yapeteam.yolbi.utils.render.RenderUtil;
 import lombok.Getter;
 import net.minecraft.client.renderer.GlStateManager;
 import org.lwjgl.input.Mouse;
