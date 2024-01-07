@@ -4,10 +4,7 @@ import cn.yapeteam.yolbi.a_pretoload.logger.Logger;
 import cn.yapeteam.yolbi.a_pretoload.mixin.Transformer;
 import cn.yapeteam.yolbi.a_pretoload.mixin.annotations.Mixin;
 import cn.yapeteam.yolbi.a_pretoload.utils.ClassUtils;
-import cn.yapeteam.yolbi.injections.MixinEntityPlayerSP;
-import cn.yapeteam.yolbi.injections.MixinEntityRenderer;
-import cn.yapeteam.yolbi.injections.MixinGuiIngame;
-import cn.yapeteam.yolbi.injections.MixinMinecraft;
+import cn.yapeteam.yolbi.injections.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -28,6 +25,7 @@ public class MixinManager {
         add(MixinGuiIngame.class);
         add(MixinEntityPlayerSP.class);
         add(MixinEntityRenderer.class);
+        add(MixinPlayerControllerMP.class);
     }
 
     public static byte[] getClassBytes(String name) throws Throwable {
