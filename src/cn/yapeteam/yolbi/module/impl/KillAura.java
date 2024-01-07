@@ -1,7 +1,5 @@
 package cn.yapeteam.yolbi.module.impl;
 
-import cn.yapeteam.yolbi.a_pretoload.Mapper;
-import cn.yapeteam.yolbi.a_pretoload.logger.Logger;
 import cn.yapeteam.yolbi.event.Listener;
 import cn.yapeteam.yolbi.event.impl.player.EventMotion;
 import cn.yapeteam.yolbi.event.impl.player.EventUpdate;
@@ -11,7 +9,6 @@ import cn.yapeteam.yolbi.module.ModuleCategory;
 import cn.yapeteam.yolbi.module.ModuleInfo;
 import cn.yapeteam.yolbi.module.values.impl.NumberValue;
 import cn.yapeteam.yolbi.utils.RenderUtil;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.network.play.client.C02PacketUseEntity;
@@ -19,7 +16,6 @@ import net.minecraft.util.MathHelper;
 import org.lwjgl.input.Keyboard;
 
 import java.awt.*;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -29,12 +25,6 @@ import java.util.stream.Collectors;
 @ModuleInfo(name = "KillAura", category = ModuleCategory.COMBAT, key = Keyboard.KEY_R)
 public class KillAura extends Module {
     public KillAura() {
-        try {
-            clickMouse = Minecraft.class.getDeclaredMethod(Mapper.map("net/minecraft/client/Minecraft", "clickMouse", "()V", Mapper.Type.Method));
-            clickMouse.setAccessible(true);
-        } catch (Throwable e) {
-            Logger.exception(e);
-        }
         addValues(range, min, max);
     }
 
@@ -42,7 +32,6 @@ public class KillAura extends Module {
     private final NumberValue<Double> range = new NumberValue<>("range", 3d, 1d, 6d, 0.1d);
     private final NumberValue<Integer> min = new NumberValue<>("min", 10, 0, 100, 1);
     private final NumberValue<Integer> max = new NumberValue<>("max", 20, 0, 100, 1);
-    private Method clickMouse = null;
 
     private long delay = 0, tim = 0;
 
