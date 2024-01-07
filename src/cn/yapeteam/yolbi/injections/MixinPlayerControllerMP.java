@@ -2,11 +2,12 @@ package cn.yapeteam.yolbi.injections;
 
 import cn.yapeteam.yolbi.YolBi;
 import cn.yapeteam.yolbi.a_pretoload.mixin.annotations.Inject;
+import cn.yapeteam.yolbi.a_pretoload.mixin.annotations.Local;
 import cn.yapeteam.yolbi.a_pretoload.mixin.annotations.Mixin;
 import cn.yapeteam.yolbi.a_pretoload.mixin.annotations.Target;
 import cn.yapeteam.yolbi.event.impl.player.EventAttack;
+import cn.yapeteam.yolbi.event.type.CancellableEvent;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
 
 /**
  * @author yuxiangll
@@ -22,14 +23,9 @@ public class MixinPlayerControllerMP {
             hasReturn = false,
             target = @Target("HEAD")
     )
-    public void attackEntity(EntityPlayer playerIn, Entity targetEntity) {
-        if (targetEntity != null) {
-            EventAttack attackEvent = new EventAttack(targetEntity);
-            YolBi.instance.getEventManager().post(attackEvent);
-            if (attackEvent.isCancelled()) {
-                return;
-            }
-            boolean ignored = false;//占位
-        }
+    public void attackEntity(@Local(source = "targetEntity", index = 2) Entity targetEntity) {
+        if (targetEntity != null && ((CancellableEvent) YolBi.instance.getEventManager().post(new EventAttack(targetEntity))).isCancelled())
+            return;
+        System.currentTimeMillis();
     }
 }

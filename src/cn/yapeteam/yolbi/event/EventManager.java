@@ -49,7 +49,7 @@ public class EventManager {
         listeningMethods.sort(Comparator.comparingInt(m -> m.method.getAnnotation(Listener.class).value()));
     }
 
-    public void post(Event e) {
+    public <E extends Event> E post(Event e) {
         listeningMethods.forEach(m -> Arrays.stream(m.method.getParameters()).filter(p -> p.getType().equals(e.getClass())).forEach(p -> {
             try {
                 m.method.invoke(m.instance, e);
@@ -57,6 +57,7 @@ public class EventManager {
                 throw new RuntimeException(ex);
             }
         }));
+        return (E) e;
     }
 
     private static class ListeningMethod {
