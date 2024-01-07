@@ -5,3 +5,5 @@
 /injector/classes.cpp
 /injector/resources.cpp
 /injector/YolBi_Lite.dll
+/toollib/
+/injector/YolBi_Lite.dylib
