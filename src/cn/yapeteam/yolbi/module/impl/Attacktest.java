@@ -1,7 +1,6 @@
 package cn.yapeteam.yolbi.module.impl;
 
 import cn.yapeteam.yolbi.event.Listener;
-import cn.yapeteam.yolbi.event.impl.player.EventAttack;
 import cn.yapeteam.yolbi.event.impl.player.EventJump;
 import cn.yapeteam.yolbi.module.Module;
 import cn.yapeteam.yolbi.module.ModuleCategory;
@@ -19,6 +18,4 @@ public class Attacktest extends Module {
     public void onJUmp(EventJump eventJump){
         System.out.println("JUMP");
     }
-
-
 }

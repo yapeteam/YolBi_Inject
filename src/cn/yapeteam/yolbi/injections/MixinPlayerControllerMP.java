@@ -2,14 +2,11 @@ package cn.yapeteam.yolbi.injections;
 
 import cn.yapeteam.yolbi.YolBi;
 import cn.yapeteam.yolbi.a_pretoload.mixin.annotations.Inject;
-import cn.yapeteam.yolbi.a_pretoload.mixin.annotations.Local;
 import cn.yapeteam.yolbi.a_pretoload.mixin.annotations.Mixin;
 import cn.yapeteam.yolbi.a_pretoload.mixin.annotations.Target;
 import cn.yapeteam.yolbi.event.impl.player.EventAttack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.network.play.client.C02PacketUseEntity;
-import net.minecraft.world.WorldSettings;
 
 /**
  * @author yuxiangll
@@ -24,7 +21,7 @@ public class MixinPlayerControllerMP {
             desc = "(Lnet/minecraft/entity/player/EntityPlayer;Lnet/minecraft/entity/Entity;)V",
             hasReturn = false,
             target = @Target("HEAD")
-            )
+    )
     public void attackEntity(EntityPlayer playerIn, Entity targetEntity) {
         if (targetEntity != null) {
             EventAttack attackEvent = new EventAttack(targetEntity);
@@ -32,10 +29,7 @@ public class MixinPlayerControllerMP {
             if (attackEvent.isCancelled()) {
                 return;
             }
-            boolean ignored = attackEvent.isCancelled();//占位
-
+            boolean ignored = false;//占位
         }
-
     }
-
 }

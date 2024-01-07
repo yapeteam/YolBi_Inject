@@ -49,5 +49,4 @@ public class MixinBlock {
             list.add(axisalignedbb);
         }
     }
-
 }

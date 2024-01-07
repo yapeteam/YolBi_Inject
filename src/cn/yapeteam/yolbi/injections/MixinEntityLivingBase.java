@@ -81,8 +81,6 @@ public class MixinEntityLivingBase extends EntityLivingBase {
     @Shadow
     public boolean isAirBorne;
 
-
-
     @Inject(
             method = "jump",
             desc = "()V",
@@ -90,13 +88,14 @@ public class MixinEntityLivingBase extends EntityLivingBase {
             target = @Target("HEAD")
     )
     protected void jump() {
-        double jumpY = (double) this.getJumpUpwardsMotion();
+        double jumpY = this.getJumpUpwardsMotion();
 
         if (this.isPotionActive(Potion.jump)) {
-            jumpY += (double) ((float) (this.getActivePotionEffect(Potion.jump).getAmplifier() + 1) * 0.1F);
+            jumpY += (float) (this.getActivePotionEffect(Potion.jump).getAmplifier() + 1) * 0.1F;
         }
 
         EventJump event = new EventJump(jumpY, this.rotationYaw, this.isSprinting());
+        //noinspection ConstantValue
         if ((EntityLivingBase)this == Minecraft.getMinecraft().thePlayer) {
             YolBi.instance.getEventManager().post(event);
         }
@@ -105,8 +104,8 @@ public class MixinEntityLivingBase extends EntityLivingBase {
 
         if (event.isBoosting()) {
             float f = event.getYaw() * 0.017453292F;
-            this.motionX -= (double) (MathHelper.sin(f) * 0.2F);
-            this.motionZ += (double) (MathHelper.cos(f) * 0.2F);
+            this.motionX -= MathHelper.sin(f) * 0.2F;
+            this.motionZ += MathHelper.cos(f) * 0.2F;
         }
 
         this.isAirBorne = true;
