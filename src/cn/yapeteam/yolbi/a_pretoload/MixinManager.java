@@ -52,6 +52,7 @@ public class MixinManager {
     private static final File dir = new File("generatedClasses");
 
     public static void load(Instrumentation instrumentation) throws Throwable {
+        dir.mkdirs();
         Map<String, byte[]> map = transformer.transform();
         for (Class<?> mixin : mixins) {
             String value = mixin.getAnnotation(Mixin.class).value();

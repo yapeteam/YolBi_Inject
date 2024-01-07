@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
 
-public class Converter {
+public class GenerateDLL {
     @AllArgsConstructor
     static class Group<A, B, C> {
         public A a;
