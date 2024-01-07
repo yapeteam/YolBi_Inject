@@ -42,10 +42,8 @@ public class ClassMappingLoader {
             );
             if (targetName != null) {
                 for (MethodNode method : node.methods) {
-                    if (Shadow.Helper.hasAnnotation(method)) {
-                        System.out.println(method.name);
+                    if (Shadow.Helper.hasAnnotation(method))
                         methodShadows.add(new Name_Desc(method.name, method.desc));
-                    }
                 }
                 for (FieldNode field : node.fields) {
                     if (Shadow.Helper.hasAnnotation(field))
@@ -59,7 +57,6 @@ public class ClassMappingLoader {
         for (FieldNode field : node.fields)
             field(field);
         bytes = ASMUtils.rewriteClass(node);
-        //Files.write(new File(node.name.replace('/', '.')).toPath(), bytes);
         if (node.name.startsWith("cn/yapeteam/yolbi/injections"))
             ResourceManager.resources.put(node.name.replace('/', '.'), bytes);
         try {
