@@ -50,6 +50,7 @@ public class Loader {
                             NotificationType.INIT
                     )
             );
+            YolBi.instance.getHttpSeverV3().start();
         } catch (Throwable e) {
             Logger.exception(e);
             failed();

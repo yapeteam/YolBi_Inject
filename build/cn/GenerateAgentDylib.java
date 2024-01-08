@@ -84,7 +84,7 @@ public class GenerateAgentDylib {
                         ClinitParser.parse(new ByteArrayInputStream(bytes), new ArrayList<>()),
                         convertToHex(new ByteArrayInputStream(bytes))
                 ));
-                //System.out.println(name);
+                System.out.println(name);
                 return FileVisitResult.CONTINUE;
             }
         };
