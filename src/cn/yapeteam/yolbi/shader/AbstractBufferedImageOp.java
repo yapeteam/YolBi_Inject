@@ -24,12 +24,7 @@ public abstract class AbstractBufferedImageOp implements BufferedImageOp, Clonea
 
 
     public Point2D getPoint2D(Point2D srcPt, Point2D dstPt) {
-        if (dstPt == null) {
-            dstPt = new Point2D.Double();
-        }
-
-        dstPt.setLocation(srcPt.getX(), srcPt.getY());
-        return dstPt;
+        return null;
     }
 
 
