@@ -220,7 +220,7 @@ DWORD WINAPI Inject(LPVOID parm)
         return 0;
     if (JNI_GetCreatedJavaVMs(&jvm, 1, NULL) != JNI_OK || (*jvm)->AttachCurrentThread(jvm, (void **)&jniEnv, NULL) != JNI_OK)
         return 0;
-    (*jvm)->GetEnv(jvm, (void **)&jvmti, JVMTI_VERSION_1_2);
+    (*jvm)->GetEnv(jvm, (void **)&jvmti, JVMTI_VERSION);
     if (!jvmti)
         return 0;
     jclass threadClass = (*jniEnv)->FindClass(jniEnv, "java/lang/Thread");
