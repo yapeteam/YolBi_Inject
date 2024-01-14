@@ -1,7 +1,7 @@
 package cn.yapeteam.yolbi.module.impl.combat;
 
-import cn.yapeteam.yolbi.a_pretoload.Mapper;
-import cn.yapeteam.yolbi.a_pretoload.logger.Logger;
+import cn.yapeteam.loader.Mapper;
+import cn.yapeteam.loader.logger.Logger;
 import cn.yapeteam.yolbi.event.Listener;
 import cn.yapeteam.yolbi.event.impl.player.EventUpdate;
 import cn.yapeteam.yolbi.module.Module;

@@ -1,6 +1,6 @@
 package cn.yapeteam.yolbi.font.cfont;
 
-import cn.yapeteam.yolbi.a_pretoload.logger.Logger;
+import cn.yapeteam.yolbi.logger.Logger;
 import lombok.Getter;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import org.lwjgl.opengl.GL11;

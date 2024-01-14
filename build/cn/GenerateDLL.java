@@ -1,6 +1,6 @@
 package cn;
 
-import cn.yapeteam.yolbi.a_pretoload.utils.ASMUtils;
+import cn.yapeteam.loader.utils.ASMUtils;
 import lombok.AllArgsConstructor;
 
 import java.io.*;

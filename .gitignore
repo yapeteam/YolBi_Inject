@@ -2,6 +2,7 @@
 /out/
 /.idea/
 /YolBi_Inject.iml
+/YolBi_Loader/YolBi_Loader.iml
 /injector/classes.cpp
 /injector/resources.cpp
 /injector/YolBi_Lite.dll

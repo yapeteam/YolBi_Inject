@@ -1,34 +1,44 @@
 package cn.yapeteam.yolbi.module;
 
-import cn.yapeteam.yolbi.a_pretoload.logger.Logger;
 import cn.yapeteam.yolbi.event.Listener;
 import cn.yapeteam.yolbi.event.impl.game.EventKey;
+import cn.yapeteam.yolbi.logger.Logger;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.reflect.Field;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 @Getter
 @SuppressWarnings("unchecked")
 public class ModuleManager {
     private final List<Module> modules = new ArrayList<>();
 
-    public ModuleManager() {
-        try {
-            Field loadedClasses = ClassLoader.class.getDeclaredField("classes");
-            loadedClasses.setAccessible(true);
-            Vector<Class<?>> vector = (Vector<Class<?>>) loadedClasses.get(Module.class.getClassLoader());
-            //noinspection ForLoopReplaceableByForEach
-            for (int i = 0; i < vector.size(); i++) {
-                Class<?> aClass = vector.get(i);
-                if (aClass.getSuperclass() == Module.class && aClass.getAnnotation(ModuleInfo.class) != null && aClass.getAnnotation(Deprecated.class) == null)
-                    registerModule((Class<? extends Module>) aClass);
+    public ModuleManager(File jar) {
+        try (ZipInputStream zis = new ZipInputStream(Files.newInputStream(jar.toPath()))) {
+            ZipEntry entry;
+            while ((entry = zis.getNextEntry()) != null) {
+                if (!entry.isDirectory()) {
+                    String name = entry.getName().replace('/', '.');
+                    if (name.startsWith(ModuleManager.class.getPackage().getName())) {
+                        name = name.substring(0, name.length() - 6);
+                        try {
+                            Class<?> aClass = Class.forName(name);
+                            if (aClass.getSuperclass() == Module.class && aClass.getAnnotation(ModuleInfo.class) != null && aClass.getAnnotation(Deprecated.class) == null)
+                                registerModule((Class<? extends Module>) aClass);
+                        } catch (Throwable e) {
+                            Logger.exception(e);
+                        }
+                    }
+                }
             }
-        } catch (Throwable e) {
+        } catch (IOException e) {
             Logger.exception(e);
         }
         modules.sort((m1, m2) -> -Integer.compare(m2.getName().charAt(0), m1.getName().charAt(0)));

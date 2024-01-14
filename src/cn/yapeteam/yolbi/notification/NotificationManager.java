@@ -3,8 +3,6 @@ package cn.yapeteam.yolbi.notification;
 import cn.yapeteam.yolbi.YolBi;
 import cn.yapeteam.yolbi.event.Listener;
 import cn.yapeteam.yolbi.event.impl.render.EventRender2D;
-import cn.yapeteam.yolbi.font.FontManager;
-import cn.yapeteam.yolbi.font.cfont.CFontRenderer;
 import cn.yapeteam.yolbi.utils.render.RenderUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
@@ -19,10 +17,8 @@ import java.util.ArrayList;
  */
 public class NotificationManager {
     private final ArrayList<Notification> notificationArrayList;
-    private final CFontRenderer fontRenderer;
 
     public NotificationManager() {
-        fontRenderer = YolBi.instance.getFontManager().getJelloRegular18();
         notificationArrayList = new ArrayList<>();
         YolBi.instance.getEventManager().register(this);
     }
@@ -93,11 +89,6 @@ public class NotificationManager {
         float thewid = (float) (180*notification.getAnimation().getProgress());
         if (thewid <0) thewid = 0;
         RenderUtil.drawBloomShadow(10,25, thewid,5,10,new Color(255, 255, 255));
-        fontRenderer.drawString(notification.getTitle(),15,15,new Color(255,255,255).getRGB());
+        YolBi.instance.getFontManager().getJelloRegular18().drawString(notification.getTitle(), 15, 15, new Color(255, 255, 255).getRGB());
     }
-
-
-
-
-
 }

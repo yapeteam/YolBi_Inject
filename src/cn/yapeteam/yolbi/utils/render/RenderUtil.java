@@ -1,6 +1,6 @@
 package cn.yapeteam.yolbi.utils.render;
 
-import cn.yapeteam.yolbi.a_pretoload.Mapper;
+import cn.yapeteam.loader.Mapper;
 import cn.yapeteam.yolbi.shader.GaussianFilter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;

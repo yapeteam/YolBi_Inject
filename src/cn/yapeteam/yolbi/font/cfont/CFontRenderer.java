@@ -1,9 +1,8 @@
 package cn.yapeteam.yolbi.font.cfont;
 
-
-import cn.yapeteam.yolbi.a_pretoload.ResourceManager;
-import cn.yapeteam.yolbi.a_pretoload.logger.Logger;
+import cn.yapeteam.yolbi.ResourceManager;
 import cn.yapeteam.yolbi.font.FontUtil;
+import cn.yapeteam.yolbi.logger.Logger;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.texture.DynamicTexture;

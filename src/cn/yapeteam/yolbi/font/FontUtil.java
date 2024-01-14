@@ -1,6 +1,6 @@
 package cn.yapeteam.yolbi.font;
 
-import cn.yapeteam.yolbi.a_pretoload.logger.Logger;
+import cn.yapeteam.yolbi.logger.Logger;
 
 import java.awt.*;
 import java.io.InputStream;

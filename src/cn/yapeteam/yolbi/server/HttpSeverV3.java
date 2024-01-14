@@ -1,7 +1,7 @@
 package cn.yapeteam.yolbi.server;
 
+import cn.yapeteam.yolbi.ResourceManager;
 import cn.yapeteam.yolbi.YolBi;
-import cn.yapeteam.yolbi.a_pretoload.ResourceManager;
 import cn.yapeteam.yolbi.notification.Notification;
 import cn.yapeteam.yolbi.notification.NotificationType;
 import cn.yapeteam.yolbi.utils.animation.Animation;
@@ -10,10 +10,6 @@ import cn.yapeteam.yolbi.utils.animation.Easing;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.file.Files;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -148,11 +144,11 @@ public class HttpSeverV3 {
 
 
     public static void main(final String[] args) throws IOException {
-        ResourceManager.add("login.html", Files.readAllBytes(new File("resources/login.html").toPath()));
+        /*ResourceManager.add("login.html", Files.readAllBytes(new File("resources/login.html").toPath()));
         ResourceManager.add("Test.html", Files.readAllBytes(new File("resources/Test.html").toPath()));
 
         HttpSeverV3 v3 = new HttpSeverV3(9090);
-        v3.start();
+        v3.start();*/
     }
 }
 

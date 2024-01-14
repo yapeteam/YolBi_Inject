@@ -9,32 +9,43 @@ import cn.yapeteam.yolbi.notification.NotificationManager;
 import cn.yapeteam.yolbi.server.HttpSeverV3;
 import lombok.Getter;
 
+import java.io.File;
 import java.io.IOException;
 
 @Getter
 public class YolBi {
-    public static YolBi instance = new YolBi();
+    public static final YolBi instance = new YolBi();
     public static final String name = "YolBi Lite";
     public static final String version = "0.1.1";
-    private final EventManager eventManager;
-    private final CommandManager commandManager;
-    private final ModuleManager moduleManager;
-    private final FontManager fontManager;
-    private final NotificationManager notificationManager;
-    private final HttpSeverV3 httpSeverV3;
+    private EventManager eventManager;
+    private CommandManager commandManager;
+    private ModuleManager moduleManager;
+    private FontManager fontManager;
+    private NotificationManager notificationManager;
+    private HttpSeverV3 httpSeverV3;
 
-    private YolBi() {
-        eventManager = new EventManager();
-        commandManager = new CommandManager();
-        moduleManager = new ModuleManager();
-        fontManager = new FontManager();
-        eventManager.register(commandManager);
-        eventManager.register(moduleManager);
-        instance = this;
-        moduleManager.getModule(HeadUpDisplay.class).setEnabled(true);
-        notificationManager = new NotificationManager();
+    public EventManager getEventManager() {
+        if (eventManager == null)
+            eventManager = new EventManager();
+        return eventManager;
+    }
+
+    public FontManager getFontManager() {
+        if (fontManager == null)
+            fontManager = new FontManager();
+        return fontManager;
+    }
+
+    public static void initialize(File jar) {
+        instance.eventManager = new EventManager();
+        instance.commandManager = new CommandManager();
+        instance.moduleManager = new ModuleManager(jar);
+        instance.eventManager.register(instance.commandManager);
+        instance.eventManager.register(instance.moduleManager);
+        instance.moduleManager.getModule(HeadUpDisplay.class).setEnabled(true);
+        instance.notificationManager = new NotificationManager();
         try {
-            httpSeverV3 = new HttpSeverV3(9090);
+            instance.httpSeverV3 = new HttpSeverV3(9090);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
