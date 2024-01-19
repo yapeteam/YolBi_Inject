@@ -31,10 +31,17 @@ public class JarMapper {
     }
 
     public static void dispose(File file, File out) throws Throwable {
+        int all = 0;
+        try (ZipInputStream zis = new ZipInputStream(Files.newInputStream(file.toPath()))) {
+            while (zis.getNextEntry() != null) all++;
+        }
         ZipOutputStream zos = new ZipOutputStream(Files.newOutputStream(out.toPath()));
         try (ZipInputStream zis = new ZipInputStream(Files.newInputStream(file.toPath()))) {
             ZipEntry se;
+            int count = 0;
             while ((se = zis.getNextEntry()) != null) {
+                count++;
+                Loader.frame.setValue((float) count / all * 100f);
                 if (!se.isDirectory() && se.getName().endsWith(".class")) {
                     byte[] bytes = readStream(zis);
                     bytes = ClassMapper.map(bytes);

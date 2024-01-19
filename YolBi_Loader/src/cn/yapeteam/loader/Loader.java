@@ -1,9 +1,12 @@
 package cn.yapeteam.loader;
 
 import cn.yapeteam.loader.logger.Logger;
+import cn.yapeteam.loader.ui.Frame;
 import cn.yapeteam.loader.utils.ClassUtils;
+import com.formdev.flatlaf.FlatDarkLaf;
 import org.objectweb.asm.Opcodes;
 
+import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.lang.reflect.Method;
@@ -11,8 +14,9 @@ import java.lang.reflect.Method;
 @SuppressWarnings("unused")
 public class Loader {
     public static final int ASM_API = Opcodes.ASM5;
+    public static Frame frame;
 
-    public static void preload(String injectionPath) {
+    public static void preload(String yolbiDir) {
         Logger.init();
         try {
             Logger.info("Start PreLoading...");
@@ -20,10 +24,22 @@ public class Loader {
             Logger.info("Reading mappings, mode: {}", mode.name());
             Mapper.setMode(mode);
             Mapper.readMappings();
+            try {
+                for (Object o : Thread.getAllStackTraces().keySet().toArray()) {
+                    Thread thread = (Thread) o;
+                    if (thread.getName().equals("Client thread"))
+                        UIManager.getDefaults().put("ClassLoader", thread.getContextClassLoader());
+                }
+                UIManager.setLookAndFeel(new FlatDarkLaf());
+            } catch (UnsupportedLookAndFeelException e) {
+                Logger.exception(e);
+            }
+            frame = new Frame();
+            frame.display();
             Logger.warn("Start Mapping Injection!");
-            File injection = new File(injectionPath);
-            JarMapper.dispose(injection, new File(injection.getParentFile(), "injection-out.jar"));
+            JarMapper.dispose(new File(yolbiDir, "injection/injection.jar"), new File(yolbiDir, "injection.jar"));
             Logger.success("Completed");
+            frame.close();
         } catch (Throwable e) {
             Logger.exception(e);
         }

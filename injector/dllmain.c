@@ -3,6 +3,7 @@
 #include "jvmti.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <dirent.h>
 #include <string.h>
 
 JavaVM *jvm;
@@ -24,8 +25,6 @@ struct TransformCallback
 };
 
 static struct TransformCallback *callback_list = NULL;
-
-jobject targetThread;
 
 jclass findThreadClass(const char *name, jobject thread)
 {
@@ -209,6 +208,22 @@ void loadJar(const char *path, jobject thread)
     (*jniEnv)->CallVoidMethod(jniEnv, (*jniEnv)->CallObjectMethod(jniEnv, thread, (*jniEnv)->GetMethodID(jniEnv, (*jniEnv)->GetObjectClass(jniEnv, thread), "getContextClassLoader", "()Ljava/lang/ClassLoader;")), addURL, url);
 }
 
+BOOL str_endwith(const char *str, const char *reg)
+{
+    int l1 = strlen(str), l2 = strlen(reg);
+    if (l1 < l2)
+        return FALSE;
+    str += l1 - l2;
+    while (*str && *reg && *str == *reg)
+    {
+        str++;
+        reg++;
+    }
+    if (!*str && !*reg)
+        return TRUE;
+    return FALSE;
+}
+
 DWORD WINAPI Inject(LPVOID parm)
 {
     HMODULE jvmHandle = GetModuleHandle("jvm.dll");
@@ -250,7 +265,7 @@ DWORD WINAPI Inject(LPVOID parm)
     }
     if (!clientThread)
         return 0;
-    targetThread = clientThread;
+
     jclass urlClassLoader = (*jniEnv)->FindClass(jniEnv, "java/net/URLClassLoader");
     jmethodID findClass = (*jniEnv)->GetMethodID(jniEnv, urlClassLoader, "findClass", "(Ljava/lang/String;)Ljava/lang/Class;");
     jmethodID addURL = (*jniEnv)->GetMethodID(jniEnv, urlClassLoader, "addURL", "(Ljava/net/URL;)V");
@@ -260,14 +275,27 @@ DWORD WINAPI Inject(LPVOID parm)
     char userProfile[MAX_PATH];
     GetEnvironmentVariableA("USERPROFILE", userProfile, MAX_PATH);
 
-    char loaderPath[MAX_PATH];
-    sprintf_s(loaderPath, MAX_PATH, "%s\\.yolbi\\loader.jar", userProfile);
+    char yolbiPath[MAX_PATH];
+    sprintf_s(yolbiPath, MAX_PATH, "%s\\.yolbi", userProfile);
 
-    char injectionPath[MAX_PATH];
-    sprintf_s(injectionPath, MAX_PATH, "%s\\.yolbi\\injection.jar", userProfile);
+    DIR *dir = opendir(yolbiPath);
+    struct dirent *entry;
+    while ((entry = readdir(dir)) != NULL)
+    {
+        if (str_endwith(entry->d_name, ".jar") && strcmp(entry->d_name, "injection.jar"))
+        {
+            char jarPath[MAX_PATH];
+            sprintf_s(jarPath, MAX_PATH, "%s\\%s", yolbiPath, entry->d_name);
+            loadJar(jarPath, clientThread);
+            printf("loaded: ");
+            printf(jarPath);
+            printf("\n");
+        }
+    }
+    closedir(dir);
 
     char injectionOutPath[MAX_PATH];
-    sprintf_s(injectionOutPath, MAX_PATH, "%s\\.yolbi\\injection-out.jar", userProfile);
+    sprintf_s(injectionOutPath, MAX_PATH, "%s\\.yolbi\\injection.jar", userProfile);
 
     jvmtiCapabilities capabilities = {0};
     memset(&capabilities, 0, sizeof(jvmtiCapabilities));
@@ -289,25 +317,24 @@ DWORD WINAPI Inject(LPVOID parm)
     (*jvmti)->SetEventCallbacks((jvmtiEnv *)jvmti, &callbacks, sizeof(jvmtiEventCallbacks));
     (*jvmti)->SetEventNotificationMode((jvmtiEnv *)jvmti, JVMTI_ENABLE, JVMTI_EVENT_CLASS_FILE_LOAD_HOOK, NULL);
 
-    loadJar(loaderPath, clientThread);
-
     jclass wrapperClass = findThreadClass("cn/yapeteam/loader/NativeWrapper", clientThread);
     JNINativeMethod methods[] = {
         {"getClassBytes", "(Ljava/lang/Class;)[B", (void *)&GetClassBytes},
         {"redefineClass", "(Ljava/lang/Class;[B)I", (void *)&RedefineClass},
         {"defineClass", "(Ljava/lang/ClassLoader;[B)Ljava/lang/Class;", (void *)&DefineClass},
-        {"getLoadedClasses", "()Ljava/util/ArrayList;", (void *)&GetLoadedClasses}};
+        {"getLoadedClasses", "()Ljava/util/ArrayList;", (void *)&GetLoadedClasses},
+    };
     (*jniEnv)->RegisterNatives(jniEnv, wrapperClass, methods, 4);
 
     jclass PreLoad = findThreadClass("cn/yapeteam/loader/Loader", clientThread);
     jmethodID preload = (*jniEnv)->GetStaticMethodID(jniEnv, PreLoad, "preload", "(Ljava/lang/String;)V");
-    (*jniEnv)->CallStaticVoidMethod(jniEnv, PreLoad, preload, (*jniEnv)->NewStringUTF(jniEnv, injectionPath));
+    (*jniEnv)->CallStaticVoidMethod(jniEnv, PreLoad, preload, (*jniEnv)->NewStringUTF(jniEnv, yolbiPath));
 
     loadJar(injectionOutPath, clientThread);
 
     jclass Start = findThreadClass("cn/yapeteam/yolbi/Loader", clientThread);
     jmethodID start = (*jniEnv)->GetStaticMethodID(jniEnv, Start, "start", "(Ljava/lang/String;)V");
-    (*jniEnv)->CallStaticVoidMethod(jniEnv, Start, start, (*jniEnv)->NewStringUTF(jniEnv, injectionPath));
+    (*jniEnv)->CallStaticVoidMethod(jniEnv, Start, start, (*jniEnv)->NewStringUTF(jniEnv, injectionOutPath));
 
     (*jvm)->DetachCurrentThread(jvm);
     return 0;

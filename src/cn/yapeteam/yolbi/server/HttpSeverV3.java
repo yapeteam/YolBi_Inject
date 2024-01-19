@@ -1,6 +1,6 @@
 package cn.yapeteam.yolbi.server;
 
-import cn.yapeteam.yolbi.ResourceManager;
+import cn.yapeteam.loader.ResourceManager;
 import cn.yapeteam.yolbi.YolBi;
 import cn.yapeteam.yolbi.notification.Notification;
 import cn.yapeteam.yolbi.notification.NotificationType;

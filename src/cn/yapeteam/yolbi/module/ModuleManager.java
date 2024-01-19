@@ -1,8 +1,8 @@
 package cn.yapeteam.yolbi.module;
 
+import cn.yapeteam.loader.logger.Logger;
 import cn.yapeteam.yolbi.event.Listener;
 import cn.yapeteam.yolbi.event.impl.game.EventKey;
-import cn.yapeteam.yolbi.logger.Logger;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
