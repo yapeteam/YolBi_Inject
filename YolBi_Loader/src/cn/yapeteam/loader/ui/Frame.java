@@ -64,6 +64,7 @@ public class Frame extends JFrame {
 
         add(main_panel);
 
+        setAlwaysOnTop(true);
         setLocationRelativeTo(null);
         setVisible(true);
         process.start();
