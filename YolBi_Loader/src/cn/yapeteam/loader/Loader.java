@@ -16,13 +16,6 @@ public class Loader {
     public static String YOLBI_DIR = null;
 
     public static void preload(String yolbi_dir) {
-        for (Object o : Thread.getAllStackTraces().keySet().toArray()) {
-            Thread thread = (Thread) o;
-            if (thread.getName().equals("Client thread")) {
-                Thread.currentThread().setContextClassLoader(thread.getContextClassLoader());
-                break;
-            }
-        }
         Logger.init();
         try {
             Logger.info("Start PreLoading...");
@@ -32,7 +25,13 @@ public class Loader {
             Mapper.setMode(mode);
             Mapper.readMappings();
             try {
-                UIManager.getDefaults().put("ClassLoader", Thread.currentThread().getContextClassLoader());
+                for (Object o : Thread.getAllStackTraces().keySet().toArray()) {
+                    Thread thread = (Thread) o;
+                    if (thread.getName().equals("Client thread")) {
+                        UIManager.getDefaults().put("ClassLoader", thread.getContextClassLoader());
+                        break;
+                    }
+                }
                 UIManager.setLookAndFeel(new FlatDarkLaf());
             } catch (UnsupportedLookAndFeelException e) {
                 Logger.exception(e);
