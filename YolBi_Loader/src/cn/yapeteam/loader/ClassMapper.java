@@ -48,10 +48,25 @@ public class ClassMapper {
                 targetName = targetName.replace('.', '/');
             }
         }
-        for (MethodNode method : node.methods)
-            method(method, node, methodShadows, fieldShadows, targetName);
-        for (FieldNode field : node.fields)
-            field(field);
+        for (MethodNode method : node.methods) {
+            for (AbstractInsnNode instruction : method.instructions) {
+                if (instruction instanceof MethodInsnNode) {
+                    MethodInsnNode methodInsnNode = (MethodInsnNode) instruction;
+                    if (methodShadows.stream().anyMatch(m -> m.name.equals(methodInsnNode.name) && m.desc.equals(methodInsnNode.desc)))
+                        methodInsnNode.owner = targetName;
+                } else if (instruction instanceof FieldInsnNode) {
+                    FieldInsnNode fieldInsnNode = (FieldInsnNode) instruction;
+                    if (fieldShadows.stream().anyMatch(m -> m.name.equals(fieldInsnNode.name) && m.desc.equals(fieldInsnNode.desc)))
+                        fieldInsnNode.owner = targetName;
+                }
+            }
+            if (Mapper.getMode() != Mapper.Mode.None)
+                method(method, node, targetName);
+        }
+        for (FieldNode field : node.fields) {
+            if (Mapper.getMode() != Mapper.Mode.None)
+                field(field);
+        }
         bytes = ASMUtils.rewriteClass(node);
         return bytes;
     }
@@ -107,7 +122,7 @@ public class ClassMapper {
     }
 
 
-    public static void method(MethodNode source, ClassNode parent, ArrayList<Name_Desc> methodShadows, ArrayList<Name_Desc> fieldShadows, String targetName) throws Throwable {
+    public static void method(MethodNode source, ClassNode parent, String targetName) throws Throwable {
         if (source.visibleAnnotations != null) {
             for (AnnotationNode visibleAnnotation : source.visibleAnnotations) {
                 if (Super.Helper.isAnnotation(visibleAnnotation)) {
@@ -121,8 +136,6 @@ public class ClassMapper {
         for (AbstractInsnNode instruction : source.instructions) {
             if (instruction instanceof MethodInsnNode) {
                 MethodInsnNode methodInsnNode = (MethodInsnNode) instruction;
-                if (methodShadows.stream().anyMatch(m -> m.name.equals(methodInsnNode.name) && m.desc.equals(methodInsnNode.desc)))
-                    methodInsnNode.owner = targetName;
                 if (hasType(methodInsnNode.owner)) {
                     methodInsnNode.name = Mapper.mapMethodWithSuper(methodInsnNode.owner, methodInsnNode.name, methodInsnNode.desc);
                     methodInsnNode.owner = Mapper.getObfClass(methodInsnNode.owner);
@@ -130,21 +143,17 @@ public class ClassMapper {
                 if (hasType(parseDesc(methodInsnNode.desc))) methodInsnNode.desc = desc(methodInsnNode.desc);
                 for (String name : parseDesc(methodInsnNode.desc).split(";"))
                     methodInsnNode.desc = replaceFirst(methodInsnNode.desc, name, Mapper.getObfClass(name));
+            } else if (instruction instanceof TypeInsnNode) {
+                TypeInsnNode typeInsnNode = (TypeInsnNode) instruction;
+                typeInsnNode.desc = Mapper.map(null, typeInsnNode.desc, null, Mapper.Type.Class);
             } else if (instruction instanceof FieldInsnNode) {
                 FieldInsnNode fieldInsnNode = (FieldInsnNode) instruction;
-                if (fieldShadows.stream().anyMatch(m -> m.name.equals(fieldInsnNode.name) && m.desc.equals(fieldInsnNode.desc)))
-                    fieldInsnNode.owner = targetName;
                 if (hasType(fieldInsnNode.owner)) {
                     fieldInsnNode.name = Mapper.mapFieldWithSuper(fieldInsnNode.owner, fieldInsnNode.name, fieldInsnNode.desc);
                     fieldInsnNode.owner = Mapper.map(null, fieldInsnNode.owner, null, Mapper.Type.Class);
                 }
                 if (hasType(parseDesc(fieldInsnNode.desc)))
                     fieldInsnNode.desc = desc(fieldInsnNode.desc);
-            }
-            if (Mapper.getMode() == Mapper.Mode.None) return;
-            if (instruction instanceof TypeInsnNode) {
-                TypeInsnNode typeInsnNode = (TypeInsnNode) instruction;
-                typeInsnNode.desc = Mapper.map(null, typeInsnNode.desc, null, Mapper.Type.Class);
             } else if (instruction instanceof LdcInsnNode) {
                 LdcInsnNode ldcInsnNode = (LdcInsnNode) instruction;
                 if (ldcInsnNode.cst instanceof Type) {
