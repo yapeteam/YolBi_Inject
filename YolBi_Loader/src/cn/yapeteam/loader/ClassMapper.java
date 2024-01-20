@@ -101,15 +101,6 @@ public class ClassMapper {
         return outStream.toByteArray();
     }
 
-    public static void main(String[] args) throws Throwable {
-        /*Mapper.setMode(Mapper.Mode.None);
-        ResourceManager.add("joined.srg", Files.readAllBytes(new File("resources/joined.srg").toPath()));
-        ResourceManager.add("fields.csv", Files.readAllBytes(new File("resources/fields.csv").toPath()));
-        ResourceManager.add("methods.csv", Files.readAllBytes(new File("resources/methods.csv").toPath()));
-        Mapper.readMappings();*/
-        //loadClass(readStream(Objects.requireNonNull(ClassMappingLoader.class.getResourceAsStream("/cn/yapeteam/yolbi/injections/MixinEntityPlayerSP.class"))));
-    }
-
     @AllArgsConstructor
     public static class Name_Desc {
         public String name, desc;
@@ -139,9 +130,6 @@ public class ClassMapper {
                 if (hasType(parseDesc(methodInsnNode.desc))) methodInsnNode.desc = desc(methodInsnNode.desc);
                 for (String name : parseDesc(methodInsnNode.desc).split(";"))
                     methodInsnNode.desc = replaceFirst(methodInsnNode.desc, name, Mapper.getObfClass(name));
-            } else if (instruction instanceof TypeInsnNode) {
-                TypeInsnNode typeInsnNode = (TypeInsnNode) instruction;
-                typeInsnNode.desc = Mapper.map(null, typeInsnNode.desc, null, Mapper.Type.Class);
             } else if (instruction instanceof FieldInsnNode) {
                 FieldInsnNode fieldInsnNode = (FieldInsnNode) instruction;
                 if (fieldShadows.stream().anyMatch(m -> m.name.equals(fieldInsnNode.name) && m.desc.equals(fieldInsnNode.desc)))
@@ -152,6 +140,11 @@ public class ClassMapper {
                 }
                 if (hasType(parseDesc(fieldInsnNode.desc)))
                     fieldInsnNode.desc = desc(fieldInsnNode.desc);
+            }
+            if (Mapper.getMode() == Mapper.Mode.None) return;
+            if (instruction instanceof TypeInsnNode) {
+                TypeInsnNode typeInsnNode = (TypeInsnNode) instruction;
+                typeInsnNode.desc = Mapper.map(null, typeInsnNode.desc, null, Mapper.Type.Class);
             } else if (instruction instanceof LdcInsnNode) {
                 LdcInsnNode ldcInsnNode = (LdcInsnNode) instruction;
                 if (ldcInsnNode.cst instanceof Type) {
