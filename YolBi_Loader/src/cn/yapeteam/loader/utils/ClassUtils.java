@@ -17,9 +17,8 @@ public class ClassUtils {
     }
 
     public static byte[] getClassBytes(String name) {
-        byte[] bytes = ResourceManager.resources.get(name.replace('.', '/') + ".class");
+        byte[] bytes = NativeWrapper.getClassBytes(getClass(name.replace('/', '.')));
         if (bytes != null) return bytes;
-        Class<?> theClass = getClass(name.replace('/', '.'));
-        return NativeWrapper.getClassBytes(theClass);
+        return ResourceManager.resources.get(name.replace('.', '/') + ".class");
     }
 }
