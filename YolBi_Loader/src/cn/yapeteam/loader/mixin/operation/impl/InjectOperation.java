@@ -18,9 +18,7 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.*;
 
-import java.io.File;
 import java.lang.reflect.Field;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -132,7 +130,6 @@ public class InjectOperation implements Operation {
         Transformer transformer = new Transformer((name) -> ResourceManager.readStream(InjectOperation.class.getResourceAsStream("/" + name + ".class")));
         transformer.addMixin("source");
         byte[] bytes = transformer.transform().get("target");
-        Files.write(new File("target").toPath(), bytes);
         new CustomLoader().load(bytes).getMethod("target").invoke(null);
     }
 
