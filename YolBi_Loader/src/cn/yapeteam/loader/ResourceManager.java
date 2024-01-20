@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public class ResourceManager {
-    private static byte[] readStream(InputStream inStream) throws IOException {
+    public static byte[] readStream(InputStream inStream) throws IOException {
         ByteArrayOutputStream outStream = new ByteArrayOutputStream();
         byte[] buffer = new byte[1024];
         int len;
@@ -39,7 +39,7 @@ public class ResourceManager {
                     Logger.exception(e);
                 }
             }
-            throw new RuntimeException("Resource not found: " + name);
+            return null;
         }
     }
 }

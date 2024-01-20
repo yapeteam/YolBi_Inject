@@ -2,7 +2,6 @@ package cn.yapeteam.loader.utils;
 
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.tree.AnnotationNode;
@@ -59,11 +58,14 @@ public class ASMUtils {
         return writer.toByteArray();
     }
 
-    public static @Nullable <T> T getAnnotationValue(AnnotationNode node, String name) {
+    public static <T> T getAnnotationValue(AnnotationNode node, String name) {
         if (node != null)
-            for (int i = 0; i < node.values.size(); i++)
-                if (node.values.get(i).equals(name))
-                    return (T) node.values.get(i + 1);
+            for (int i = 0; i < node.values.size(); i += 2) {
+                if (node.values.get(i).equals(name)) {
+                    Object obj = node.values.get(i + 1);
+                    return (T) obj;
+                }
+            }
         return null;
     }
 

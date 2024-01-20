@@ -2,8 +2,10 @@ package cn.yapeteam.loader.mixin.operation.impl;
 
 import cn.yapeteam.loader.Loader;
 import cn.yapeteam.loader.Mapper;
+import cn.yapeteam.loader.ResourceManager;
 import cn.yapeteam.loader.logger.Logger;
 import cn.yapeteam.loader.mixin.Mixin;
+import cn.yapeteam.loader.mixin.Transformer;
 import cn.yapeteam.loader.mixin.annotations.Inject;
 import cn.yapeteam.loader.mixin.annotations.Local;
 import cn.yapeteam.loader.mixin.annotations.Target;
@@ -16,7 +18,9 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.*;
 
+import java.io.File;
 import java.lang.reflect.Field;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -96,21 +100,62 @@ public class InjectOperation implements Operation {
     }
 
     private static boolean isLoadOpe(int opcode) {
-        for (Field field : Opcodes.class.getFields()) {
-            if (field.getName().endsWith("LOAD")) {
+        for (Field field : Opcodes.class.getFields())
+            if (field.getName().endsWith("LOAD"))
                 try {
-                    if ((int) field.get(null) == opcode) {
+                    if ((int) field.get(null) == opcode)
                         return true;
-                    }
-                } catch (IllegalAccessException ignored) {
+                } catch (Throwable ignored) {
                 }
-            }
-        }
         return false;
     }
 
+    private static boolean isStoreOpe(int opcode) {
+        for (Field field : Opcodes.class.getFields())
+            if (field.getName().endsWith("STORE"))
+                try {
+                    if ((int) field.get(null) == opcode)
+                        return true;
+                } catch (Throwable ignored) {
+                }
+        return false;
+    }
+
+    static class CustomLoader extends ClassLoader {
+        public Class<?> load(byte[] bytes) {
+            return defineClass(null, bytes, 0, bytes.length);
+        }
+    }
+
+    public static void main(String[] args) throws Throwable {
+        Mapper.setMode(Mapper.Mode.None);
+        Transformer transformer = new Transformer((name) -> ResourceManager.readStream(InjectOperation.class.getResourceAsStream("/" + name + ".class")));
+        transformer.addMixin("source");
+        byte[] bytes = transformer.transform().get("target");
+        Files.write(new File("target").toPath(), bytes);
+        new CustomLoader().load(bytes).getMethod("target").invoke(null);
+    }
+
     private static void processLocalValues(MethodNode source, MethodNode target) {
+        int max_index = 0;
+        for (AbstractInsnNode instruction : target.instructions) {
+            if (instruction instanceof VarInsnNode && (isLoadOpe(instruction.getOpcode()) || isStoreOpe(instruction.getOpcode()))) {
+                VarInsnNode varInsnNode = (VarInsnNode) instruction;
+                max_index = Math.max(max_index, varInsnNode.var);
+            }
+        }
+
+
         Map<Integer, Integer> varMap = new HashMap<>();
+        //Process local var store & load
+        for (int i = 0; i < source.instructions.size(); i++) {
+            AbstractInsnNode instruction = source.instructions.get(i);
+            if (instruction instanceof VarInsnNode && isStoreOpe(instruction.getOpcode())) {
+                VarInsnNode varInsnNode = (VarInsnNode) instruction;
+                varMap.put(varInsnNode.var, varInsnNode.var += max_index);
+            }
+        }
+        //Access context local var
         ArrayList<String[]> sourceParameters = getLocalParameters(source);
         for (String[] sourceParameter : sourceParameters) {
             varMap.put(
@@ -125,6 +170,11 @@ public class InjectOperation implements Operation {
                 Integer index = varMap.get(varInsnNode.var);
                 if (index != null)
                     varInsnNode.var = index;
+            } else if (instruction instanceof IincInsnNode) {
+                IincInsnNode iincInsnNode = (IincInsnNode) instruction;
+                Integer index = varMap.get(iincInsnNode.var);
+                if (index != null)
+                    iincInsnNode.var = index;
             }
         }
     }

@@ -13,6 +13,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
 
 public class Mapper {
     @Getter
@@ -49,9 +50,9 @@ public class Mapper {
         mappings.clear();
         searges.clear();
 
-        String joined = new String(ResourceManager.resources.get("joined.srg"), StandardCharsets.UTF_8);
-        String fields = new String(ResourceManager.resources.get("fields.csv"), StandardCharsets.UTF_8);
-        String methods = new String(ResourceManager.resources.get("methods.csv"), StandardCharsets.UTF_8);
+        String joined = new String(Objects.requireNonNull(ResourceManager.resources.get("joined.srg")), StandardCharsets.UTF_8);
+        String fields = new String(Objects.requireNonNull(ResourceManager.resources.get("fields.csv")), StandardCharsets.UTF_8);
+        String methods = new String(Objects.requireNonNull(ResourceManager.resources.get("methods.csv")), StandardCharsets.UTF_8);
 
         for (String line : joined.split("\n")) {
             line = line.replace(String.valueOf((char) 13), "");

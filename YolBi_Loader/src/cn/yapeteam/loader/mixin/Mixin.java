@@ -18,9 +18,8 @@ public class Mixin {
                         .filter(a -> a.desc.contains(ASMUtils.slash(cn.yapeteam.loader.mixin.annotations.Mixin.class.getName())))
                         .findFirst().orElse(null), "value"
         );
-        if (targetName == null) {
+        if (targetName == null)
             throw new NullPointerException("Mixin value is null!");
-        }
         target = ASMUtils.node(provider.getClassBytes(Mapper.map(null, ASMUtils.slash(targetName), null, Mapper.Type.Class)));
     }
 }

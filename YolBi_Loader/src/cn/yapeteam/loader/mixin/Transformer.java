@@ -41,8 +41,8 @@ public class Transformer {
             for (Operation operation : operations)
                 operation.dispose(mixin);
             String name = mixin.getTarget().name.replace('/', '.');
-            byte[] classfile = ASMUtils.rewriteClass(mixin.getTarget());
-            classMap.put(name, classfile);
+            byte[] class_bytes = ASMUtils.rewriteClass(mixin.getTarget());
+            classMap.put(name, class_bytes);
         }
         return classMap;
     }

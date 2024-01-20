@@ -6,22 +6,20 @@ import cn.yapeteam.loader.ResourceManager;
 public class ClassUtils {
     public static Class<?> getClass(String name) {
         name = name.replace('/', '.');
-        if (false) {
-            try {
-                return Class.forName(name);
-            } catch (ClassNotFoundException e) {
-                return null;
-            }
+        Class<?> clazz = null;
+        try {
+            clazz = Class.forName(name);
+        } catch (Throwable ignored) {
         }
+        if (clazz != null) return clazz;
         String finalName = name;
         return NativeWrapper.getLoadedClasses().stream().filter(c -> finalName.equals(c.getName())).findFirst().orElse(null);
     }
 
     public static byte[] getClassBytes(String name) {
-        name = name.replace('/', '.');
-        Class<?> theClass = getClass(name);
-        byte[] bytes = NativeWrapper.getClassBytes(theClass);
+        byte[] bytes = ResourceManager.resources.get(name.replace('.', '/') + ".class");
         if (bytes != null) return bytes;
-        else return ResourceManager.resources.get(name);
+        Class<?> theClass = getClass(name.replace('/', '.'));
+        return NativeWrapper.getClassBytes(theClass);
     }
 }
