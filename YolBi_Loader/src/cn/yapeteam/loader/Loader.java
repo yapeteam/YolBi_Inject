@@ -13,21 +13,26 @@ import java.io.File;
 public class Loader {
     public static final int ASM_API = Opcodes.ASM5;
     public static Frame frame;
+    public static String YOLBI_DIR = null;
 
-    public static void preload(String yolbiDir) {
+    public static void preload(String yolbi_dir) {
+        for (Object o : Thread.getAllStackTraces().keySet().toArray()) {
+            Thread thread = (Thread) o;
+            if (thread.getName().equals("Client thread")) {
+                Thread.currentThread().setContextClassLoader(thread.getContextClassLoader());
+                break;
+            }
+        }
         Logger.init();
         try {
             Logger.info("Start PreLoading...");
+            YOLBI_DIR = yolbi_dir;
             Mapper.Mode mode = Mapper.guessMappingMode();
             Logger.info("Reading mappings, mode: {}", mode.name());
             Mapper.setMode(mode);
             Mapper.readMappings();
             try {
-                for (Object o : Thread.getAllStackTraces().keySet().toArray()) {
-                    Thread thread = (Thread) o;
-                    if (thread.getName().equals("Client thread"))
-                        UIManager.getDefaults().put("ClassLoader", thread.getContextClassLoader());
-                }
+                UIManager.getDefaults().put("ClassLoader", Thread.currentThread().getContextClassLoader());
                 UIManager.setLookAndFeel(new FlatDarkLaf());
             } catch (UnsupportedLookAndFeelException e) {
                 Logger.exception(e);
@@ -35,7 +40,7 @@ public class Loader {
             frame = new Frame();
             frame.display();
             Logger.warn("Start Mapping Injection!");
-            JarMapper.dispose(new File(yolbiDir, "injection/injection.jar"), new File(yolbiDir, "injection.jar"));
+            JarMapper.dispose(new File(yolbi_dir, "injection/injection.jar"), new File(yolbi_dir, "injection.jar"));
             Logger.success("Completed");
             frame.close();
         } catch (Throwable e) {
