@@ -4,6 +4,7 @@
 /YolBi_Inject.iml
 /YolBi_Loader/YolBi_Loader.iml
 /injector/agent.dll
+/injector/injection.dll
 /injector/injection.dll.dll
 /injector/main.o
 /injector/agent.o
