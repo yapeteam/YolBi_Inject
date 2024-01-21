@@ -1,5 +1,6 @@
 package cn.yapeteam.loader.utils;
 
+import cn.yapeteam.loader.Loader;
 import cn.yapeteam.loader.NativeWrapper;
 import cn.yapeteam.loader.ResourceManager;
 
@@ -10,15 +11,13 @@ public class ClassUtils {
         if (clazz != null) return clazz;
         name = name.replace('/', '.');
         try {
-            clazz = Class.forName(name);
+            clazz = Class.forName(name, false, Loader.client_thread.getContextClassLoader());
         } catch (Throwable ignored) {
         }
         return clazz;
     }
 
     public static byte[] getClassBytes(String name) {
-        byte[] bytes = NativeWrapper.getClassBytes(getClass(name.replace('/', '.')));
-        if (bytes != null) return bytes;
         return ResourceManager.resources.get(name.replace('.', '/') + ".class");
     }
 }

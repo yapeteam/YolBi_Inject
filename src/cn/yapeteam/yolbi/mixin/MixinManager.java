@@ -1,11 +1,9 @@
 package cn.yapeteam.yolbi.mixin;
 
-import cn.yapeteam.loader.Mapper;
 import cn.yapeteam.loader.NativeWrapper;
 import cn.yapeteam.loader.logger.Logger;
 import cn.yapeteam.loader.mixin.Transformer;
 import cn.yapeteam.loader.mixin.annotations.Mixin;
-import cn.yapeteam.loader.utils.ClassUtils;
 import cn.yapeteam.yolbi.mixin.injection.*;
 
 import java.io.File;
@@ -18,7 +16,7 @@ public class MixinManager {
     public static Transformer transformer;
 
     public static void init() throws Throwable {
-        transformer = new Transformer(ClassUtils::getClassBytes);
+        transformer = new Transformer(NativeWrapper::getClassBytes);
         add(MixinMinecraft.class);
         add(MixinGuiIngame.class);
         add(MixinEntityPlayerSP.class);
@@ -31,22 +29,21 @@ public class MixinManager {
     private static final File dir = new File("generatedClasses");
 
     public static void load() throws Throwable {
-        dir.mkdirs();
+        boolean ignored = dir.mkdirs();
         Map<String, byte[]> map = transformer.transform();
         for (Class<?> mixin : mixins) {
-            String value = mixin.getAnnotation(Mixin.class).value();
-            Class<?> theClass = ClassUtils.getClass(Mapper.map(null, value, null, Mapper.Type.Class));
-            if (theClass != null) {
-                byte[] bytes = map.get(theClass.getName());
-                Files.write(new File(dir, theClass.getName()).toPath(), bytes);
-                int code = NativeWrapper.redefineClass(theClass, bytes);
-                Logger.success("Redefined {}, Return Code {}.", theClass, code);
+            Class<?> targetClass = mixin.getAnnotation(Mixin.class).value();
+            if (targetClass != null) {
+                byte[] bytes = map.get(targetClass.getName());
+                Files.write(new File(dir, targetClass.getName()).toPath(), bytes);
+                int code = NativeWrapper.redefineClass(targetClass, bytes);
+                Logger.success("Redefined {}, Return Code {}.", targetClass, code);
             }
         }
     }
 
     private static void add(Class<?> clazz) throws Throwable {
         mixins.add(clazz);
-        transformer.addMixin(clazz.getName());
+        transformer.addMixin(clazz);
     }
 }

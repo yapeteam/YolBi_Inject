@@ -6,8 +6,9 @@ import cn.yapeteam.loader.mixin.annotations.Mixin;
 import cn.yapeteam.loader.mixin.annotations.Target;
 import cn.yapeteam.yolbi.YolBi;
 import cn.yapeteam.yolbi.event.impl.render.EventRender3D;
+import net.minecraft.client.renderer.EntityRenderer;
 
-@Mixin("net.minecraft.client.renderer.EntityRenderer")
+@Mixin(EntityRenderer.class)
 public class MixinEntityRenderer {
     @Inject(
             method = "renderWorldPass", desc = "(IFJ)V", hasReturn = false,

@@ -5,7 +5,7 @@ import cn.yapeteam.loader.mixin.annotations.Target;
 
 import java.io.PrintStream;
 
-@Mixin("target")
+@Mixin(target.class)
 public class source {
     @Inject(method = "target", desc = "()V", hasReturn = false, target = @Target(value = "GETSTATIC", shift = Target.Shift.AFTER))
     public static void source(@Local(source = "ps", target = "ps") PrintStream ps) {

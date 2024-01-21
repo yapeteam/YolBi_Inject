@@ -6,6 +6,7 @@ import cn.yapeteam.loader.mixin.annotations.Shadow;
 import cn.yapeteam.loader.mixin.annotations.Target;
 import cn.yapeteam.yolbi.YolBi;
 import cn.yapeteam.yolbi.event.impl.block.EventBlockBB;
+import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.AxisAlignedBB;
@@ -19,7 +20,7 @@ import java.util.List;
  * @since 2024/1/7 21:23
  * IntelliJ IDEA
  */
-@Mixin("net.minecraft.block.Block")
+@Mixin(Block.class)
 public class MixinBlock {
     @Shadow
     public AxisAlignedBB getCollisionBoundingBox(World worldIn, BlockPos pos, IBlockState state) {

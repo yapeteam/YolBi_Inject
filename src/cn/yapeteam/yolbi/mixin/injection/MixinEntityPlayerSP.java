@@ -16,7 +16,7 @@ import net.minecraft.stats.StatFileWriter;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
 
-@Mixin("net.minecraft.client.entity.EntityPlayerSP")
+@Mixin(EntityPlayerSP.class)
 public class MixinEntityPlayerSP extends EntityPlayerSP {
     public MixinEntityPlayerSP(Minecraft mcIn, World worldIn, NetHandlerPlayClient netHandler, StatFileWriter statFile) {
         super(mcIn, worldIn, netHandler, statFile);

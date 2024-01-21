@@ -5,6 +5,7 @@ import cn.yapeteam.loader.utils.ClassUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import net.minecraft.client.Minecraft;
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.tree.ClassNode;
 
@@ -110,7 +111,7 @@ public class Mapper {
     }
 
     public static Mode guessMappingMode() {
-        byte[] bytes = ClassUtils.getClassBytes("net.minecraft.client.Minecraft");
+        byte[] bytes = NativeWrapper.getClassBytes(Minecraft.class);
         if (bytes == null) return Mode.Vanilla;
         ClassNode node = ASMUtils.node(bytes);
         if (node.methods.stream().anyMatch(m -> m.name.equals("runTick")))

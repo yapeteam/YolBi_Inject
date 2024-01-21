@@ -10,7 +10,7 @@ import cn.yapeteam.yolbi.event.impl.game.EventTick;
 import net.minecraft.client.Minecraft;
 import org.lwjgl.input.Keyboard;
 
-@Mixin("net.minecraft.client.Minecraft")
+@Mixin(Minecraft.class)
 public class MixinMinecraft {
     @Inject(method = "runTick", desc = "()V", hasReturn = false, target = @Target("HEAD"))
     public void onTick() {

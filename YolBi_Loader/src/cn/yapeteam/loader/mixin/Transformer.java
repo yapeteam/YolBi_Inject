@@ -3,6 +3,7 @@ package cn.yapeteam.loader.mixin;
 import cn.yapeteam.loader.mixin.operation.Operation;
 import cn.yapeteam.loader.mixin.operation.impl.InjectOperation;
 import cn.yapeteam.loader.utils.ASMUtils;
+import cn.yapeteam.loader.utils.ClassUtils;
 import lombok.Getter;
 import org.objectweb.asm.tree.ClassNode;
 
@@ -23,16 +24,10 @@ public class Transformer {
         operations.add(new InjectOperation());
     }
 
-    public void addMixin(String name) throws Throwable {
-        addMixin(provider.getClassBytes(name));
-    }
-
-    public void addMixin(byte[] bytes) throws Throwable {
-        addMixin(ASMUtils.node(bytes));
-    }
-
-    public void addMixin(ClassNode node) throws Throwable {
-        mixins.add(new Mixin(node, provider));
+    public void addMixin(Class<?> theClass) throws Throwable {
+        byte[] bytes = ClassUtils.getClassBytes(theClass.getName());
+        ClassNode source = ASMUtils.node(bytes);
+        mixins.add(new Mixin(source, theClass, provider));
     }
 
     public Map<String, byte[]> transform() {

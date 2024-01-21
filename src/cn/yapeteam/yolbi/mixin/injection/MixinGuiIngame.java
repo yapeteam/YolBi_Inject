@@ -6,9 +6,10 @@ import cn.yapeteam.loader.mixin.annotations.Mixin;
 import cn.yapeteam.loader.mixin.annotations.Target;
 import cn.yapeteam.yolbi.YolBi;
 import cn.yapeteam.yolbi.event.impl.render.EventRender2D;
+import net.minecraft.client.gui.GuiIngame;
 import net.minecraft.client.gui.ScaledResolution;
 
-@Mixin("net.minecraft.client.gui.GuiIngame")
+@Mixin(GuiIngame.class)
 public class MixinGuiIngame {
     @Inject(
             method = "renderTooltip",

@@ -7,6 +7,7 @@ import cn.yapeteam.loader.mixin.annotations.Target;
 import cn.yapeteam.yolbi.YolBi;
 import cn.yapeteam.yolbi.event.impl.player.EventAttack;
 import cn.yapeteam.yolbi.event.type.CancellableEvent;
+import net.minecraft.client.multiplayer.PlayerControllerMP;
 import net.minecraft.entity.Entity;
 
 /**
@@ -14,7 +15,7 @@ import net.minecraft.entity.Entity;
  * @since 2024/1/7 20:58
  * IntelliJ IDEA
  */
-@Mixin("net.minecraft.client.multiplayer.PlayerControllerMP")
+@Mixin(PlayerControllerMP.class)
 public class MixinPlayerControllerMP {
 
     @Inject(

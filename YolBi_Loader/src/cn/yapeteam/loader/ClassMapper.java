@@ -31,11 +31,12 @@ public class ClassMapper {
         ArrayList<Name_Desc> fieldShadows = new ArrayList<>();
         String targetName = null;
         if (node.visibleAnnotations != null) {
-            targetName = ASMUtils.getAnnotationValue(
+            Type type = ASMUtils.getAnnotationValue(
                     node.visibleAnnotations.stream()
                             .filter(a -> a.desc.contains(ASMUtils.slash(Mixin.class.getName())))
                             .findFirst().orElse(null), "value"
             );
+            if (type != null) targetName = type.getClassName();
             if (targetName != null) {
                 for (MethodNode method : node.methods) {
                     if (Shadow.Helper.hasAnnotation(method))

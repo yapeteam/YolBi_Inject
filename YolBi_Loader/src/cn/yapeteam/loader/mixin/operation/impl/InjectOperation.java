@@ -128,7 +128,7 @@ public class InjectOperation implements Operation {
     public static void main(String[] args) throws Throwable {
         Mapper.setMode(Mapper.Mode.None);
         Transformer transformer = new Transformer((name) -> ResourceManager.readStream(InjectOperation.class.getResourceAsStream("/" + name + ".class")));
-        transformer.addMixin("source");
+        //transformer.addMixin(source.class);
         byte[] bytes = transformer.transform().get("target");
         new CustomLoader().load(bytes).getMethod("target").invoke(null);
     }

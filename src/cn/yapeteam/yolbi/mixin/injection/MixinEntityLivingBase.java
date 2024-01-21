@@ -19,7 +19,7 @@ import net.minecraft.world.World;
  * @since 2024/1/7 21:39
  * IntelliJ IDEA
  */
-@Mixin("net.minecraft.entity.EntityLivingBase")
+@Mixin(EntityLivingBase.class)
 public class MixinEntityLivingBase extends EntityLivingBase {
     public MixinEntityLivingBase(World worldIn) {
         super(worldIn);
