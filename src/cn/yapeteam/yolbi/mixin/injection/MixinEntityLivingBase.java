@@ -21,8 +21,6 @@ import net.minecraft.world.World;
  */
 @Mixin("net.minecraft.entity.EntityLivingBase")
 public class MixinEntityLivingBase extends EntityLivingBase {
-
-
     public MixinEntityLivingBase(World worldIn) {
         super(worldIn);
     }
@@ -57,7 +55,6 @@ public class MixinEntityLivingBase extends EntityLivingBase {
 
     @Override
     public void setCurrentItemOrArmor(int i, ItemStack itemStack) {
-
     }
 
     @Override
@@ -109,5 +106,7 @@ public class MixinEntityLivingBase extends EntityLivingBase {
         }
 
         this.isAirBorne = true;
+        //noinspection UnnecessaryReturnStatement
+        return;
     }
 }

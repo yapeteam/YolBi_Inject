@@ -9,6 +9,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.entity.Entity;
+import net.minecraft.network.play.client.C01PacketChatMessage;
 import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.network.play.client.C0BPacketEntityAction;
 import net.minecraft.stats.StatFileWriter;
@@ -166,14 +167,15 @@ public class MixinEntityPlayerSP extends EntityPlayerSP {
 
     @Inject(
             method = "sendChatMessage", desc = "(Ljava/lang/String;)V",
-            hasReturn = false,
+            hasReturn = true,
             target = @Target("HEAD")
     )
     public void onSendChatMessage(@Local(source = "message", index = 1) String message) {
         EventChat event = new EventChat(message);
         YolBi.instance.getEventManager().post(event);
-        if (event.isCancelled()) return;
-        message = event.getMessage();
-        boolean ignored = message.isEmpty();//占位
+        if (!event.isCancelled()) {
+            message = event.getMessage();
+            this.sendQueue.addToSendQueue(new C01PacketChatMessage(message));
+        }
     }
 }
