@@ -5,15 +5,15 @@ import cn.yapeteam.loader.ResourceManager;
 
 public class ClassUtils {
     public static Class<?> getClass(String name) {
+        String finalName = name;
+        Class<?> clazz = NativeWrapper.getLoadedClasses().stream().filter(c -> finalName.equals(c.getName())).findFirst().orElse(null);
+        if (clazz != null) return clazz;
         name = name.replace('/', '.');
-        Class<?> clazz = null;
         try {
             clazz = Class.forName(name);
         } catch (Throwable ignored) {
         }
-        if (clazz != null) return clazz;
-        String finalName = name;
-        return NativeWrapper.getLoadedClasses().stream().filter(c -> finalName.equals(c.getName())).findFirst().orElse(null);
+        return clazz;
     }
 
     public static byte[] getClassBytes(String name) {
