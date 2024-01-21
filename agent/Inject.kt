@@ -7,18 +7,20 @@ import java.io.File
 import java.io.IOException
 
 
-fun getPid(type: ClientType = Lunar): String? {
+fun getPid(type: ClientType = PCL): String? {
     val classname =
         when (type) {
             Lunar -> "com.moonsworth.lunar.genesis.Genesis"
             Minecraft -> "net.minecraft.client.main.Main"
             Forge -> "net.minecraft.launchwrapper.Launch"
+            PCL -> "JavaWrapper.jar"
         }
     val local = MonitoredHost.getMonitoredHost("localhost")
     local.activeVms().forEach {
         val vm = local.getMonitoredVm(VmIdentifier("//$it"))
         val processName = MonitoredVmUtil.mainClass(vm, true)
-        if (processName == classname) {
+        println(processName)
+        if (processName.contains(classname)) {
             return it.toString()
         }
     }
