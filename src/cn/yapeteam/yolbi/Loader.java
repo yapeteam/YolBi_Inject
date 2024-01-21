@@ -4,7 +4,6 @@ import cn.yapeteam.loader.logger.Logger;
 import cn.yapeteam.yolbi.mixin.MixinManager;
 import cn.yapeteam.yolbi.notification.Notification;
 import cn.yapeteam.yolbi.notification.NotificationType;
-import cn.yapeteam.yolbi.utils.animation.Animation;
 import cn.yapeteam.yolbi.utils.animation.Easing;
 
 import java.awt.*;
@@ -23,9 +22,10 @@ public class Loader {
             YolBi.initialize(new File(jarPath));
             YolBi.instance.getNotificationManager().post(
                     new Notification(
-                            "Injected successfully",
-                            new Animation(Easing.EASE_IN_OUT_CIRC, 15000L),
-                            NotificationType.INIT
+                            "Injected successfully", "",
+                            Easing.EASE_IN_OUT_CIRC,
+                            Easing.EASE_IN_OUT_CIRC,
+                            15000L, NotificationType.INIT
                     )
             );
             YolBi.instance.getHttpSeverV3().start();

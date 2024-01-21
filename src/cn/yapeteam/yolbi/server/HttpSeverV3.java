@@ -4,7 +4,6 @@ import cn.yapeteam.loader.ResourceManager;
 import cn.yapeteam.yolbi.YolBi;
 import cn.yapeteam.yolbi.notification.Notification;
 import cn.yapeteam.yolbi.notification.NotificationType;
-import cn.yapeteam.yolbi.utils.animation.Animation;
 import cn.yapeteam.yolbi.utils.animation.Easing;
 
 import java.io.*;
@@ -120,9 +119,10 @@ public class HttpSeverV3 {
         if (YolBi.instance.getFontManager()==null) return;
         YolBi.instance.getNotificationManager().post(
                 new Notification(
-                        "Login successfully",
-                        new Animation(Easing.EASE_IN_OUT_CIRC, 15000L),
-                        NotificationType.INIT
+                        "Login successfully", "",
+                        Easing.EASE_IN_OUT_CIRC,
+                        Easing.EASE_IN_OUT_CIRC,
+                        15000L, NotificationType.INIT
                 )
         );
 
