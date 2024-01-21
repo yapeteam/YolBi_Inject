@@ -3,6 +3,10 @@
 /.idea/
 /YolBi_Inject.iml
 /YolBi_Loader/YolBi_Loader.iml
-/injector/demo.dll
+/injector/agent.dll
+/injector/injection.dll.dll
+/injector/main.o
+/injector/agent.o
+/injector/dllmain.o
 /toollib/
 /injector/YolBi_Lite.dylib
