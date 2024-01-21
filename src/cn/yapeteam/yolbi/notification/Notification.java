@@ -2,7 +2,6 @@ package cn.yapeteam.yolbi.notification;
 
 import cn.yapeteam.yolbi.utils.animation.Animation;
 import cn.yapeteam.yolbi.utils.animation.Easing;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
@@ -12,10 +11,10 @@ import lombok.Getter;
  */
 @Getter
 public class Notification {
-    private String title;
-    private String content;
-    private Animation animation;
-    private NotificationType type;
+    private final String title;
+    private final String content;
+    private final Animation animation;
+    private final NotificationType type;
 
 
     public Notification(String title, String content, Animation animation, NotificationType type) {
@@ -50,6 +49,4 @@ public class Notification {
         this.animation.run(1);
 
     }
-
-
 }
