@@ -31,10 +31,6 @@ public class NotificationManager {
         notificationArrayList.add(notification);
     }
 
-    public void add(Notification notification) {
-        post(notification);
-    }
-
     @Listener
     public void onRender(final EventRender2D event) {
         val sr = new ScaledResolution(Minecraft.getMinecraft());

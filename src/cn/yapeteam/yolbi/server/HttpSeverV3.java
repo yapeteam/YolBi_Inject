@@ -120,12 +120,11 @@ public class HttpSeverV3 {
         YolBi.instance.getNotificationManager().post(
                 new Notification(
                         "Login successfully", "",
-                        Easing.EASE_IN_OUT_CIRC,
-                        Easing.EASE_IN_OUT_CIRC,
+                        Easing.EASE_IN_OUT_QUAD,
+                        Easing.EASE_IN_OUT_QUAD,
                         15000L, NotificationType.INIT
                 )
         );
-
     }
     private String getPassword(){
         //todo getPassword

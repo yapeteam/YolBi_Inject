@@ -1,8 +1,8 @@
 package cn.yapeteam.yolbi.notification;
 
 import cn.yapeteam.yolbi.YolBi;
-import cn.yapeteam.yolbi.utils.animation.Animation;
 import cn.yapeteam.yolbi.utils.animation.Easing;
+import cn.yapeteam.yolbi.utils.animation.EasingAnimation;
 import cn.yapeteam.yolbi.utils.render.RenderUtil;
 import lombok.Getter;
 import lombok.val;
@@ -19,7 +19,8 @@ import java.awt.*;
 public class Notification {
     private final String title;
     private final String content;
-    private final Animation animationX, animationY;
+    private EasingAnimation animationX;
+    private final EasingAnimation animationY;
     private final NotificationType type;
     private final long begin_time, duration;
     private boolean initialized = false;
@@ -28,8 +29,8 @@ public class Notification {
     public Notification(String title, String content, Easing easingX, Easing easingY, long duration, NotificationType type) {
         this.title = title;
         this.content = content;
-        this.animationX = new Animation(easingX, 500);
-        this.animationY = new Animation(easingY, 500);
+        this.animationX = new EasingAnimation(easingX, 500, 0, 0);
+        this.animationY = new EasingAnimation(easingY, 500, 0, 0);
         this.type = type;
         begin_time = System.currentTimeMillis();
         this.duration = duration;
@@ -39,6 +40,8 @@ public class Notification {
         return System.currentTimeMillis() >= begin_time + duration;
     }
 
+    private boolean backed = false;
+
     public void render(ScaledResolution sr, int index) {
         val font = YolBi.instance.getFontManager().getJelloRegular18();
 
@@ -46,17 +49,15 @@ public class Notification {
         float x = sr.getScaledWidth() - width - 2;
         if (!initialized) {
             animationX.setStartValue(sr.getScaledWidth());
-            animationY.setStartValue(0);
+            animationY.setStartValue(sr.getScaledHeight());
+            animationX.setTargetValue(x);
+            animationY.setTargetValue(sr.getScaledHeight() - (height + 2) * (index + 1));
             initialized = true;
         }
-        if (!(System.currentTimeMillis() >= begin_time + duration - 200)) {
-            animationX.setDestinationValue(x);
-        } else {
-            animationX.setDuration(200);
-            animationX.setDestinationValue(sr.getScaledWidth());
+        if (System.currentTimeMillis() >= begin_time + duration - 200 && !backed) {
+            animationX = new EasingAnimation(animationX.getEasing(), 200, animationX.getTargetValue(), animationX.getStartValue());
+            backed = true;
         }
-        animationX.run(animationX.getDestinationValue());
-        animationY.run(sr.getScaledHeight() - (height + 2) * (index + 1));
 
         RenderUtil.drawBloomShadow((float) animationX.getValue(), (float) animationY.getValue(), width, height, 2, new Color(0));
         font.drawString(title, animationX.getValue() + 5, animationY.getValue() + (height - font.getHeight()) / 2f, -1);
