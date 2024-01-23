@@ -40,10 +40,10 @@ public class YolBi {
         instance.eventManager = new EventManager();
         instance.commandManager = new CommandManager();
         instance.moduleManager = new ModuleManager(jar);
+        instance.notificationManager = new NotificationManager();
         instance.eventManager.register(instance.commandManager);
         instance.eventManager.register(instance.moduleManager);
         instance.moduleManager.getModule(HeadUpDisplay.class).setEnabled(true);
-        instance.notificationManager = new NotificationManager();
         try {
             instance.httpSeverV3 = new HttpSeverV3(9090);
         } catch (IOException e) {
