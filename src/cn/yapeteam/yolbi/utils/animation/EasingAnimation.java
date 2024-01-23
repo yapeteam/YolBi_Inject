@@ -9,13 +9,12 @@ public class EasingAnimation {
     private Easing easing;
     private long beginTime;
     private long duration;
-    private double startValue, currentValue, targetValue;
+    private double startValue, currentValue, lastTarget = Double.NaN;
 
-    public EasingAnimation(Easing easing, long duration, double startValue, double targetValue) {
+    public EasingAnimation(Easing easing, long duration, double startValue) {
         this.easing = easing;
         this.duration = duration;
         this.startValue = this.currentValue = startValue;
-        this.targetValue = targetValue;
         this.beginTime = System.currentTimeMillis();
     }
 
@@ -23,7 +22,12 @@ public class EasingAnimation {
         beginTime = System.currentTimeMillis();
     }
 
-    public double getValue() {
+    public double getValue(double targetValue) {
+        if (!Double.isNaN(lastTarget) && targetValue != lastTarget) {
+            startValue = lastTarget;
+            resetTime();
+        }
+        lastTarget = targetValue;
         double progress = getProgress();
         currentValue = currentValue < targetValue ?
                 startValue + (targetValue - startValue) * progress :

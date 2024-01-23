@@ -19,8 +19,7 @@ import java.awt.*;
 public class Notification {
     private final String title;
     private final String content;
-    private EasingAnimation animationX;
-    private final EasingAnimation animationY;
+    private final EasingAnimation animationX, animationY;
     private final NotificationType type;
     private final long begin_time, duration;
     private boolean initialized = false;
@@ -29,8 +28,8 @@ public class Notification {
     public Notification(String title, String content, Easing easingX, Easing easingY, long duration, NotificationType type) {
         this.title = title;
         this.content = content;
-        this.animationX = new EasingAnimation(easingX, 500, 0, 0);
-        this.animationY = new EasingAnimation(easingY, 500, 0, 0);
+        this.animationX = new EasingAnimation(easingX, (long) (duration * 0.2), 0);
+        this.animationY = new EasingAnimation(easingY, (long) (duration * 0.2), 0);
         this.type = type;
         begin_time = System.currentTimeMillis();
         this.duration = duration;
@@ -40,26 +39,22 @@ public class Notification {
         return System.currentTimeMillis() >= begin_time + duration;
     }
 
-    private boolean backed = false;
-
     public void render(ScaledResolution sr, int index) {
         val font = YolBi.instance.getFontManager().getJelloRegular18();
 
         float width = font.getStringWidth(title) + 5 * 2;
-        float x = sr.getScaledWidth() - width - 2;
         if (!initialized) {
             animationX.setStartValue(sr.getScaledWidth());
             animationY.setStartValue(sr.getScaledHeight());
-            animationX.setTargetValue(x);
-            animationY.setTargetValue(sr.getScaledHeight() - (height + 2) * (index + 1));
             initialized = true;
         }
-        if (System.currentTimeMillis() >= begin_time + duration - 200 && !backed) {
-            animationX = new EasingAnimation(animationX.getEasing(), 200, animationX.getTargetValue(), animationX.getStartValue());
-            backed = true;
+        float targetX = sr.getScaledWidth() - width - 2;
+        if (System.currentTimeMillis() >= begin_time + duration - 200) {
+            targetX = sr.getScaledWidth() + 2;
+            animationX.setDuration((long) (duration * 0.1));
         }
-
-        RenderUtil.drawBloomShadow((float) animationX.getValue(), (float) animationY.getValue(), width, height, 2, new Color(0));
-        font.drawString(title, animationX.getValue() + 5, animationY.getValue() + (height - font.getHeight()) / 2f, -1);
+        float targetY = sr.getScaledHeight() - (height + 2) * (index + 1);
+        RenderUtil.drawBloomShadow((float) animationX.getValue(targetX), (float) animationY.getValue(targetY), width, height, 2, new Color(0));
+        font.drawString(title, animationX.getValue(targetX) + 5, animationY.getValue(targetY) + (height - font.getHeight()) / 2f, -1);
     }
 }
