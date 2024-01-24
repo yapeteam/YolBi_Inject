@@ -2,9 +2,6 @@ package cn.yapeteam.yolbi.module;
 
 import cn.yapeteam.yolbi.YolBi;
 import cn.yapeteam.yolbi.module.values.Value;
-import cn.yapeteam.yolbi.notification.Notification;
-import cn.yapeteam.yolbi.notification.NotificationType;
-import cn.yapeteam.yolbi.utils.animation.Easing;
 import com.mojang.realmsclient.gui.ChatFormatting;
 import lombok.Getter;
 import lombok.Setter;
@@ -46,12 +43,6 @@ public abstract class Module {
                 onDisable();
                 stopListening();
             }
-            YolBi.instance.getNotificationManager().post(new Notification(
-                            "Module toggled", "Module: " + name,
-                            Easing.EASE_IN_OUT_QUAD, Easing.EASE_OUT_BOUNCE,
-                            1000, enabled ? NotificationType.SUCCESS : NotificationType.FAILED
-                    )
-            );
         }
     }
 

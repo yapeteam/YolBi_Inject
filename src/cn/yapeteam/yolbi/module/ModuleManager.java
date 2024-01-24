@@ -1,8 +1,12 @@
 package cn.yapeteam.yolbi.module;
 
 import cn.yapeteam.loader.logger.Logger;
+import cn.yapeteam.yolbi.YolBi;
 import cn.yapeteam.yolbi.event.Listener;
 import cn.yapeteam.yolbi.event.impl.game.EventKey;
+import cn.yapeteam.yolbi.notification.Notification;
+import cn.yapeteam.yolbi.notification.NotificationType;
+import cn.yapeteam.yolbi.utils.animation.Easing;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
@@ -46,7 +50,15 @@ public class ModuleManager {
 
     @Listener
     private void onKey(EventKey e) {
-        modules.stream().filter(m -> m.getKey() == e.getKey()).collect(Collectors.toList()).forEach(Module::toggle);
+        modules.stream().filter(m -> m.getKey() == e.getKey()).collect(Collectors.toList()).forEach(module -> {
+            module.toggle();
+            YolBi.instance.getNotificationManager().post(new Notification(
+                            "Module toggled", "Module: " + module.getName(),
+                            Easing.EASE_IN_OUT_QUAD, Easing.EASE_OUT_BOUNCE,
+                            1000, module.isEnabled() ? NotificationType.SUCCESS : NotificationType.FAILED
+                    )
+            );
+        });
     }
 
     private void registerModule(@NotNull Class<? extends Module> aClass) {
