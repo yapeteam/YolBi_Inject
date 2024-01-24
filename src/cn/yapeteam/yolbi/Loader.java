@@ -22,7 +22,7 @@ public class Loader {
             YolBi.initialize(new File(jarPath));
             YolBi.instance.getNotificationManager().post(
                     new Notification(
-                            "Injected successfully", "",
+                            "Injected successfully",
                             Easing.EASE_IN_OUT_QUAD,
                             Easing.EASE_IN_OUT_QUAD,
                             15000L, NotificationType.INIT

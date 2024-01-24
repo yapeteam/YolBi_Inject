@@ -20,7 +20,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 @Getter
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "unused"})
 public class ModuleManager {
     private final List<Module> modules = new ArrayList<>();
 
@@ -53,8 +53,8 @@ public class ModuleManager {
         modules.stream().filter(m -> m.getKey() == e.getKey()).collect(Collectors.toList()).forEach(module -> {
             module.toggle();
             YolBi.instance.getNotificationManager().post(new Notification(
-                            "Module toggled", "Module: " + module.getName(),
-                            Easing.EASE_IN_OUT_QUAD, Easing.EASE_OUT_BOUNCE,
+                    "Module: " + module.getName() + " toggled",
+                    Easing.EASE_OUT_BACK, Easing.EASE_IN_OUT_CUBIC,
                             1000, module.isEnabled() ? NotificationType.SUCCESS : NotificationType.FAILED
                     )
             );

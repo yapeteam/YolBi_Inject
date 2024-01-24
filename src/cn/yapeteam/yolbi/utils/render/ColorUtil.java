@@ -4,11 +4,14 @@ import java.awt.*;
 
 public class ColorUtil {
     public static int reAlpha(int color, float alpha) {
-        Color c = new Color(color);
-        float r = 0.003921569f * (float) c.getRed();
-        float g = 0.003921569f * (float) c.getGreen();
-        float b = 0.003921569f * (float) c.getBlue();
-        return new Color(r, g, b, alpha).getRGB();
+        return reAlpha(new Color(color), alpha).getRGB();
+    }
+
+    public static Color reAlpha(Color color, float alpha) {
+        float r = 0.003921569f * (float) color.getRed();
+        float g = 0.003921569f * (float) color.getGreen();
+        float b = 0.003921569f * (float) color.getBlue();
+        return new Color(r, g, b, alpha);
     }
 
     public static final int buttonHoveredColor = new Color(255, 255, 255).getRGB();

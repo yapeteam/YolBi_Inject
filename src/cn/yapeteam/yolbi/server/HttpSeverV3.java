@@ -66,41 +66,41 @@ public class HttpSeverV3 {
         }
     }
 
-    private void doPost(final HttpRequest request,final HttpRespond respond) throws IOException {
+    private void doPost(final HttpRequest request, final HttpRespond respond) throws IOException {
         String userName = request.getPararmeters("username");
         String password = request.getPararmeters("password");
-        if (userName == null || password == null){
-            renderHTML(respond,"login.html");
+        if (userName == null || password == null) {
+            renderHTML(respond, "login.html");
             return;
         }
-        if (checkUser(new User(userName,password))) {
+        if (checkUser(new User(userName, password))) {
             logined();
-            renderHTML(respond,"Test.html");
+            renderHTML(respond, "Test.html");
         } else {
             //登录失败
-            renderHTML(respond,"login.html");
+            renderHTML(respond, "login.html");
         }
     }
 
     private void doGet(final HttpRequest request, final HttpRespond respond) throws IOException {
         String userName = request.getPararmeters("username");
         String password = request.getPararmeters("password");
-        User user = new User(userName,password);
-        if (userName == null || password == null){
-            renderHTML(respond,"login.html");
+        User user = new User(userName, password);
+        if (userName == null || password == null) {
+            renderHTML(respond, "login.html");
             return;
         }
         if (checkUser(user)) {
             logined();
-            renderHTML(respond,"Test.html");
+            renderHTML(respond, "Test.html");
         } else {
-            renderHTML(respond,"login.html");
+            renderHTML(respond, "login.html");
         }
 
     }
 
 
-    private void renderHTML(final HttpRespond respond,final String name) throws IOException {
+    private void renderHTML(final HttpRespond respond, final String name) throws IOException {
         respond.setHeaders("Content-type", "text/html");
         respond.setStatue(200);
         respond.setMessage("Ok");
@@ -114,30 +114,35 @@ public class HttpSeverV3 {
         }
         bufferedReader.close();
     }
-    private void logined(){
+
+    private void logined() {
         //System.out.println("Logined");
-        if (YolBi.instance.getFontManager()==null) return;
+        if (YolBi.instance.getFontManager() == null) return;
         YolBi.instance.getNotificationManager().post(
                 new Notification(
-                        "Login successfully", "",
+                        "Login successfully",
                         Easing.EASE_IN_OUT_QUAD,
                         Easing.EASE_IN_OUT_QUAD,
                         15000L, NotificationType.INIT
                 )
         );
     }
-    private String getPassword(){
+
+    private String getPassword() {
         //todo getPassword
         return "1";
     }
-    private String getUsername(){
+
+    private String getUsername() {
         //todo getUsername
         return "YolBi";
     }
-    private InputStream getHTML(final String name){
+
+    private InputStream getHTML(final String name) {
         return new ByteArrayInputStream(ResourceManager.resources.get(name));
     }
-    private boolean checkUser(final User user){
+
+    private boolean checkUser(final User user) {
         return user.getUsername().equals(getUsername()) && user.getPassword().equals(getPassword());
     }
 

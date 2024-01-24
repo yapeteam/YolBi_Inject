@@ -8,8 +8,6 @@ package cn.yapeteam.yolbi.notification;
 public enum NotificationType {
     SUCCESS,
     FAILED,
-    INFO,
-    NORMAL,
+    WARNING,
     INIT,
-
 }

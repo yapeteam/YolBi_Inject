@@ -42,6 +42,7 @@ public enum Easing {
     SIGMOID(x -> 1 / (1 + Math.exp(-x))),
     EASE_OUT_ELASTIC(x -> x == 0 ? 0 : x == 1 ? 1 : pow(2, -10 * x) * sin((x * 10 - 0.75) * ((2 * Math.PI) / 3)) * 0.5 + 1),
     EASE_IN_BACK(x -> (1.70158 + 1) * x * x * x - 1.70158 * x * x),
+    EASE_OUT_BACK(x -> 1 + (1.70158 + 1) * Math.pow(x - 1, 3) + 1.70158 * Math.pow(x - 1, 2)),
     EASE_IN_OUT_ELASTIC(x -> {
         double c5 = (2 * Math.PI) / 4.5;
         double c6 = sin((20 * x - 11.125) * c5);
