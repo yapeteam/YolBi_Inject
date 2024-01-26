@@ -36,7 +36,7 @@ public abstract class Shader {
         this.texture = GL11.glGenTextures();
     }
 
-    public abstract int dispose(int relativeX, int relativeY, float screenWidth, float screenHeight, int pixel);
+    public abstract int dispose(int relativeX, int relativeY, float screenWidth, float screenHeight);
 
     @Nullable
     public abstract Object[] params();
@@ -70,18 +70,22 @@ public abstract class Shader {
         drawImage(texture, x, y, getRealWidth(), getRealHeight(), color);
     }
 
-    private void compile() {
+    public BufferedImage generate() {
         int width = (int) this.width, height = (int) this.height;
+        int size = width * height;
+        ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());
+        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+        for (int i = 0; i < size; i++) {
+            int x = i % width, y = i / width;
+            image.setRGB(x, y, dispose(x, y, sr.getScaledWidth(), sr.getScaledHeight()));
+        }
+        image = antiAlias ? new GaussianFilter(level / 2f).filter(image, null) : image;
+        return image;
+    }
+
+    private void compile() {
         Runnable connect = () -> {
-            int size = width * height;
-            ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());
-            BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR_PRE);
-            for (int i = 0; i < size; i++) {
-                int x = i % width, y = i / width;
-                image.setRGB(x, y, dispose(x, y, sr.getScaledWidth(), sr.getScaledHeight(), 0));
-            }
-            image = antiAlias ? new GaussianFilter(level / 2f).filter(image, null) : image;
-            BufferedImage finalImage = image;
+            BufferedImage finalImage = generate();
             Runnable task = () -> TextureUtil.uploadTextureImageAllocate(
                     texture,
                     finalImage,

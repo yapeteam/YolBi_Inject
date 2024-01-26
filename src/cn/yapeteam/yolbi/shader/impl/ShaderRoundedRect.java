@@ -18,7 +18,7 @@ public class ShaderRoundedRect extends Shader {
 
     @SuppressWarnings("DuplicatedCode")
     @Override
-    public int dispose(int relativeX, int relativeY, float screenWidth, float screenHeight, int pixel) {
+    public int dispose(int relativeX, int relativeY, float screenWidth, float screenHeight) {
         float radius2 = radius * radius;
         float left = relativeX - radius;
         float right = width - relativeX - radius;

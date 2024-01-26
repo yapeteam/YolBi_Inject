@@ -2,6 +2,7 @@ package cn.yapeteam.yolbi.utils.render;
 
 import cn.yapeteam.loader.Mapper;
 import cn.yapeteam.yolbi.shader.GaussianFilter;
+import cn.yapeteam.yolbi.shader.impl.ShaderScissor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
@@ -716,8 +717,8 @@ public class RenderUtil {
         x = x - blurRadius;
         y = y - blurRadius;
 
-        float _X = x - 0.25f;
-        float _Y = y + 0.25f;
+        float _X = x - 0.75f;
+        float _Y = y - 0.75f;
 
         int identifier = (width + "," + height + "," + blurRadius).hashCode();
 
@@ -738,6 +739,7 @@ public class RenderUtil {
             g.dispose();
             GaussianFilter op = new GaussianFilter(blurRadius);
             BufferedImage blurred = op.filter(original, null);
+            blurred = new ShaderScissor(blurRadius, blurRadius, (int) (width - blurRadius * 2), (int) (height - blurRadius * 2), blurred, 1, false, false).generate();
             shadowCache.put(identifier, TextureUtil.uploadTextureImageAllocate(TextureUtil.glGenTextures(), blurred, true, false));
         }
 
