@@ -721,7 +721,7 @@ public class RenderUtil {
         float _X = x - 0.75f;
         float _Y = y - 0.75f;
 
-        int identifier = Arrays.deepHashCode(new Object[]{width, height, blurRadius});
+        int identifier = Arrays.deepHashCode(new Object[]{width, height, blurRadius, roundRadius});
 
         glEnable(GL11.GL_TEXTURE_2D);
         glDisable(GL_CULL_FACE);
