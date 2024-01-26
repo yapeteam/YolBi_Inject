@@ -18,6 +18,7 @@ import org.lwjgl.opengl.GL11;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -720,7 +721,7 @@ public class RenderUtil {
         float _X = x - 0.75f;
         float _Y = y - 0.75f;
 
-        int identifier = (width + "," + height + "," + blurRadius).hashCode();
+        int identifier = Arrays.deepHashCode(new Object[]{width, height, blurRadius});
 
         glEnable(GL11.GL_TEXTURE_2D);
         glDisable(GL_CULL_FACE);
