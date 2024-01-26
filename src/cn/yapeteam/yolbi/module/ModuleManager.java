@@ -55,7 +55,7 @@ public class ModuleManager {
             YolBi.instance.getNotificationManager().post(new Notification(
                     "Module: " + module.getName() + " toggled",
                     Easing.EASE_OUT_BACK, Easing.EASE_IN_OUT_CUBIC,
-                            1000, module.isEnabled() ? NotificationType.SUCCESS : NotificationType.FAILED
+                    1500, module.isEnabled() ? NotificationType.SUCCESS : NotificationType.FAILED
                     )
             );
         });
