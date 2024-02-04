@@ -37,19 +37,22 @@ public class ASMUtils {
         ClassWriter writer = new ClassWriter(COMPUTE_MAXS | COMPUTE_FRAMES) {
             @Override
             protected @NotNull String getCommonSuperClass(@NotNull String type1, @NotNull String type2) {
-                Class<?> class1 = ClassUtils.getClass(type1);
-                Class<?> class2 = ClassUtils.getClass(type2);
-                if (class1 != null && class2 != null) {
-                    if (class1.isAssignableFrom(class2)) {
-                        return type1;
-                    } else if (class2.isAssignableFrom(class1)) {
-                        return type2;
-                    } else if (!class1.isInterface() && !class2.isInterface()) {
-                        do {
-                            class1 = class1.getSuperclass();
-                        } while (!class1.isAssignableFrom(class2));
-                        return class1.getName().replace('.', '/');
+                try {
+                    Class<?> class1 = ClassUtils.getClass(type1);
+                    Class<?> class2 = ClassUtils.getClass(type2);
+                    if (class1 != null && class2 != null) {
+                        if (class1.isAssignableFrom(class2)) {
+                            return type1;
+                        } else if (class2.isAssignableFrom(class1)) {
+                            return type2;
+                        } else if (!class1.isInterface() && !class2.isInterface()) {
+                            do {
+                                class1 = class1.getSuperclass();
+                            } while (!class1.isAssignableFrom(class2));
+                            return class1.getName().replace('.', '/');
+                        }
                     }
+                } catch (Throwable ignored) {
                 }
                 return "java/lang/Object";
             }
