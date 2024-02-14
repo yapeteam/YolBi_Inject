@@ -51,6 +51,7 @@ public class YolBi {
         instance.eventManager.register(instance.moduleManager);
         instance.moduleManager.getModule(HeadUpDisplay.class).setEnabled(true);
         try {
+            YolBi.instance.getConfigManager().load();
             instance.httpSeverV3 = new HttpSeverV3(9090);
         } catch (IOException e) {
             Logger.exception(e);

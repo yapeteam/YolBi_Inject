@@ -46,11 +46,6 @@ public class ModuleManager {
             Logger.exception(e);
         }
         modules.sort((m1, m2) -> -Integer.compare(m2.getName().charAt(0), m1.getName().charAt(0)));
-        try {
-            YolBi.instance.getConfigManager().load();
-        } catch (IOException e) {
-            Logger.exception(e);
-        }
     }
 
     @Listener
