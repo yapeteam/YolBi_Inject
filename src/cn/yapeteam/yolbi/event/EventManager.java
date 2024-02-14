@@ -1,7 +1,5 @@
 package cn.yapeteam.yolbi.event;
 
-import dev.skidfuscator.annotations.Exclude;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -9,7 +7,6 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-@Exclude
 public class EventManager {
     private final ArrayList<Object> listeningObjects = new ArrayList<>();
     private final ArrayList<Class<?>> listeningClasses = new ArrayList<>();

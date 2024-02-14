@@ -30,7 +30,7 @@ public class ConfigManager {
 
     public void load() throws IOException {
         if (file.exists()) {
-            JsonObject jsonObject = JsonParser.parseString(new String(Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8)).getAsJsonObject();
+            JsonObject jsonObject = new JsonParser().parse(new String(Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8)).getAsJsonObject();
             for (Config config : configs) {
                 JsonObject e = jsonObject.getAsJsonObject(config.getName());
                 if (e != null) config.load(e);

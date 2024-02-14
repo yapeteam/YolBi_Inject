@@ -112,22 +112,22 @@ public class CFont {
         GL11.glVertex2d(x + width, y);
     }
 
-    public int getStringHeight() {
+    public double getStringHeight() {
         return this.getHeight();
     }
 
-    public int getHeight() {
-        return (this.fontHeight - 8) / 2;
+    public double getHeight() {
+        return (this.fontHeight - 8) / 2f;
     }
 
-    public int getStringWidth(final String text) {
+    public double getStringWidth(final String text) {
         int width = 0;
         for (final char c : text.toCharArray()) {
             if (c < this.charData.length) {
                 width += this.charData[c].width - 8 + this.charOffset;
             }
         }
-        return width / 2;
+        return width / 2f;
     }
 
     public void setAntiAlias(final boolean antiAlias) {

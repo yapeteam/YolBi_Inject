@@ -9,13 +9,11 @@ import cn.yapeteam.yolbi.module.ModuleManager;
 import cn.yapeteam.yolbi.module.impl.visual.HeadUpDisplay;
 import cn.yapeteam.yolbi.notification.NotificationManager;
 import cn.yapeteam.yolbi.server.HttpSeverV3;
-import dev.skidfuscator.annotations.Exclude;
 import lombok.Getter;
 
 import java.io.File;
 import java.io.IOException;
 
-@Exclude
 @Getter
 public class YolBi {
     public static final YolBi instance = new YolBi();

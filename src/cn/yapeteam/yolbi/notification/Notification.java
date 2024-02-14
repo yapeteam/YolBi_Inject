@@ -59,7 +59,7 @@ public class Notification {
     public void render(ScaledResolution sr, int index) {
         val font = YolBi.instance.getFontManager().getJelloRegular18();
 
-        float width = font.getStringWidth(content) + 5 * 2;
+        float width = (float) (font.getStringWidth(content) + 5 * 2);
         float targetY = sr.getScaledHeight() - (height + 2) * (index + 1);
         if (!initialized) {
             animationX.setStartValue(sr.getScaledWidth());
@@ -74,8 +74,8 @@ public class Notification {
 
         float x = (float) animationX.getValue(targetX), y = (float) animationY.getValue(targetY);
         RenderUtil.drawBloomShadow(x, y, width, height, 6, ColorUtil.reAlpha(color, 0.6f));
-        RenderUtil.drawSillyRect(x, y, x + width, y + height, ColorUtil.reAlpha(color.darker(), 0.6f).getRGB());
-        RenderUtil.drawSillyRect(x, y, x + width * animationProcess.getValue(1), y + height, color.getRGB());
+        RenderUtil.drawRect(x, y, x + width, y + height, ColorUtil.reAlpha(color.darker(), 0.6f).getRGB());
+        RenderUtil.drawRect(x, y, x + width * animationProcess.getValue(1), y + height, color.getRGB());
         font.drawString(content, x + 5, y + (height - font.getHeight()) / 2f, type == null ? 0 : -1);
     }
 }

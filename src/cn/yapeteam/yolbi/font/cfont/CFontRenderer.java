@@ -2,6 +2,7 @@ package cn.yapeteam.yolbi.font.cfont;
 
 import cn.yapeteam.loader.ResourceManager;
 import cn.yapeteam.loader.logger.Logger;
+import cn.yapeteam.yolbi.font.AbstractFontRenderer;
 import cn.yapeteam.yolbi.font.FontUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
@@ -12,10 +13,11 @@ import java.awt.*;
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 
 @SuppressWarnings({"UnusedReturnValue", "unused", "SameParameterValue"})
-public class CFontRenderer extends CFont {
+public class CFontRenderer extends CFont implements AbstractFontRenderer {
     protected CFont.CharData[] boldChars = new CFont.CharData[256];
     protected CFont.CharData[] italicChars = new CFont.CharData[256];
     protected CFont.CharData[] boldItalicChars = new CFont.CharData[256];
@@ -29,40 +31,30 @@ public class CFontRenderer extends CFont {
     }
 
     public CFontRenderer(String resourceName, int size, int fontType, boolean antiAlias, boolean fractionalMetrics) {
-        super(FontUtil.getFontFromTTF(new ByteArrayInputStream(ResourceManager.resources.get(resourceName)), size, fontType), antiAlias, fractionalMetrics);
+        super(FontUtil.getFontFromTTF(new ByteArrayInputStream(Objects.requireNonNull(ResourceManager.resources.get(resourceName))), size, fontType), antiAlias, fractionalMetrics);
         setupMinecraftColorcodes();
         setupBoldItalicIDs();
     }
 
-    public float drawString(String text, float x, float y, int color) {
+    @Override
+    public double drawString(String text, double x, double y, int color) {
         return drawString(text, x, y, color, false);
     }
 
-    public float drawString(String text, double x, double y, int color) {
-        return drawString(text, x, y, color, false);
+    @Override
+    public void drawStringWithShadow(String text, double x, double y, int color) {
+        double shadowWidth = drawString(text, x + 1, y + .5, color, true);
+        drawString(text, x, y, color, false);
     }
 
-    public float drawStringWithShadow(String text, float x, float y, int color) {
-        float shadowWidth = drawString(text, x + 1D, y + .5D, color, true);
-        return Math.max(shadowWidth, drawString(text, x, y, color, false));
+    @Override
+    public void drawStringWithShadow(String text, double x, double y, Color color) {
+        drawStringWithShadow(text, x, y, color.getRGB());
     }
 
-    public float drawStringWithShadow(String text, double x, double y, int color) {
-        float shadowWidth = drawString(text, x + 1, y + .5, color, true);
-        return Math.max(shadowWidth, drawString(text, x, y, color, false));
-    }
-
-    public float drawCenteredString(String text, float x, float y, int color) {
-        return drawString(text, x - getStringWidth(text) / 2f, y, color);
-    }
-
-    public float drawCenteredString(String text, double x, double y, int color) {
-        return drawString(text, x - getStringWidth(text) / 2f, y, color);
-    }
-
-    public float drawCenteredStringWithShadow(String text, float x, float y, int color) {
-        float shadowWidth = drawString(text, x - getStringWidth(text) / 2f + 0.45D, y + 0.5D, color, true);
-        return drawString(text, x - getStringWidth(text) / 2f, y, color);
+    @Override
+    public void drawCenteredString(String text, double x, double y, int color) {
+        drawString(text, x - getStringWidth(text) / 2f, y, color);
     }
 
     public void drawStringWithOutline(String text, double x, double y, int color) {
@@ -89,12 +81,24 @@ public class CFontRenderer extends CFont {
         drawCenteredString(text, x, y, color);
     }
 
-    public float drawCenteredStringWithShadow(String text, double x, double y, int color) {
-        float shadowWidth = drawString(text, x - getStringWidth(text) / 2f + 0.45D, y + 0.5D, color, true);
+    @Override
+    public double drawCenteredStringWithShadow(String text, double x, double y, int color) {
+        double shadowWidth = drawString(text, x - getStringWidth(text) / 2f + 0.45D, y + 0.5D, color, true);
         return drawString(text, x - getStringWidth(text) / 2f, y, color);
     }
 
-    public float drawString(String text, double x, double y, int color, boolean shadow) {
+    @Override
+    public void drawCenteredString(String text, double x, double y, Color color) {
+        drawString(text, x - getStringWidth(text) / 2f, y, color);
+    }
+
+    @Override
+    public void drawString(String text, double x, double y, Color color) {
+        drawString(text, x, y, color.getRGB());
+    }
+
+    @Override
+    public double drawString(String text, double x, double y, int color, boolean shadow) {
         Minecraft mc = Minecraft.getMinecraft();
         x -= 1;
 
@@ -220,7 +224,7 @@ public class CFontRenderer extends CFont {
         return (float) x / 2.0F;
     }
 
-    public int getStringWidth(String text) {
+    public double getStringWidth(String text) {
         if (text == null) {
             return 0;
         }
@@ -267,10 +271,15 @@ public class CFontRenderer extends CFont {
             }
         }
 
-        return width / 2;
+        return width / 2f;
     }
 
-    public int getStringWidthCust(String text) {
+    @Override
+    public double getStringHeight(String s) {
+        return getStringHeight();
+    }
+
+    public double getStringWidthCust(String text) {
         if (text == null) {
             return 0;
         }

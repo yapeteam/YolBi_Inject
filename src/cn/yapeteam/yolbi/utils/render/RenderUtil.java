@@ -154,63 +154,59 @@ public class RenderUtil {
         return (old + (current - old) * scale);
     }
 
-    public static void drawFastRoundedRect(final float left, final float top, final float right, final float bottom, final float radius, final int color) {
-        final float f2 = (color >> 24 & 0xFF) / 255.0f;
-        final float f3 = (color >> 16 & 0xFF) / 255.0f;
-        final float f4 = (color >> 8 & 0xFF) / 255.0f;
-        final float f5 = (color & 0xFF) / 255.0f;
+    public static void drawFastRoundedRect(double left, double top, double right, double bottom, double radius, int color) {
         glDisable(2884);
         glDisable(3553);
         glEnable(3042);
         glBlendFunc(770, 771);
         OpenGlHelper.glBlendFunc(770, 771, 1, 0);
-        glColor4f(f3, f4, f5, f2);
+        glColor4f((color >> 16 & 0xFF) / 255.0f, (color >> 8 & 0xFF) / 255.0f, (color & 0xFF) / 255.0f, (color >> 24 & 0xFF) / 255.0f);
         glBegin(5);
-        glVertex2f(left + radius, top);
-        glVertex2f(left + radius, bottom);
-        glVertex2f(right - radius, top);
-        glVertex2f(right - radius, bottom);
+        glVertex2d(left + radius, top);
+        glVertex2d(left + radius, bottom);
+        glVertex2d(right - radius, top);
+        glVertex2d(right - radius, bottom);
         glEnd();
         glBegin(5);
-        glVertex2f(left, top + radius);
-        glVertex2f(left + radius, top + radius);
-        glVertex2f(left, bottom - radius);
-        glVertex2f(left + radius, bottom - radius);
+        glVertex2d(left, top + radius);
+        glVertex2d(left + radius, top + radius);
+        glVertex2d(left, bottom - radius);
+        glVertex2d(left + radius, bottom - radius);
         glEnd();
         glBegin(5);
-        glVertex2f(right, top + radius);
-        glVertex2f(right - radius, top + radius);
-        glVertex2f(right, bottom - radius);
-        glVertex2f(right - radius, bottom - radius);
+        glVertex2d(right, top + radius);
+        glVertex2d(right - radius, top + radius);
+        glVertex2d(right, bottom - radius);
+        glVertex2d(right - radius, bottom - radius);
         glEnd();
         glBegin(6);
-        float f6 = right - radius;
-        float f7 = top + radius;
-        glVertex2f(f6, f7);
+        double d1 = right - radius;
+        double d2 = top + radius;
+        glVertex2d(d1, d2);
         int j;
         for (j = 0; j <= 18; ++j)
-            glVertex2f((float) (f6 + radius * Math.cos(Math.toRadians(j * 5.0f))), (float) (f7 - radius * Math.sin(Math.toRadians(j * 5.0f))));
+            glVertex2d(d1 + radius * Math.cos(Math.toRadians(j * 5.0f)), d2 - radius * Math.sin(Math.toRadians(j * 5.0f)));
         glEnd();
         glBegin(6);
-        f6 = left + radius;
-        f7 = top + radius;
-        glVertex2f(f6, f7);
+        d1 = left + radius;
+        d2 = top + radius;
+        glVertex2d(d1, d2);
         for (j = 0; j <= 18; ++j)
-            glVertex2f((float) (f6 - radius * Math.cos(Math.toRadians(j * 5.0f))), (float) (f7 - radius * Math.sin(Math.toRadians(j * 5.0f))));
+            glVertex2d(d1 - radius * Math.cos(Math.toRadians(j * 5.0f)), d2 - radius * Math.sin(Math.toRadians(j * 5.0f)));
         glEnd();
         glBegin(6);
-        f6 = left + radius;
-        f7 = bottom - radius;
-        glVertex2f(f6, f7);
+        d1 = left + radius;
+        d2 = bottom - radius;
+        glVertex2d(d1, d2);
         for (j = 0; j <= 18; ++j)
-            glVertex2f((float) (f6 - radius * Math.cos(Math.toRadians(j * 5.0f))), (float) (f7 + radius * Math.sin(Math.toRadians(j * 5.0f))));
+            glVertex2d(d1 - radius * Math.cos(Math.toRadians(j * 5.0f)), d2 + radius * Math.sin(Math.toRadians(j * 5.0f)));
         glEnd();
         glBegin(6);
-        f6 = right - radius;
-        f7 = bottom - radius;
-        glVertex2f(f6, f7);
+        d1 = right - radius;
+        d2 = bottom - radius;
+        glVertex2d(d1, d2);
         for (j = 0; j <= 18; ++j)
-            glVertex2f((float) (f6 + radius * Math.cos(Math.toRadians(j * 5.0f))), (float) (f7 + radius * Math.sin(Math.toRadians(j * 5.0f))));
+            glVertex2d(d1 + radius * Math.cos(Math.toRadians(j * 5.0f)), d2 + radius * Math.sin(Math.toRadians(j * 5.0f)));
         glEnd();
         glEnable(3553);
         glEnable(2884);
@@ -219,7 +215,7 @@ public class RenderUtil {
         disableBlend();
     }
 
-    public static void drawFastRoundedRect2(float x, float y, float width, float height, float radius, int color) {
+    public static void drawFastRoundedRect2(double x, double y, double width, double height, double radius, int color) {
         drawFastRoundedRect(x, y, x + width, y + height, radius, color);
     }
 
@@ -392,16 +388,6 @@ public class RenderUtil {
     }
 
     public static void drawRect(double left, double top, double right, double bottom, int color) {
-        GL11.glBegin(GL11.GL_QUADS);
-        color(color);
-        GL11.glVertex2d(left, bottom);
-        GL11.glVertex2d(right, bottom);
-        GL11.glVertex2d(right, top);
-        GL11.glVertex2d(left, top);
-        GL11.glEnd();
-    }
-
-    public static void drawSillyRect(double left, double top, double right, double bottom, int color) {
         double j;
         if (left < right) {
             j = left;
@@ -433,6 +419,10 @@ public class RenderUtil {
         tessellator.draw();
         GlStateManager.enableTexture2D();
         GlStateManager.disableBlend();
+    }
+
+    public static void drawRect2(double x, double y, double width, double height, int color) {
+        drawRect(x, y, x + width, y + height, color);
     }
 
     public static final Field renderPosX, renderPosY, renderPosZ;
