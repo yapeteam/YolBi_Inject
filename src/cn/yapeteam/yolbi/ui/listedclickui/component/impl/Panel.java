@@ -100,7 +100,7 @@ public class Panel extends AbstractComponent {
             setX(mouseX - dragX);
             setY(mouseY - dragY);
         }
-        RenderUtil.drawBloomShadow(getX(), getY(), getWidth(), getHeight(), 5, 4, new Color(0));
+        RenderUtil.drawBloomShadow(getX(), getY(), getWidth(), getHeight(), 5, 6, new Color(0));
         /*roundedRect.setWidth(getWidth());
         roundedRect.setHeight(getHeight());
         roundedRect.setColor(ImplScreen.MainTheme[0].getRGB());
