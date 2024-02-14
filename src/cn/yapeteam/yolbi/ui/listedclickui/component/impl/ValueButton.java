@@ -70,11 +70,11 @@ public class ValueButton extends AbstractComponent {
             }
             if (value instanceof BooleanValue) {
                 BooleanValue booleanValue = (BooleanValue) value;
-                font.drawString(value.getName(), getX() + 5 - 0.5f, getY() + (getHeight() - font.getHeight()) / 2f + 1, -1);
+                font.drawString(value.getName(), getX() + 5, getY() + (getHeight() - font.getHeight()) / 2f, -1);
                 int w = 8, h = 8;
                 RenderUtil.drawRect2(getX() + getWidth() - 5 - w, getY() + (getHeight() - h) / 2f, w, h, ImplScreen.MainTheme[1].getRGB());
                 if (booleanValue.getValue())
-                    icon.drawString("j", getX() + getWidth() - 5 - w, getY() + (getHeight() - icon.getHeight()) / 2f, ImplScreen.getComponentColor((all - 1 - index) * 100));
+                    icon.drawString("j", getX() + getWidth() - 5 - w - 0.5f, getY() + (getHeight() - icon.getHeight()) / 2f + 1, ImplScreen.getComponentColor((all - 1 - index) * 100));
             } else if (value instanceof NumberValue<?>) {
                 NumberValue<?> numberValue = (NumberValue<?>) value;
                 font.drawString(numberValue.getName(), getX() + 5, getY() + 5, -1);
