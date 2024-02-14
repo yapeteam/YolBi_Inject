@@ -1,5 +1,5 @@
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <dirent.h>
 #include <string.h>
 #include "jvmti.h"
@@ -8,6 +8,10 @@
 JavaVM *jvm;
 JNIEnv *jniEnv;
 jvmtiEnv *jvmti;
+
+typedef int bool;
+#define false 0
+#define true 1
 
 struct Callback
 {
@@ -24,16 +28,6 @@ struct TransformCallback
 };
 
 static struct TransformCallback *callback_list = NULL;
-
-jclass findThreadClass(const char *name, jobject thread)
-{
-    return (jclass)(*jniEnv)->CallObjectMethod(jniEnv,
-                                               (*jniEnv)->CallObjectMethod(
-                                                   jniEnv, thread, (*jniEnv)->GetMethodID(jniEnv, (*jniEnv)->GetObjectClass(jniEnv, thread), "getContextClassLoader", "()Ljava/lang/ClassLoader;")),
-                                               (*jniEnv)->GetMethodID(jniEnv, (*jniEnv)->FindClass(jniEnv, "java/net/URLClassLoader"),
-                                                                      "findClass", "(Ljava/lang/String;)Ljava/lang/Class;"),
-                                               (*jniEnv)->NewStringUTF(jniEnv, name));
-}
 
 unsigned char *jbyteArrayToUnsignedCharArray(JNIEnv *env, jbyteArray byteArray)
 {
@@ -191,20 +185,64 @@ jclass DefineClass(JNIEnv *env, jobject obj, jobject classLoader, jbyteArray byt
     return (jclass)classDefined;
 }
 
+bool useThread = true;
+
+jclass findThreadClass(const char *name, jobject thread)
+{
+    jclass Thread = (*jniEnv)->GetObjectClass(jniEnv, thread);
+    jclass URLClassLoader = (*jniEnv)->FindClass(jniEnv, "java/net/URLClassLoader");
+    jclass ClassLoader = (*jniEnv)->FindClass(jniEnv, "java/lang/ClassLoader");
+
+    jmethodID getContextClassLoader = (*jniEnv)->GetMethodID(jniEnv, Thread, "getContextClassLoader", "()Ljava/lang/ClassLoader;");
+    jmethodID findClass = (*jniEnv)->GetMethodID(jniEnv, URLClassLoader, "findClass", "(Ljava/lang/String;)Ljava/lang/Class;");
+    jmethodID loadClass = (*jniEnv)->GetMethodID(jniEnv, URLClassLoader, "loadClass", "(Ljava/lang/String;)Ljava/lang/Class;");
+    jmethodID getSystemClassLoader = (*jniEnv)->GetStaticMethodID(jniEnv, ClassLoader, "getSystemClassLoader", "()Ljava/lang/ClassLoader;");
+
+    jobject classloader;
+    if (useThread)
+    {
+        classloader = (*jniEnv)->CallObjectMethod(jniEnv, thread, getContextClassLoader);
+        return (jclass)(*jniEnv)->CallObjectMethod(jniEnv, classloader, findClass, (*jniEnv)->NewStringUTF(jniEnv, name));
+    }
+    else
+    {
+        classloader = (*jniEnv)->CallStaticObjectMethod(jniEnv, ClassLoader, getSystemClassLoader);
+        printf("%d\n", classloader);
+        return (jclass)(*jniEnv)->CallObjectMethod(jniEnv, classloader, loadClass, (*jniEnv)->NewStringUTF(jniEnv, name));
+    }
+}
+
 void loadJar(const char *path, jobject thread)
 {
-    jclass urlClassLoader = (*jniEnv)->FindClass(jniEnv, "java/net/URLClassLoader");
-    jclass fileClass = (*jniEnv)->FindClass(jniEnv, "java/io/File");
-    jmethodID init = (*jniEnv)->GetMethodID(jniEnv, fileClass, "<init>", "(Ljava/lang/String;)V");
-    jmethodID addURL = (*jniEnv)->GetMethodID(jniEnv, urlClassLoader, "addURL", "(Ljava/net/URL;)V");
+    jclass URLClassLoader = (*jniEnv)->FindClass(jniEnv, "java/net/URLClassLoader");
+    jclass ClassLoader = (*jniEnv)->FindClass(jniEnv, "java/lang/ClassLoader");
+    jclass URI = (*jniEnv)->FindClass(jniEnv, "java/net/URI");
+    jclass File = (*jniEnv)->FindClass(jniEnv, "java/io/File");
+    jclass Thread = (*jniEnv)->GetObjectClass(jniEnv, thread);
+
+    jmethodID init = (*jniEnv)->GetMethodID(jniEnv, File, "<init>", "(Ljava/lang/String;)V");
+    jmethodID addURL = (*jniEnv)->GetMethodID(jniEnv, URLClassLoader, "addURL", "(Ljava/net/URL;)V");
+    jmethodID toURI = (*jniEnv)->GetMethodID(jniEnv, File, "toURI", "()Ljava/net/URI;");
+    jmethodID toURL = (*jniEnv)->GetMethodID(jniEnv, URI, "toURL", "()Ljava/net/URL;");
+    jmethodID getContextClassLoader = (*jniEnv)->GetMethodID(jniEnv, Thread, "getContextClassLoader", "()Ljava/lang/ClassLoader;");
+    jmethodID getSystemClassLoader = (*jniEnv)->GetStaticMethodID(jniEnv, ClassLoader, "getSystemClassLoader", "()Ljava/lang/ClassLoader;");
+
     jstring filePath = (*jniEnv)->NewStringUTF(jniEnv, path);
-    jobject file = (*jniEnv)->NewObject(jniEnv, fileClass, init, filePath);
-    jmethodID toURI = (*jniEnv)->GetMethodID(jniEnv, fileClass, "toURI", "()Ljava/net/URI;");
+    jobject file = (*jniEnv)->NewObject(jniEnv, File, init, filePath);
     jobject uri = (*jniEnv)->CallObjectMethod(jniEnv, file, toURI);
-    jclass URIClass = (*jniEnv)->FindClass(jniEnv, "java/net/URI");
-    jmethodID toURL = (*jniEnv)->GetMethodID(jniEnv, URIClass, "toURL", "()Ljava/net/URL;");
     jobject url = (*jniEnv)->CallObjectMethod(jniEnv, uri, toURL);
-    (*jniEnv)->CallVoidMethod(jniEnv, (*jniEnv)->CallObjectMethod(jniEnv, thread, (*jniEnv)->GetMethodID(jniEnv, (*jniEnv)->GetObjectClass(jniEnv, thread), "getContextClassLoader", "()Ljava/lang/ClassLoader;")), addURL, url);
+    jobject classloader;
+
+    if (useThread)
+    {
+        classloader = (*jniEnv)->CallObjectMethod(jniEnv, thread, getContextClassLoader);
+    }
+    else
+    {
+        classloader = (*jniEnv)->CallStaticObjectMethod(jniEnv, ClassLoader, getSystemClassLoader);
+    }
+
+    (*jniEnv)->CallVoidMethod(jniEnv, classloader, addURL, url);
 }
 
 int str_endwith(const char *str, const char *reg)
@@ -270,9 +308,7 @@ void Inject(JNIEnv *env, jvmtiEnv *jti, const char yolbi_dir[260])
             char jarPath[260];
             sprintf_s(jarPath, 260, "%s\\%s", yolbi_dir, entry->d_name);
             loadJar(jarPath, clientThread);
-            printf("loaded: ");
-            printf(jarPath);
-            printf("\n");
+            printf("loaded: %s\n", jarPath);
         }
     }
     closedir(dir);
@@ -300,6 +336,7 @@ void Inject(JNIEnv *env, jvmtiEnv *jti, const char yolbi_dir[260])
     (*jvmti)->SetEventCallbacks((jvmtiEnv *)jvmti, &callbacks, sizeof(jvmtiEventCallbacks));
     (*jvmti)->SetEventNotificationMode((jvmtiEnv *)jvmti, JVMTI_ENABLE, JVMTI_EVENT_CLASS_FILE_LOAD_HOOK, NULL);
 
+    printf("1\n");
     jclass wrapperClass = findThreadClass("cn/yapeteam/loader/NativeWrapper", clientThread);
     JNINativeMethod methods[] = {
         {"getClassBytes", "(Ljava/lang/Class;)[B", (void *)&GetClassBytes},
@@ -307,7 +344,9 @@ void Inject(JNIEnv *env, jvmtiEnv *jti, const char yolbi_dir[260])
         {"defineClass", "(Ljava/lang/ClassLoader;[B)Ljava/lang/Class;", (void *)&DefineClass},
         {"getLoadedClasses", "()Ljava/util/ArrayList;", (void *)&GetLoadedClasses},
     };
+    printf("%d\n", wrapperClass);
     (*jniEnv)->RegisterNatives(jniEnv, wrapperClass, methods, 4);
+    printf("2\n");
 
     jclass PreLoad = findThreadClass("cn/yapeteam/loader/Loader", clientThread);
     jmethodID preload = (*jniEnv)->GetStaticMethodID(jniEnv, PreLoad, "preload", "(Ljava/lang/String;)V");
@@ -316,7 +355,9 @@ void Inject(JNIEnv *env, jvmtiEnv *jti, const char yolbi_dir[260])
     loadJar(injectionOutPath, clientThread);
 
     jclass Start = findThreadClass("cn/yapeteam/yolbi/Loader", clientThread);
+    printf("%d\n", Start);
     jmethodID start = (*jniEnv)->GetStaticMethodID(jniEnv, Start, "start", "(Ljava/lang/String;)V");
+    printf("%d\n", start);
     (*jniEnv)->CallStaticVoidMethod(jniEnv, Start, start, (*jniEnv)->NewStringUTF(jniEnv, injectionOutPath));
 
     (*jvm)->DetachCurrentThread(jvm);

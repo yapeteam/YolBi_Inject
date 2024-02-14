@@ -1,24 +1,30 @@
 package cn.yapeteam.yolbi;
 
+import cn.yapeteam.loader.logger.Logger;
 import cn.yapeteam.yolbi.command.CommandManager;
+import cn.yapeteam.yolbi.config.ConfigManager;
 import cn.yapeteam.yolbi.event.EventManager;
 import cn.yapeteam.yolbi.font.FontManager;
 import cn.yapeteam.yolbi.module.ModuleManager;
 import cn.yapeteam.yolbi.module.impl.visual.HeadUpDisplay;
 import cn.yapeteam.yolbi.notification.NotificationManager;
 import cn.yapeteam.yolbi.server.HttpSeverV3;
+import dev.skidfuscator.annotations.Exclude;
 import lombok.Getter;
 
 import java.io.File;
 import java.io.IOException;
 
+@Exclude
 @Getter
 public class YolBi {
     public static final YolBi instance = new YolBi();
     public static final String name = "YolBi Lite";
     public static final String version = "0.1.1";
+    public static final File YOLBI_DIR = new File(System.getProperty("user.home"), ".yolbi");
     private EventManager eventManager;
     private CommandManager commandManager;
+    private ConfigManager configManager;
     private ModuleManager moduleManager;
     private FontManager fontManager;
     private NotificationManager notificationManager;
@@ -37,8 +43,10 @@ public class YolBi {
     }
 
     public static void initialize(File jar) {
+        boolean ignored = YOLBI_DIR.mkdirs();
         instance.eventManager = new EventManager();
         instance.commandManager = new CommandManager();
+        instance.configManager = new ConfigManager();
         instance.moduleManager = new ModuleManager(jar);
         instance.notificationManager = new NotificationManager();
         instance.eventManager.register(instance.commandManager);
@@ -47,7 +55,15 @@ public class YolBi {
         try {
             instance.httpSeverV3 = new HttpSeverV3(9090);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            Logger.exception(e);
+        }
+    }
+
+    public void shutdown() {
+        try {
+            configManager.save();
+        } catch (IOException e) {
+            Logger.exception(e);
         }
     }
 }

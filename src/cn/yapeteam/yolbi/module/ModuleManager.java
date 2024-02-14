@@ -46,6 +46,11 @@ public class ModuleManager {
             Logger.exception(e);
         }
         modules.sort((m1, m2) -> -Integer.compare(m2.getName().charAt(0), m1.getName().charAt(0)));
+        try {
+            YolBi.instance.getConfigManager().load();
+        } catch (IOException e) {
+            Logger.exception(e);
+        }
     }
 
     @Listener
@@ -73,6 +78,7 @@ public class ModuleManager {
                 if (module.getKey() == 0)
                     module.setKey(info.key());
                 modules.add(module);
+                YolBi.instance.getConfigManager().registerConfig(module.getConfig());
             } catch (Throwable e) {
                 Logger.error("Failed to load Module: {}", aClass.getSimpleName());
                 Logger.exception(e);

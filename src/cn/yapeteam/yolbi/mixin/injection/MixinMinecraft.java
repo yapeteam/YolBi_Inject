@@ -17,7 +17,19 @@ public class MixinMinecraft {
         YolBi.instance.getEventManager().post(new EventTick());
     }
 
-    @Inject(method = "runTick", desc = "()V", hasReturn = false, target = @Target(value = "INVOKESTATIC", target = "org/lwjgl/input/Keyboard.getEventKeyState()Z", shift = Target.Shift.AFTER))
+    @Inject(method = "shutdownMinecraftApplet", desc = "()V", hasReturn = false, target = @Target("HEAD"))
+    public void onShutdown() {
+        YolBi.instance.shutdown();
+    }
+
+    @Inject(
+            method = "runTick", desc = "()V", hasReturn = false,
+            target = @Target(
+                    value = "INVOKESTATIC",
+                    target = "org/lwjgl/input/Keyboard.getEventKeyState()Z",
+                    shift = Target.Shift.AFTER
+            )
+    )
     public void onKey(@Local(source = "key", index = 1) int key) {
         if (Minecraft.getMinecraft().currentScreen == null && Keyboard.getEventKeyState())
             YolBi.instance.getEventManager().post(new EventKey(key));

@@ -7,9 +7,9 @@ import lombok.Setter;
 
 import java.util.Arrays;
 
+@Setter
 @Getter
 public class ModeValue<T> extends Value<T> {
-    @Setter
     private T[] modes;
 
     @SafeVarargs
@@ -27,8 +27,8 @@ public class ModeValue<T> extends Value<T> {
         setVisibility(visibility);
     }
 
-    public boolean is(T str) {
-        return getValue().equals(str);
+    public boolean is(T mode) {
+        return getValue().equals(mode);
     }
 
     public void setMode(String str) {

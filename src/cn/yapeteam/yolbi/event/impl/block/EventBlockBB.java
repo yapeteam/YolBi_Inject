@@ -12,7 +12,8 @@ import net.minecraft.util.BlockPos;
  * @since 2024/1/7 21:21
  * IntelliJ IDEA
  */
-@Getter @Setter
+@Getter
+@Setter
 public class EventBlockBB extends Event {
     private BlockPos blockPos;
     private Block block;
@@ -30,7 +31,4 @@ public class EventBlockBB extends Event {
         this.y = blockPos.getY();
         this.z = blockPos.getZ();
     }
-
-
-
 }
