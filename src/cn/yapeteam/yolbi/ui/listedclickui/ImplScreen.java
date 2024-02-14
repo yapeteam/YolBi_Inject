@@ -1,5 +1,6 @@
 package cn.yapeteam.yolbi.ui.listedclickui;
 
+import cn.yapeteam.loader.mixin.annotations.Super;
 import cn.yapeteam.yolbi.YolBi;
 import cn.yapeteam.yolbi.module.ModuleCategory;
 import cn.yapeteam.yolbi.module.impl.visual.ClickUI;
@@ -44,6 +45,7 @@ public class ImplScreen extends GuiScreen {
     private static ClientTheme clientThemeModuleInstance;
     private static ClickUI guiModuleInstance;
 
+    @Super
     @Override
     public void initGui() {
         if (!init) {
@@ -90,14 +92,16 @@ public class ImplScreen extends GuiScreen {
         MainTheme[2] = new Color(YolBi.instance.getModuleManager().getModule(ClientTheme.class).getColor(0));
     }
 
+    @Super
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         update();
         panels.forEach(p -> p.drawComponent(mouseX, mouseY, partialTicks, null));
     }
 
+    @Super
     @Override
-    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
+    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) {
         Panel toTop = null;
         for (Panel panel : panels.stream().filter(p -> isHovering(p.getX(), p.getY(), p.getWidth(), p.getHeight(), mouseX, mouseY)).collect(Collectors.toList())) {
             if (toTop == null)
@@ -113,17 +117,20 @@ public class ImplScreen extends GuiScreen {
         panels.forEach(p -> p.mouseClicked(mouseX, mouseY, mouseButton));
     }
 
+    @Super
     @Override
     protected void mouseReleased(int mouseX, int mouseY, int state) {
         panels.forEach(p -> p.mouseReleased(mouseX, mouseY, state));
     }
 
+    @Super
     @Override
     protected void keyTyped(char typedChar, int keyCode) throws IOException {
         super.keyTyped(typedChar, keyCode);
         panels.forEach(p -> p.keyTyped(typedChar, keyCode));
     }
 
+    @Super
     @Override
     public void onGuiClosed() {
         if (OpenGlHelper.shadersSupported && Minecraft.getMinecraft().getRenderViewEntity() instanceof EntityPlayer) {
@@ -139,6 +146,7 @@ public class ImplScreen extends GuiScreen {
         return guiModuleInstance.getRainbow().getValue() ? ColorUtil.rainbow(10, index / 10, 1, 1, 1).getRGB() : clientThemeModuleInstance.getColor(index);
     }
 
+    @Super
     @Override
     public boolean doesGuiPauseGame() {
         return guiModuleInstance.getPauseGame().getValue();
