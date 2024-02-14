@@ -107,7 +107,8 @@ public class Panel extends AbstractComponent {
         roundedRect.setRadius(3);
         roundedRect.render(getX(), getY(), -1);*/
         RenderUtil.drawFastRoundedRect(getX(), getY(), getX() + getWidth(), getY() + getHeight() + 1, 3, ImplScreen.MainTheme[0].getRGB());
-        RenderUtil.drawRect(getX(), getY() + ImplScreen.panelTopHeight - 0.5f, getX() + getWidth(), getY() + ImplScreen.panelTopHeight, new Color(210, 210, 210, 84).getRGB());
+        if (!getChildComponents().isEmpty())
+            RenderUtil.drawRect(getX(), getY() + ImplScreen.panelTopHeight - 0.5f, getX() + getWidth(), getY() + ImplScreen.panelTopHeight, new Color(210, 210, 210, 84).getRGB());
         AbstractFontRenderer font = YolBi.instance.getFontManager().getPingFangBold18();
         font.drawString(
                 category.name(),
