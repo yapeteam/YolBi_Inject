@@ -12,16 +12,16 @@ import net.minecraft.client.gui.ScaledResolution;
 @Mixin(GuiIngame.class)
 public class MixinGuiIngame {
     @Inject(
-            method = "renderTooltip",
-            desc = "(Lnet/minecraft/client/gui/ScaledResolution;F)V", hasReturn = false,
+            method = "renderGameOverlay",
+            desc = "(F)V", hasReturn = false,
             target = @Target(
-                    value = "INVOKESTATIC",
-                    target = "net/minecraft/client/renderer/GlStateManager.color(FFFF)V",
+                    value = "INVOKEVIRTUAL",
+                    target = "net/minecraft/client/gui/GuiNewChat.drawChat(I)V",
                     shift = Target.Shift.AFTER
             )
     )
-    //After "this.mc.theWorld.getScoreboard();"
-    public void render(@Local(source = "sr", index = 1) ScaledResolution sr, @Local(source = "partialTicks", index = 2) float partialTicks) {
+    //After “this.persistantChatGUI.drawChat(this.updateCounter);"
+    public void render(@Local(source = "partialTicks", index = 1) float partialTicks, @Local(source = "sr", index = 2) ScaledResolution sr) {
         YolBi.instance.getEventManager().post(new EventRender2D(partialTicks, sr));
     }
 }
