@@ -100,7 +100,7 @@ public class ValueButton extends AbstractComponent {
                 RenderUtil.drawFastRoundedRect(getX() + 2, getY() + 2, getX() + getWidth() - 2, getY() + getHeight() - 2, 2, ImplScreen.MainTheme[1].getRGB());
                 String text = modeValue.getName() + " | " + modeValue.getValue();
                 font.drawString(text, getX() + (getWidth() - font.getStringWidth(text)) / 2f, getY() + (getHeight() - font.getHeight()) / 2f - 2, -1);
-                font.drawString("|", getX() + (getWidth() - font.getStringWidth("|")) / 2f, getY() + getHeight() / 2f + 1, ImplScreen.getComponentColor((all - 1 - index) * 100));
+                font.drawString("|", getX() + (getWidth() - font.getStringWidth("|")) / 2f, getY() + getHeight() / 2f + 1.5f, ImplScreen.getComponentColor((all - 1 - index) * 100));
                 icon.drawString("h i", getX() + (getWidth() - icon.getStringWidth("h i")) / 2f, getY() + getHeight() / 2f + 1.5f, ImplScreen.getComponentColor((all - 1 - index) * 100));
             } else if (value instanceof ColorValue) {
                 ColorValue colorValue = (ColorValue) value;

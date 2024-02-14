@@ -15,15 +15,22 @@ import java.util.stream.Collectors;
 
 @ModuleInfo(name = "HUD", category = ModuleCategory.VISUAL)
 public class HeadUpDisplay extends Module {
+    @Override
+    protected void onEnable() {
+        theme = YolBi.instance.getModuleManager().getModule(ClientTheme.class);
+    }
+
+    private ClientTheme theme;
+
     @Listener
     private void onRender(EventRender2D e) {
         AbstractFontRenderer fontRenderer = YolBi.instance.getFontManager().getJelloRegular18();
         fontRenderer.drawString(YolBi.name + " " + YolBi.version, 2, 2, new Color(-1).getRGB());
-        List<Module> activeModules = YolBi.instance.getModuleManager().getModules().stream().filter(Module::isEnabled).sorted(Comparator.comparingInt(m -> m.getName().length())).collect(Collectors.toList());
+        List<Module> activeModules = YolBi.instance.getModuleManager().getModules().stream().filter(Module::isEnabled).sorted(Comparator.comparingInt(m -> -(m.getName() + (m.getSuffix() != null ? " " + m.getSuffix() : "")).length())).collect(Collectors.toList());
         for (int i = 0; i < activeModules.size(); i++) {
             Module module = activeModules.get(i);
             String text = module.getName() + (module.getSuffix() != null ? " " + module.getSuffix() : "");
-            fontRenderer.drawString(text, e.getScaledresolution().getScaledWidth() - fontRenderer.getStringWidth(text) - 2, 2 + i * (fontRenderer.getStringHeight() + 2), new Color(-1).getRGB());
+            fontRenderer.drawString(text, e.getScaledresolution().getScaledWidth() - fontRenderer.getStringWidth(text) - 2, 2 + i * (fontRenderer.getStringHeight() + 2), theme.getColor(i));
         }
     }
 }
