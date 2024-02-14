@@ -70,7 +70,7 @@ public class Panel extends AbstractComponent {
             }
         }
         height -= ImplScreen.moduleSpacing;
-        setHeight(Math.min(height, ImplScreen.panelMaxHeight));
+        setHeight(ImplScreen.panelTopHeight + Math.min(height, ImplScreen.panelMaxHeight));
 
         getChildComponents().forEach(AbstractComponent::update);
     }
