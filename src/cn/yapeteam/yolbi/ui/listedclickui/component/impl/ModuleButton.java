@@ -57,9 +57,6 @@ public class ModuleButton extends AbstractComponent {
         super.init();
     }
 
-    private float lastExpand;
-    private float parentExtendedHeight = 0;
-
     @Override
     public void update() {
         extend = 0;
@@ -71,18 +68,6 @@ public class ModuleButton extends AbstractComponent {
                 y += component.getHeight() + ImplScreen.valueSpacing;
             if (extended && !(component instanceof ValueButton && !((ValueButton) component).getValue().getVisibility().get()))
                 extend += component.getHeight() + ImplScreen.valueSpacing;
-        }
-
-        int extend = 0;
-        for (AbstractComponent component : getChildComponents())
-            if (!(component instanceof ValueButton && !((ValueButton) component).getValue().getVisibility().get()))
-                extend += (int) (component.getHeight() + ImplScreen.valueSpacing);
-        if (lastExpand != extend) {
-            if (extended) {
-                getParent().setHeight(getParent().getHeight() + (extend - lastExpand));//更新展开长度
-                parentExtendedHeight += extend - lastExpand;
-            }
-            lastExpand = extend;
         }
         super.update();
     }
@@ -134,20 +119,8 @@ public class ModuleButton extends AbstractComponent {
         if (isHovering(getParent().getX(), getParent().getY() + ImplScreen.panelTopHeight, getParent().getWidth(), getParent().getHeight() - ImplScreen.panelTopHeight, mouseX, mouseY))
             if (isHovering(getX(), getY(), getWidth(), getHeight(), mouseX, mouseY)) {
                 if (mouseButton == 0) module.setEnabled(!module.isEnabled());
-                if (mouseButton == 1 && !getChildComponents().isEmpty()) {
-                    int extend = 0;
-                    for (AbstractComponent component : getChildComponents())
-                        if (!(component instanceof ValueButton && !((ValueButton) component).getValue().getVisibility().get()))
-                            extend += (int) (component.getHeight() + ImplScreen.valueSpacing);
+                if (mouseButton == 1 && !getChildComponents().isEmpty())
                     extended = !extended;
-                    if (extended) {
-                        parentExtendedHeight += Math.min(extend, 100);
-                        getParent().setHeight(getParent().getHeight() + Math.min(extend, 100));
-                    } else {
-                        getParent().setHeight(getParent().getHeight() - parentExtendedHeight);
-                        parentExtendedHeight = 0;
-                    }
-                }
             }
         if (extended)
             getChildComponents().stream().filter(c -> !(c instanceof ValueButton && !((ValueButton) c).getValue().getVisibility().get())).collect(Collectors.toList()).forEach(c -> c.mouseClicked(mouseX, mouseY, mouseButton));

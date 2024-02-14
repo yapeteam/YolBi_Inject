@@ -4,7 +4,6 @@ import cn.yapeteam.yolbi.YolBi;
 import cn.yapeteam.yolbi.font.AbstractFontRenderer;
 import cn.yapeteam.yolbi.module.Module;
 import cn.yapeteam.yolbi.module.ModuleCategory;
-import cn.yapeteam.yolbi.shader.impl.ShaderRoundedRect;
 import cn.yapeteam.yolbi.ui.listedclickui.ImplScreen;
 import cn.yapeteam.yolbi.ui.listedclickui.component.AbstractComponent;
 import cn.yapeteam.yolbi.ui.listedclickui.component.Limitation;
@@ -57,13 +56,29 @@ public class Panel extends AbstractComponent {
                 ry += ImplScreen.moduleHeight + ImplScreen.moduleSpacing + moduleButton.getExtend();
             }
         scrollCache += (scroll - scrollCache) / 5f;
+
+        float height = 0;
+        for (AbstractComponent childComponent : getChildComponents()) {
+            height += childComponent.getHeight() + ImplScreen.moduleSpacing;
+            if (((ModuleButton) childComponent).isExtended()) {
+                for (AbstractComponent component : childComponent.getChildComponents()) {
+                    if (!(component instanceof ValueButton && !((ValueButton) component).getValue().getVisibility().get()))
+                        height += component.getHeight() + ImplScreen.valueSpacing;
+
+                }
+                height -= ImplScreen.valueSpacing;
+            }
+        }
+        height -= ImplScreen.moduleSpacing;
+        setHeight(Math.min(height, ImplScreen.panelMaxHeight));
+
         getChildComponents().forEach(AbstractComponent::update);
     }
 
     @Getter
     private float scroll = 0, scrollCache = 0;
 
-    private final ShaderRoundedRect roundedRect = new ShaderRoundedRect(4, true, true);
+    //private final ShaderRoundedRect roundedRect = new ShaderRoundedRect(4, true, true);
 
     @Override
     public void drawComponent(int mouseX, int mouseY, float partialTicks, Limitation ignored) {
@@ -85,7 +100,7 @@ public class Panel extends AbstractComponent {
             setX(mouseX - dragX);
             setY(mouseY - dragY);
         }
-        RenderUtil.drawBloomShadow(getX(), getY(), getWidth(), getHeight(), 5, new Color(0));
+        RenderUtil.drawBloomShadow(getX(), getY(), getWidth(), getHeight(), 5, 4, new Color(0));
         /*roundedRect.setWidth(getWidth());
         roundedRect.setHeight(getHeight());
         roundedRect.setColor(ImplScreen.MainTheme[0].getRGB());
