@@ -5,12 +5,9 @@ import cn.yapeteam.loader.utils.ClassUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import net.minecraft.client.Minecraft;
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.tree.ClassNode;
 
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -107,19 +104,22 @@ public class Mapper {
                 (type == Type.Class || owner == null || m.owner.equals(owner.replace('.', '/'))) &&
                 (m.name.equals(name.replace('.', '/'))) &&
                 (type == Type.Class || desc == null || m.desc.equals(desc))
-        ).findFirst().orElse(new Map(owner, name, desc, name, type)));
+        ).findFirst().orElse(new Map(owner, name, "null", name, type)));
     }
 
     public static Mode guessMappingMode() {
-        byte[] bytes = NativeWrapper.getClassBytes(Minecraft.class);
-        if (bytes == null) return Mode.Vanilla;
-        ClassNode node = ASMUtils.node(bytes);
-        if (node.methods.stream().anyMatch(m -> m.name.equals("runTick")))
-            return Mode.None;
-        return Mode.Searge;
+        try {
+            byte[] bytes = JVMTIWrapper.instance.getClassBytes(Class.forName("net.minecraft.client.Minecraft", true, Thread.currentThread().getContextClassLoader()));
+            ClassNode node = ASMUtils.node(bytes);
+            if (node.methods.stream().anyMatch(m -> m.name.equals("runTick")))
+                return Mode.None;
+            return Mode.Searge;
+        } catch (ClassNotFoundException ignored) {
+            return Mode.Vanilla;
+        }
     }
 
-    public static byte[] readStream(InputStream inStream) throws Exception {
+  /*  public static byte[] readStream(InputStream inStream) throws Exception {
         ByteArrayOutputStream outStream = new ByteArrayOutputStream();
         byte[] buffer = new byte[1024];
         int len;
@@ -132,13 +132,13 @@ public class Mapper {
     }
 
     public static void main(String[] args) throws Throwable {
-        /*ResourceManager.resources.put("joined.srg", readStream(Objects.requireNonNull(Mapper.class.getResourceAsStream("/joined.srg"))));
+        ResourceManager.resources.put("joined.srg", readStream(Objects.requireNonNull(Mapper.class.getResourceAsStream("/joined.srg"))));
         ResourceManager.resources.put("fields.csv", readStream(Objects.requireNonNull(Mapper.class.getResourceAsStream("/fields.csv"))));
         ResourceManager.resources.put("methods.csv", readStream(Objects.requireNonNull(Mapper.class.getResourceAsStream("/methods.csv"))));
         readMappings();
         setMode(Mode.Vanilla);
-        System.out.println(mapFieldWithSuper(EntityLivingBase.class.getName(), "posX", null));*/
-    }
+        System.out.println(mapFieldWithSuper(EntityLivingBase.class.getName(), "posX", null));
+    }*/
 
     public static String applyMode(Map map) {
         switch (mode) {
@@ -167,8 +167,8 @@ public class Mapper {
         while (theClass != Object.class) {
             if (theClass != null) {
                 Class<?> finalTheClass = theClass;
-                java.util.Map.Entry<String, Map> entry = owners.entrySet().stream().filter(m ->
-                                map(null, m.getKey(), null, Type.Class).equals(finalTheClass.getName().replace('.', '/')))
+                java.util.Map.Entry<String, Map> entry = owners.entrySet().stream()
+                        .filter(m -> map(null, m.getKey(), null, Type.Class).equals(finalTheClass.getName().replace('.', '/')))
                         .findFirst().orElse(null);
                 if (entry != null) return applyMode(entry.getValue());
                 theClass = theClass.getSuperclass();
@@ -187,5 +187,11 @@ public class Mapper {
 
     public static String getObfClass(String name) {
         return map(null, name, null, Type.Class);
+    }
+
+    public static String getFriendlyClass(String obf) {
+        Map map = mappings.stream().filter(m -> m.type == Type.Class && m.obf.equals(obf.replace('.', '/'))).findFirst().orElse(null);
+        if (map != null) return map.name;
+        return obf;
     }
 }

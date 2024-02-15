@@ -1,6 +1,6 @@
 package cn.yapeteam.yolbi.mixin;
 
-import cn.yapeteam.loader.NativeWrapper;
+import cn.yapeteam.loader.JVMTIWrapper;
 import cn.yapeteam.loader.logger.Logger;
 import cn.yapeteam.loader.mixin.Transformer;
 import cn.yapeteam.loader.mixin.annotations.Mixin;
@@ -16,7 +16,7 @@ public class MixinManager {
     public static Transformer transformer;
 
     public static void init() throws Throwable {
-        transformer = new Transformer(NativeWrapper::getClassBytes);
+        transformer = new Transformer(JVMTIWrapper.instance::getClassBytes);
         add(MixinMinecraft.class);
         add(MixinGuiIngame.class);
         add(MixinEntityPlayerSP.class);
@@ -36,7 +36,7 @@ public class MixinManager {
             if (targetClass != null) {
                 byte[] bytes = map.get(targetClass.getName());
                 Files.write(new File(dir, targetClass.getName()).toPath(), bytes);
-                int code = NativeWrapper.redefineClass(targetClass, bytes);
+                int code = JVMTIWrapper.instance.redefineClass(targetClass, bytes);
                 Logger.success("Redefined {}, Return Code {}.", targetClass, code);
             }
         }

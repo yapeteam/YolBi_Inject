@@ -32,7 +32,8 @@ fun main() {
     val agentFile = File("injector/agent.dll")
     try {
         val pid = getPid()
-        attach(pid).loadAgentPath(agentFile.absolutePath, "")
+        // attach(pid).loadAgentPath(agentFile.absolutePath, "")
+        attach(pid).loadAgent(File("out/artifacts/Agent.jar").absolutePath)
         println("注入成功")
     } catch (exception: Exception) {
         if (exception is IOException) {

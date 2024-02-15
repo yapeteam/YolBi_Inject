@@ -1,11 +1,17 @@
 package cn.yapeteam.loader;
 
+import cn.yapeteam.loader.mixin.annotations.Mixin;
+import cn.yapeteam.loader.utils.ASMUtils;
+import lombok.val;
+import lombok.var;
+
 import java.io.*;
 import java.nio.file.Files;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
+@SuppressWarnings("SameParameterValue")
 public class JarMapper {
     private static void copyStream(OutputStream os, InputStream is) throws IOException {
         copyStream(os, is, 0);
@@ -14,15 +20,14 @@ public class JarMapper {
     private static void copyStream(OutputStream os, InputStream is, int bufsize) throws IOException {
         if (bufsize <= 0) bufsize = 4096;
         int len;
-        byte[] bytes = new byte[bufsize];
-        while ((len = is.read(bytes)) != -1) {
+        val bytes = new byte[bufsize];
+        while ((len = is.read(bytes)) != -1)
             os.write(bytes, 0, len);
-        }
     }
 
     private static byte[] readStream(InputStream inStream) throws Exception {
-        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-        byte[] buffer = new byte[1024];
+        val outStream = new ByteArrayOutputStream();
+        val buffer = new byte[1024];
         int len;
         while ((len = inStream.read(buffer)) != -1)
             outStream.write(buffer, 0, len);
@@ -31,26 +36,31 @@ public class JarMapper {
     }
 
     public static void dispose(File file, File out) throws Throwable {
-        int all = 0;
-        try (ZipInputStream zis = new ZipInputStream(Files.newInputStream(file.toPath()))) {
+        var all = 0;
+        try (val zis = new ZipInputStream(Files.newInputStream(file.toPath()))) {
             while (zis.getNextEntry() != null) all++;
         }
-        ZipOutputStream zos = new ZipOutputStream(Files.newOutputStream(out.toPath()));
-        try (ZipInputStream zis = new ZipInputStream(Files.newInputStream(file.toPath()))) {
+        val zos = new ZipOutputStream(Files.newOutputStream(out.toPath()));
+        try (val zis = new ZipInputStream(Files.newInputStream(file.toPath()))) {
             ZipEntry se;
             int count = 0;
             while ((se = zis.getNextEntry()) != null) {
                 count++;
                 Loader.frame.setValue((float) count / all * 100f);
                 if (!se.isDirectory() && se.getName().endsWith(".class")) {
-                    byte[] bytes = readStream(zis);
+                    var bytes = readStream(zis);
                     bytes = ClassMapper.map(bytes);
-                    ZipEntry de = newEntry(se, bytes);
+                    val node = ASMUtils.node(bytes);
+                    if (node.visibleAnnotations != null && node.visibleAnnotations.stream().anyMatch(a -> a.desc.contains(ASMUtils.slash(Mixin.class.getName())))) {
+                        System.out.println(se.getName());
+                        ResourceManager.resources.res.put(se.getName().replace(".class", "").replace('/', '.'), bytes);
+                    }
+                    val de = newEntry(se, bytes);
                     zos.putNextEntry(de);
                     zos.write(bytes);
                     zos.closeEntry();
                 } else {
-                    ZipEntry de = new ZipEntry(se);
+                    val de = new ZipEntry(se);
                     de.setCompressedSize(-1);
                     zos.putNextEntry(de);
                     copyStream(zos, zis);
@@ -62,7 +72,7 @@ public class JarMapper {
     }
 
     private static ZipEntry newEntry(ZipEntry se, byte[] bytes) {
-        ZipEntry de = new ZipEntry(se.getName());
+        val de = new ZipEntry(se.getName());
         if (se.getLastModifiedTime() != null)
             de.setLastModifiedTime(se.getLastModifiedTime());
         if (se.getLastAccessTime() != null)
@@ -70,7 +80,7 @@ public class JarMapper {
         if (se.getCreationTime() != null)
             de.setCreationTime(se.getCreationTime());
         de.setSize(bytes.length);
-        int method = se.getMethod();
+        val method = se.getMethod();
         if (!(method != ZipEntry.STORED && method != ZipEntry.DEFLATED))
             de.setMethod(method);
         de.setExtra(se.getExtra());

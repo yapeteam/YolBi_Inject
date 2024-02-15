@@ -27,6 +27,21 @@ public class ClassMapper {
         for (String anInterface : node.interfaces)
             interfaces.add(Mapper.getObfClass(anInterface));
         node.interfaces = interfaces;
+        if (node.visibleAnnotations != null)
+            for (AnnotationNode visibleAnnotation : node.visibleAnnotations) {
+                if (visibleAnnotation.values == null) continue;
+                List<Object> values = new ArrayList<>();
+                for (int i = 0; i < visibleAnnotation.values.size(); i++) {
+                    Object aValue = visibleAnnotation.values.get(i);
+                    if (aValue instanceof Type) {
+                        Type type = (Type) aValue;
+                        String name = type.getClassName();
+                        aValue = Type.getType("L" + type.getClassName().replace(name, Mapper.getObfClass(name)).replace('.', '/') + ";");
+                    }
+                    values.add(aValue);
+                }
+                visibleAnnotation.values = values;
+            }
         ArrayList<Name_Desc> methodShadows = new ArrayList<>();
         ArrayList<Name_Desc> fieldShadows = new ArrayList<>();
         String targetName = null;
@@ -54,11 +69,11 @@ public class ClassMapper {
                 if (instruction instanceof MethodInsnNode) {
                     MethodInsnNode methodInsnNode = (MethodInsnNode) instruction;
                     if (methodShadows.stream().anyMatch(m -> m.name.equals(methodInsnNode.name) && m.desc.equals(methodInsnNode.desc)))
-                        methodInsnNode.owner = targetName;
+                        methodInsnNode.owner = Mapper.getFriendlyClass(targetName);
                 } else if (instruction instanceof FieldInsnNode) {
                     FieldInsnNode fieldInsnNode = (FieldInsnNode) instruction;
                     if (fieldShadows.stream().anyMatch(m -> m.name.equals(fieldInsnNode.name) && m.desc.equals(fieldInsnNode.desc)))
-                        fieldInsnNode.owner = targetName;
+                        fieldInsnNode.owner = Mapper.getFriendlyClass(targetName);
                 }
             }
             if (Mapper.getMode() != Mapper.Mode.None)

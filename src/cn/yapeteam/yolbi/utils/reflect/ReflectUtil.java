@@ -2,6 +2,7 @@ package cn.yapeteam.yolbi.utils.reflect;
 
 import cn.yapeteam.loader.Mapper;
 import cn.yapeteam.loader.logger.Logger;
+import cn.yapeteam.loader.utils.ClassUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.client.shader.Shader;
@@ -82,5 +83,9 @@ public class ReflectUtil {
         } catch (Exception e) {
             Logger.exception(e);
         }
+    }
+
+    public static boolean hasOptifine() {
+        return ClassUtils.getClass("net.optifine.Log") != null;
     }
 }

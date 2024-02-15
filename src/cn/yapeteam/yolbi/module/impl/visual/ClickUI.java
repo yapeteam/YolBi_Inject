@@ -6,6 +6,7 @@ import cn.yapeteam.yolbi.module.ModuleInfo;
 import cn.yapeteam.yolbi.module.values.impl.BooleanValue;
 import cn.yapeteam.yolbi.module.values.impl.NumberValue;
 import cn.yapeteam.yolbi.ui.listedclickui.ImplScreen;
+import cn.yapeteam.yolbi.utils.reflect.ReflectUtil;
 import lombok.Getter;
 import org.lwjgl.input.Keyboard;
 
@@ -18,7 +19,9 @@ public class ClickUI extends Module {
     private final NumberValue<Integer> blurRadius = new NumberValue<>("blurRadius", blur::getValue, 3, 0, 50, 1);
 
     public ClickUI() {
-        blur.setCallback((oldV, newV) -> !mc.gameSettings.ofFastRender && newV);
+        if (ReflectUtil.hasOptifine())
+            blur.setCallback((oldV, newV) -> !mc.gameSettings.ofFastRender && newV);
+        else blur.setVisibility(() -> true);
         addValues(pauseGame, blur, rainbow, blurRadius);
     }
 
@@ -28,7 +31,7 @@ public class ClickUI extends Module {
     @Override
     protected void onEnable() {
         setEnabled(false);
-        if (mc.gameSettings.ofFastRender)
+        if (ReflectUtil.hasOptifine() && mc.gameSettings.ofFastRender)
             blur.setValue(false);
         mc.displayGuiScreen(screen);
     }

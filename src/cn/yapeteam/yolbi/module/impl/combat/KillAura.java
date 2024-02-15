@@ -37,6 +37,10 @@ public class KillAura extends Module {
 
     @Override
     public void onEnable() {
+        if (mc.thePlayer == null) {
+            setEnabled(false);
+            return;
+        }
         delay = random(min.getValue(), max.getValue());
         tim = System.currentTimeMillis();
         rotationTimer = System.currentTimeMillis();
