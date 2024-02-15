@@ -44,6 +44,7 @@ public class ImplScreen extends GuiScreen {
     @Getter
     private static ClientTheme clientThemeModuleInstance;
     private static ClickUI guiModuleInstance;
+    private static final Minecraft mc = Minecraft.getMinecraft();
 
     @Super
     @Override
