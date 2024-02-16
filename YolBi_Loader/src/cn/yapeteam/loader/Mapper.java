@@ -108,15 +108,13 @@ public class Mapper {
     }
 
     public static Mode guessMappingMode() {
-        try {
-            byte[] bytes = JVMTIWrapper.instance.getClassBytes(Class.forName("net.minecraft.client.Minecraft", true, Thread.currentThread().getContextClassLoader()));
-            ClassNode node = ASMUtils.node(bytes);
-            if (node.methods.stream().anyMatch(m -> m.name.equals("runTick")))
-                return Mode.None;
-            return Mode.Searge;
-        } catch (ClassNotFoundException ignored) {
-            return Mode.Vanilla;
-        }
+        Class<?> clazz = ClassUtils.getClass("net.minecraft.client.Minecraft");
+        if (clazz == null) return Mode.Vanilla;
+        byte[] bytes = JVMTIWrapper.instance.getClassBytes(clazz);
+        ClassNode node = ASMUtils.node(bytes);
+        if (node.methods.stream().anyMatch(m -> m.name.equals("runTick")))
+            return Mode.None;
+        return Mode.Searge;
     }
 
   /*  public static byte[] readStream(InputStream inStream) throws Exception {
