@@ -1,27 +1,20 @@
 package cn.yapeteam.yolbi.shader;
 
-import cn.yapeteam.yolbi.YolBi;
 import cn.yapeteam.yolbi.event.Listener;
 import cn.yapeteam.yolbi.event.impl.game.EventLoop;
+import cn.yapeteam.yolbi.utils.render.RenderUtil;
 import lombok.AllArgsConstructor;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.texture.TextureUtil;
-import net.minecraft.util.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL11;
 
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import static net.minecraft.client.renderer.GlStateManager.disableBlend;
-import static net.minecraft.client.renderer.GlStateManager.enableTexture2D;
-import static org.lwjgl.opengl.GL11.*;
-
+@SuppressWarnings("unused")
 public abstract class Shader {
     public int identifier = -1;
     public float width, height;
@@ -67,7 +60,7 @@ public abstract class Shader {
             disposing = true;
             compile();
         }
-        drawImage(texture, x, y, getRealWidth(), getRealHeight(), color);
+        RenderUtil.drawImage(texture, x, y, getRealWidth(), getRealHeight(), color);
     }
 
     public BufferedImage generate() {
@@ -102,52 +95,6 @@ public abstract class Shader {
     }
 
     private final static CopyOnWriteArrayList<Runnable> tasks = new CopyOnWriteArrayList<>();
-
-    static {
-        YolBi.instance.getEventManager().register(Shader.class);
-    }
-
-    public static void drawImage(ResourceLocation image, int x, int y, int width, int height) {
-        try {
-            Minecraft.getMinecraft().getTextureManager().bindTexture(image);
-            glEnable(GL11.GL_BLEND);
-            Gui.drawModalRectWithCustomSizedTexture(x, y, 0, 0, width, height, width, height);
-            glDisable(GL11.GL_BLEND);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static void drawImage(int image, float x, float y, float width, float height, int color) {
-        GlStateManager.bindTexture(image);
-        Color c = new Color(color);
-        GlStateManager.color(c.getRed() / 255f, c.getGreen() / 255f, c.getGreen() / 255f);
-        glPushMatrix();
-        GlStateManager.alphaFunc(GL11.GL_GREATER, 0.01f);
-        glEnable(GL11.GL_TEXTURE_2D);
-        glDisable(GL_CULL_FACE);
-        glEnable(GL11.GL_ALPHA_TEST);
-        GlStateManager.enableBlend();
-        GL11.glBegin(GL11.GL_QUADS);
-        GL11.glTexCoord2f(0, 0); // top left
-        GL11.glVertex2f(x, y);
-
-        GL11.glTexCoord2f(0, 1); // bottom left
-        GL11.glVertex2f(x, y + height);
-
-        GL11.glTexCoord2f(1, 1); // bottom right
-        GL11.glVertex2f(x + width, y + height);
-
-        GL11.glTexCoord2f(1, 0); // top right
-        GL11.glVertex2f(x + width, y);
-        GL11.glEnd();
-        enableTexture2D();
-        disableBlend();
-        GlStateManager.resetColor();
-
-        glEnable(GL_CULL_FACE);
-        glPopMatrix();
-    }
 
     @Listener
     private static void onLoop(EventLoop e) {

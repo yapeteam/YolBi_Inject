@@ -9,6 +9,7 @@ import cn.yapeteam.yolbi.module.ModuleManager;
 import cn.yapeteam.yolbi.module.impl.visual.HeadUpDisplay;
 import cn.yapeteam.yolbi.notification.NotificationManager;
 import cn.yapeteam.yolbi.server.HttpSeverV3;
+import cn.yapeteam.yolbi.shader.Shader;
 import lombok.Getter;
 
 import java.io.File;
@@ -49,6 +50,7 @@ public class YolBi {
         instance.notificationManager = new NotificationManager();
         instance.eventManager.register(instance.commandManager);
         instance.eventManager.register(instance.moduleManager);
+        instance.eventManager.register(Shader.class);
         instance.moduleManager.getModule(HeadUpDisplay.class).setEnabled(true);
         try {
             YolBi.instance.getConfigManager().load();

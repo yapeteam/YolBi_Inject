@@ -17,10 +17,9 @@ import java.util.stream.Collectors;
 /**
  * @author TIMER_err
  */
+@Getter
 public class ModuleButton extends AbstractComponent {
-    @Getter
     private final Module module;
-    @Getter
     @Setter
     private float realY;
 
@@ -29,9 +28,7 @@ public class ModuleButton extends AbstractComponent {
         this.module = module;
     }
 
-    @Getter
     private boolean extended = false;
-    @Getter
     private float extend = 0;
 
     @Override

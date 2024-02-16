@@ -22,9 +22,9 @@ public class Limitation {
         start(() -> RenderUtil.drawRect(x, y, x + width, y + height, -1));
     }
 
-    public void start(Runnable connect) {
+    public void start(Runnable area) {
         Stencil.write(false);
-        connect.run();
+        area.run();
         Stencil.erase(true);
     }
 

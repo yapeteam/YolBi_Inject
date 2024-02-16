@@ -22,8 +22,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import static net.minecraft.client.renderer.GlStateManager.disableBlend;
-import static net.minecraft.client.renderer.GlStateManager.enableTexture2D;
 import static org.lwjgl.opengl.GL11.*;
 
 @SuppressWarnings({"DuplicatedCode", "unused"})
@@ -155,10 +153,9 @@ public class RenderUtil {
     }
 
     public static void drawFastRoundedRect(double left, double top, double right, double bottom, double radius, int color) {
-        glDisable(2884);
-        glDisable(3553);
-        glEnable(3042);
-        glBlendFunc(770, 771);
+        GlStateManager.disableCull();
+        GlStateManager.disableTexture2D();
+        GlStateManager.enableBlend();
         OpenGlHelper.glBlendFunc(770, 771, 1, 0);
         glColor4f((color >> 16 & 0xFF) / 255.0f, (color >> 8 & 0xFF) / 255.0f, (color & 0xFF) / 255.0f, (color >> 24 & 0xFF) / 255.0f);
         glBegin(5);
@@ -208,11 +205,9 @@ public class RenderUtil {
         for (j = 0; j <= 18; ++j)
             glVertex2d(d1 + radius * Math.cos(Math.toRadians(j * 5.0f)), d2 + radius * Math.sin(Math.toRadians(j * 5.0f)));
         glEnd();
-        glEnable(3553);
-        glEnable(2884);
-        glDisable(3042);
-        enableTexture2D();
-        disableBlend();
+        GlStateManager.enableTexture2D();
+        GlStateManager.enableCull();
+        GlStateManager.disableBlend();
     }
 
     public static void drawFastRoundedRect2(double x, double y, double width, double height, double radius, int color) {
@@ -233,8 +228,7 @@ public class RenderUtil {
         arcEllipse(x, y, start, end, radius, radius, color);
     }
 
-    public static void arcEllipse(final float x, final float y, float start, float end, final float w, final float h,
-                                  final int color) {
+    public static void arcEllipse(final float x, final float y, float start, float end, final float w, final float h, final int color) {
         GlStateManager.color(0.0f, 0.0f, 0.0f);
         GL11.glColor4f(0.0f, 0.0f, 0.0f, 0.0f);
         float temp;
@@ -252,7 +246,7 @@ public class RenderUtil {
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
         GlStateManager.color(var12, var13, var14, var11);
         if (var11 > 0.5f) {
-            GL11.glEnable(2848);
+            GL11.glEnable(GL_LINE_SMOOTH);
             GL11.glLineWidth(2.0f);
             GL11.glBegin(3);
             for (float i = end; i >= start; i -= 4.0f) {
@@ -261,7 +255,7 @@ public class RenderUtil {
                 GL11.glVertex2f(x + ldx, y + ldy);
             }
             GL11.glEnd();
-            GL11.glDisable(2848);
+            GL11.glDisable(GL_LINE_SMOOTH);
         }
         GL11.glBegin(6);
         for (float i = end; i >= start; i -= 4.0f) {
@@ -274,8 +268,72 @@ public class RenderUtil {
         GlStateManager.disableBlend();
     }
 
-    public static void arcEllipse(final float x, final float y, float start, float end, final float w, final float h,
-                                  final Color color) {
+    public static void drawImage(int image, float x, float y, float width, float height, int color) {
+        /*GlStateManager.enableBlend();
+        GlStateManager.enableTexture2D();
+        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
+        GlStateManager.color((color >> 16 & 0xFF) / 255.0F, (color >> 8 & 0xFF) / 255.0F, (color & 0xFF) / 255.0F, (color >> 24 & 0xFF) / 255.0F);
+        GlStateManager.bindTexture(image);
+        drawModalRectWithCustomSizedTexture(x, y, 0.0f, 0.0f, width, height, width, height);
+        GlStateManager.disableBlend();
+        GlStateManager.disableTexture2D();*/
+        /*GL11.glDisable(GL_DEPTH_TEST);
+        GL11.glEnable(GL_BLEND);
+        GL11.glDepthMask(false);
+        OpenGlHelper.glBlendFunc(770, 771, 1, 0);
+        GL11.glColor4f((color >> 16 & 0xFF) / 255.0F, (color >> 8 & 0xFF) / 255.0F, (color & 0xFF) / 255.0F, (color >> 24 & 0xFF) / 255.0F);
+        GL11.glBindTexture(GL_TEXTURE_2D, image);
+        drawModalRectWithCustomSizedTexture(x, y, 0.0f, 0.0f, width, height, width, height);
+        GL11.glDepthMask(true);
+        GL11.glDisable(GL_BLEND);
+        GL11.glEnable(GL_DEPTH_TEST);*/
+
+        glPushMatrix();
+        GlStateManager.alphaFunc(GL11.GL_GREATER, 0.01f);
+        glEnable(GL11.GL_TEXTURE_2D);
+        glDisable(GL_CULL_FACE);
+        glEnable(GL11.GL_ALPHA_TEST);
+        GlStateManager.enableBlend();
+        GlStateManager.bindTexture(image);
+
+        color(color);
+
+        GL11.glBegin(GL11.GL_QUADS);
+        GL11.glTexCoord2f(0, 0); // top left
+        GL11.glVertex2f(x, y);
+
+        GL11.glTexCoord2f(0, 1); // bottom left
+        GL11.glVertex2f(x, y + height);
+
+        GL11.glTexCoord2f(1, 1); // bottom right
+        GL11.glVertex2f(x + width, y + height);
+
+        GL11.glTexCoord2f(1, 0); // top right
+        GL11.glVertex2f(x + width, y);
+        GL11.glEnd();
+
+        GlStateManager.enableTexture2D();
+        GlStateManager.disableBlend();
+        GlStateManager.resetColor();
+
+        glEnable(GL_CULL_FACE);
+        glPopMatrix();
+    }
+
+    public static void drawModalRectWithCustomSizedTexture(float x, float y, float u, float v, float width, float height, float textureWidth, float textureHeight) {
+        float f = 1.0F / textureWidth;
+        float f1 = 1.0F / textureHeight;
+        Tessellator tessellator = Tessellator.getInstance();
+        WorldRenderer worldrenderer = tessellator.getWorldRenderer();
+        worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX);
+        worldrenderer.pos(x, y + height, 0.0).tex(u * f, (v + height) * f1).endVertex();
+        worldrenderer.pos(x + width, y + height, 0.0).tex((u + width) * f, (v + height) * f1).endVertex();
+        worldrenderer.pos(x + width, y, 0.0).tex((u + width) * f, v * f1).endVertex();
+        worldrenderer.pos(x, y, 0.0).tex(u * f, v * f1).endVertex();
+        tessellator.draw();
+    }
+
+    public static void arcEllipse(final float x, final float y, float start, float end, final float w, final float h, final Color color) {
         GlStateManager.color(0.0f, 0.0f, 0.0f);
         GL11.glColor4f(0.0f, 0.0f, 0.0f, 0.0f);
         float temp;
@@ -343,8 +401,8 @@ public class RenderUtil {
         glEnable(3553);
         glDisable(3042);
         glDisable(2848);
-        enableTexture2D();
-        disableBlend();
+        GlStateManager.enableTexture2D();
+        GlStateManager.disableBlend();
         glColor4f(1, 1, 1, 1);
     }
 
@@ -696,31 +754,18 @@ public class RenderUtil {
         GlStateManager.color(red, green, blue, alpha);
     }
 
-    public static void drawBloomShadow(float x, float y, float width, float height, int blurRadius, Color color) {
-        drawBloomShadow(x, y, width, height, blurRadius, 0, color);
+    public static void drawBloomShadow(float x, float y, float width, float height, int blurRadius, Color color, boolean scissor) {
+        drawBloomShadow(x, y, width, height, blurRadius, 0, color, scissor);
     }
 
-    public static void drawBloomShadow(float x, float y, float width, float height, int blurRadius, int roundRadius, Color color) {
-        glPushMatrix();
-        GlStateManager.alphaFunc(GL11.GL_GREATER, 0.01f);
+    public static void drawBloomShadow(float x, float y, float width, float height, int blurRadius, int roundRadius, Color color, boolean scissor) {
         width = width + blurRadius * 2;
         height = height + blurRadius * 2;
-        x = x - blurRadius;
-        y = y - blurRadius;
-
-        float _X = x - 0.75f;
-        float _Y = y - 0.75f;
+        x -= blurRadius + 0.75f;
+        y -= blurRadius + 0.75f;
 
         int identifier = Arrays.deepHashCode(new Object[]{width, height, blurRadius, roundRadius});
-
-        glEnable(GL11.GL_TEXTURE_2D);
-        glDisable(GL_CULL_FACE);
-        glEnable(GL11.GL_ALPHA_TEST);
-        GlStateManager.enableBlend();
-
-        if (shadowCache.containsKey(identifier)) {
-            GlStateManager.bindTexture(shadowCache.get(identifier));
-        } else {
+        if (!shadowCache.containsKey(identifier)) {
             if (width <= 0) width = 1;
             if (height <= 0) height = 1;
             BufferedImage original = new BufferedImage((int) width, (int) height, BufferedImage.TYPE_INT_ARGB_PRE);
@@ -730,31 +775,10 @@ public class RenderUtil {
             g.dispose();
             GaussianFilter op = new GaussianFilter(blurRadius);
             BufferedImage blurred = op.filter(original, null);
-            blurred = new ShaderScissor(blurRadius, blurRadius, (int) (width - blurRadius * 2), (int) (height - blurRadius * 2), blurred, 1, false, false).generate();
+            if (scissor)
+                blurred = new ShaderScissor(blurRadius, blurRadius, (int) (width - blurRadius * 2), (int) (height - blurRadius * 2), blurred, 1, false, false).generate();
             shadowCache.put(identifier, TextureUtil.uploadTextureImageAllocate(TextureUtil.glGenTextures(), blurred, true, false));
         }
-
-        color(color.getRGB());
-
-        GL11.glBegin(GL11.GL_QUADS);
-        GL11.glTexCoord2f(0, 0); // top left
-        GL11.glVertex2f(_X, _Y);
-
-        GL11.glTexCoord2f(0, 1); // bottom left
-        GL11.glVertex2f(_X, _Y + height);
-
-        GL11.glTexCoord2f(1, 1); // bottom right
-        GL11.glVertex2f(_X + width, _Y + height);
-
-        GL11.glTexCoord2f(1, 0); // top right
-        GL11.glVertex2f(_X + width, _Y);
-        GL11.glEnd();
-
-        enableTexture2D();
-        disableBlend();
-        GlStateManager.resetColor();
-
-        glEnable(GL_CULL_FACE);
-        glPopMatrix();
+        drawImage(shadowCache.get(identifier), x, y, width, height, color.getRGB());
     }
 }

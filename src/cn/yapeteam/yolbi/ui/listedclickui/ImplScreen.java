@@ -84,11 +84,12 @@ public class ImplScreen extends GuiScreen {
         }
     }
 
-    public void update() {
+    public void update(int mouseX, int mouseY) {
         float wheel = Mouse.getDWheel();
         panels.forEach(p -> {
             p.setWheel(wheel);
-            p.update();
+            if (p.isFullHovering(mouseX, mouseY))
+                p.update();
         });
         MainTheme[2] = new Color(YolBi.instance.getModuleManager().getModule(ClientTheme.class).getColor(0));
     }
@@ -96,7 +97,7 @@ public class ImplScreen extends GuiScreen {
     @Super
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-        update();
+        update(mouseX, mouseY);
         panels.forEach(p -> p.drawComponent(mouseX, mouseY, partialTicks, null));
     }
 

@@ -6,12 +6,18 @@ import cn.yapeteam.loader.mixin.annotations.Mixin;
 import cn.yapeteam.loader.mixin.annotations.Target;
 import cn.yapeteam.yolbi.YolBi;
 import cn.yapeteam.yolbi.event.impl.game.EventKey;
+import cn.yapeteam.yolbi.event.impl.game.EventLoop;
 import cn.yapeteam.yolbi.event.impl.game.EventTick;
 import net.minecraft.client.Minecraft;
 import org.lwjgl.input.Keyboard;
 
 @Mixin(Minecraft.class)
 public class MixinMinecraft {
+    @Inject(method = "runGameLoop", desc = "()V", hasReturn = false, target = @Target("HEAD"))
+    private void onLoop() {
+        YolBi.instance.getEventManager().post(new EventLoop());
+    }
+
     @Inject(method = "runTick", desc = "()V", hasReturn = false, target = @Target("HEAD"))
     public void onTick() {
         YolBi.instance.getEventManager().post(new EventTick());
