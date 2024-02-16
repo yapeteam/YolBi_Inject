@@ -30,15 +30,13 @@ public class ModuleManager {
             while ((entry = zis.getNextEntry()) != null) {
                 if (!entry.isDirectory()) {
                     String name = entry.getName().replace('/', '.');
-                    if (name.startsWith(ModuleManager.class.getPackage().getName())) {
-                        name = name.substring(0, name.length() - 6);
-                        try {
-                            Class<?> aClass = Class.forName(name);
-                            if (aClass.getSuperclass() == Module.class && aClass.getAnnotation(ModuleInfo.class) != null && aClass.getAnnotation(Deprecated.class) == null)
-                                registerModule((Class<? extends Module>) aClass);
-                        } catch (Throwable e) {
-                            Logger.exception(e);
-                        }
+                    name = name.substring(0, name.length() - 6);
+                    try {
+                        Class<?> aClass = Class.forName(name);
+                        if (aClass.getSuperclass() == Module.class && aClass.getAnnotation(ModuleInfo.class) != null && aClass.getAnnotation(Deprecated.class) == null)
+                            registerModule((Class<? extends Module>) aClass);
+                    } catch (Throwable e) {
+                        Logger.exception(e);
                     }
                 }
             }
