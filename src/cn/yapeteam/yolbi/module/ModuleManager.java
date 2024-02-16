@@ -32,6 +32,7 @@ public class ModuleManager {
                     String name = entry.getName().replace('/', '.');
                     name = name.substring(0, name.length() - 6);
                     try {
+                        if (name.contains(".injection.")) continue;
                         Class<?> aClass = Class.forName(name);
                         if (aClass.getSuperclass() == Module.class && aClass.getAnnotation(ModuleInfo.class) != null && aClass.getAnnotation(Deprecated.class) == null)
                             registerModule((Class<? extends Module>) aClass);
