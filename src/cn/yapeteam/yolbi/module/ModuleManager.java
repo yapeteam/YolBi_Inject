@@ -31,14 +31,14 @@ public class ModuleManager {
                 if (!entry.isDirectory()) {
                     String name = entry.getName().replace('/', '.');
                     name = name.substring(0, name.length() - 6);
-                    try {
-                        if (name.contains(".injection.")) continue;
-                        Class<?> aClass = Class.forName(name);
-                        if (aClass.getSuperclass() == Module.class && aClass.getAnnotation(ModuleInfo.class) != null && aClass.getAnnotation(Deprecated.class) == null)
-                            registerModule((Class<? extends Module>) aClass);
-                    } catch (Throwable e) {
-                        Logger.exception(e);
-                    }
+                    if (name.startsWith("cn.yapeteam.yolbi.module.impl."))
+                        try {
+                            Class<?> aClass = Class.forName(name);
+                            if (aClass.getSuperclass() == Module.class && aClass.getAnnotation(ModuleInfo.class) != null && aClass.getAnnotation(Deprecated.class) == null)
+                                registerModule((Class<? extends Module>) aClass);
+                        } catch (Throwable e) {
+                            Logger.exception(e);
+                        }
                 }
             }
         } catch (IOException e) {
