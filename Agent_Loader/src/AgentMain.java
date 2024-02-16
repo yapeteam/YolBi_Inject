@@ -7,15 +7,9 @@ import java.util.Objects;
 
 public class AgentMain {
     private static void loadJar(URLClassLoader urlClassLoader, File jar) throws Throwable {
-        String path = jar.getAbsolutePath();
-        if (File.separatorChar != '/')
-            path = path.replace(File.separatorChar, '/');
-        if (!path.startsWith("/"))
-            path = "/" + path;
-        URL url = new URL("file", "", path);
         Method method = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
         method.setAccessible(true);
-        method.invoke(urlClassLoader, url);
+        method.invoke(urlClassLoader, jar.toURI().toURL());
     }
 
     public static void agentmain(String args, Instrumentation instrumentation) throws Throwable {
