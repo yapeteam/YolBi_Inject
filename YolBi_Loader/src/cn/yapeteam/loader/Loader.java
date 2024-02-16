@@ -19,6 +19,8 @@ public class Loader {
     public static void preload(String yolbi_dir) {
         Logger.init();
         try {
+            if (JVMTIWrapper.instance == null)
+                JVMTIWrapper.instance = new NativeWrapper();
             Logger.info("Start PreLoading...");
             YOLBI_DIR = yolbi_dir;
             Mapper.Mode mode = Mapper.guessMappingMode();
