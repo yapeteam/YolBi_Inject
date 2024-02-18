@@ -7,12 +7,13 @@ import java.io.File
 import java.io.IOException
 
 
-fun getPid(type: ClientType = PCL): String? {
+fun getPid(type: ClientType = Debug): String? {
     val classname =
         when (type) {
             Lunar -> "com.moonsworth.lunar.genesis.Genesis"
             Minecraft -> "net.minecraft.client.main.Main"
             Forge -> "net.minecraft.launchwrapper.Launch"
+            Debug -> "Start"
             PCL -> "JavaWrapper.jar"
         }
     val local = MonitoredHost.getMonitoredHost("localhost")
