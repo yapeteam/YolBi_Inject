@@ -76,6 +76,7 @@ public class ImplScreen extends GuiScreen {
                 theShaderGroup.deleteShaderGroup();
             ReflectUtil.EntityRenderer$loadShader(mc.entityRenderer, new ResourceLocation("shaders/post/blur.json"));
             int radius = guiModuleInstance.getBlurRadius().getValue();
+            theShaderGroup = ReflectUtil.GetEntityRenderer$theShaderGroup(mc.entityRenderer);
             List<Shader> listShaders = ReflectUtil.GetShaderGroup$listShaders(theShaderGroup);
             if (listShaders != null && listShaders.size() >= 2) {
                 listShaders.get(0).getShaderManager().getShaderUniform("Radius").set(radius);
