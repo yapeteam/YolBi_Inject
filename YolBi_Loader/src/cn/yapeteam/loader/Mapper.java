@@ -57,17 +57,27 @@ public class Mapper {
                     dest.add(new Map(null, values[1], null, values[0], Type.Class));
                     break;
                 case "FD":
-                    obf = ASMUtils.split(values[0], "/");
-                    friendly = ASMUtils.split(values[2], "/");
-                    dest.add(
-                            new Map(
-                                    values[2].replace("/" + friendly[friendly.length - 1], ""),
-                                    friendly[friendly.length - 1],
-                                    values[3],
-                                    obf[obf.length - 1],
-                                    Type.Field
-                            )
-                    );
+                    if (values.length == 4) {
+                        obf = ASMUtils.split(values[0], "/");
+                        friendly = ASMUtils.split(values[2], "/");
+                        mappings.add(new Map(
+                                values[2].replace("/" + friendly[friendly.length - 1], ""),
+                                friendly[friendly.length - 1],
+                                values[3],
+                                obf[obf.length - 1],
+                                Mapper.Type.Field
+                        ));
+                    } else if (values.length == 2) {
+                        obf = ASMUtils.split(values[0], "/");
+                        friendly = ASMUtils.split(values[1], "/");
+                        mappings.add(new Map(
+                                values[1].replace("/" + friendly[friendly.length - 1], ""),
+                                friendly[friendly.length - 1],
+                                null,
+                                obf[obf.length - 1],
+                                Mapper.Type.Field
+                        ));
+                    }
                     break;
                 case "MD":
                     obf = ASMUtils.split(values[0], "/");

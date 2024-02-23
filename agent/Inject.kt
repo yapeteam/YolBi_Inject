@@ -7,7 +7,7 @@ import java.io.File
 import java.io.IOException
 
 
-fun getPid(type: ClientType = Debug): String? {
+fun getPid(type: ClientType = PCL): String? {
     val classname =
         when (type) {
             Lunar -> "com.moonsworth.lunar.genesis.Genesis"
