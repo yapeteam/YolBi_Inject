@@ -61,7 +61,7 @@ public class Mapper {
                     if (values.length == 4) {
                         obf = ASMUtils.split(values[0], "/");
                         friendly = ASMUtils.split(values[2], "/");
-                        mappings.add(new Map(
+                        dest.add(new Map(
                                 values[2].replace("/" + friendly[friendly.length - 1], ""),
                                 friendly[friendly.length - 1],
                                 values[3],
@@ -71,7 +71,7 @@ public class Mapper {
                     } else if (values.length == 2) {
                         obf = ASMUtils.split(values[0], "/");
                         friendly = ASMUtils.split(values[1], "/");
-                        mappings.add(new Map(
+                        dest.add(new Map(
                                 values[1].replace("/" + friendly[friendly.length - 1], ""),
                                 friendly[friendly.length - 1],
                                 null,
