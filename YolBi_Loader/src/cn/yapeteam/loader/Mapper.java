@@ -162,7 +162,7 @@ public class Mapper {
         String finalName = name;
         java.util.Map<String, Map> owners = new HashMap<>();
         mappings.stream().filter(m ->
-                m.type == type && m.name.equals(finalName) && (desc == null || m.desc.equals(desc))
+                m.type == type && m.name.equals(finalName) && (desc == null || desc.equals(m.desc))
         ).forEach(m -> owners.put(m.owner, m));
         String mappedOwner = map(null, owner, null, Type.Class);
         Class<?> theClass = ClassUtils.getClass(mappedOwner);
