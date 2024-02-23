@@ -48,7 +48,7 @@ public class Frame extends JFrame {
         label.setVerticalAlignment(SwingConstants.CENTER);
         try {
             label.setFont(Font.createFont(Font.PLAIN,
-                            Objects.requireNonNull(ResourceManager.resources.getStream("JelloLight.ttf")))
+                            Objects.requireNonNull(ResourceManager.resources.getStream("fonts/JelloLight.ttf")))
                     .deriveFont(Font.PLAIN, width / 10)
             );
         } catch (FontFormatException | IOException e) {
