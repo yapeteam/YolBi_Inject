@@ -145,6 +145,7 @@ public class Mapper {
     public static String applyMode(Map map) {
         switch (mode) {
             case Vanilla:
+                return map.obf;
             case Searge:
                 if (map.type == Type.Class)
                     return map.name;
@@ -173,7 +174,7 @@ public class Mapper {
                         .findFirst().orElse(null);
                 if (entry != null) return applyMode(entry.getValue());
                 theClass = theClass.getSuperclass();
-            }
+            } else break;
         }
         return name;
     }
