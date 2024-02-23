@@ -31,7 +31,7 @@ public class CFontRenderer extends CFont implements AbstractFontRenderer {
     }
 
     public CFontRenderer(String resourceName, int size, int fontType, boolean antiAlias, boolean fractionalMetrics) {
-        super(FontUtil.getFontFromTTF(new ByteArrayInputStream(Objects.requireNonNull(ResourceManager.resources.get(resourceName))), size, fontType), antiAlias, fractionalMetrics);
+        super(FontUtil.getFontFromTTF(new ByteArrayInputStream(Objects.requireNonNull(ResourceManager.resources.get("fonts/" + resourceName))), size, fontType), antiAlias, fractionalMetrics);
         setupMinecraftColorcodes();
         setupBoldItalicIDs();
     }

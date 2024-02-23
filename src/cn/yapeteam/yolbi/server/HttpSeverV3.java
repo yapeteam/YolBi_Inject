@@ -139,7 +139,7 @@ public class HttpSeverV3 {
     }
 
     private InputStream getHTML(final String name) {
-        return new ByteArrayInputStream(ResourceManager.resources.get(name));
+        return new ByteArrayInputStream(ResourceManager.resources.get("web/" + name));
     }
 
     private boolean checkUser(final User user) {

@@ -4,7 +4,6 @@ import cn.yapeteam.loader.utils.ASMUtils;
 import cn.yapeteam.loader.utils.ClassUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.Setter;
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.tree.ClassNode;
 
@@ -30,65 +29,67 @@ public class Mapper {
     }
 
     /**
+     * friendly→obf
+     **/
+    @Getter
+    private static ArrayList<Map> mappings = new ArrayList<>();
+    /**
      * friendly→notch
      **/
     @Getter
-    private static final ArrayList<Map> mappings = new ArrayList<>();
+    private static final ArrayList<Map> vanilla = new ArrayList<>();
     /**
      * friendly→searges
      **/
     @Getter
-    private static final java.util.Map<String, String> searges = new HashMap<>();
+    private static final ArrayList<Map> searges = new ArrayList<>();
 
     @Getter
-    @Setter
     public static Mode mode = null;
 
-    public static void readMappings() {
-        mappings.clear();
-        searges.clear();
-
-        String joined = new String(Objects.requireNonNull(ResourceManager.resources.get("joined.srg")), StandardCharsets.UTF_8);
-        String fields = new String(Objects.requireNonNull(ResourceManager.resources.get("fields.csv")), StandardCharsets.UTF_8);
-        String methods = new String(Objects.requireNonNull(ResourceManager.resources.get("methods.csv")), StandardCharsets.UTF_8);
-
-        for (String line : joined.split("\n")) {
-            line = line.replace(String.valueOf((char) 13), "");
+    public static void readMapping(String content, ArrayList<Map> dest) {
+        dest.clear();
+        for (String line : content.split("\n")) {
             String[] values = line.substring(4).split(" ");
             String[] obf, friendly;
             switch (line.substring(0, 2)) {
                 case "CL":
-                    mappings.add(new Map(null, values[1], null, values[0], Type.Class));
+                    dest.add(new Map(null, values[1], null, values[0], Type.Class));
                     break;
                 case "FD":
                     obf = ASMUtils.split(values[0], "/");
                     friendly = ASMUtils.split(values[2], "/");
-                    mappings.add(new Map(
-                            values[2].replace("/" + friendly[friendly.length - 1], ""),
-                            friendly[friendly.length - 1],
-                            values[3],
-                            obf[obf.length - 1],
-                            Type.Field
-                    ));
+                    dest.add(
+                            new Map(
+                                    values[2].replace("/" + friendly[friendly.length - 1], ""),
+                                    friendly[friendly.length - 1],
+                                    values[3],
+                                    obf[obf.length - 1],
+                                    Type.Field
+                            )
+                    );
                     break;
                 case "MD":
                     obf = ASMUtils.split(values[0], "/");
                     friendly = ASMUtils.split(values[2], "/");
-                    mappings.add(new Map(
-                            values[2].replace("/" + friendly[friendly.length - 1], ""),
-                            friendly[friendly.length - 1],
-                            values[3],
-                            obf[obf.length - 1],
-                            Type.Method
-                    ));
+                    dest.add(
+                            new Map(
+                                    values[2].replace("/" + friendly[friendly.length - 1], ""),
+                                    friendly[friendly.length - 1],
+                                    values[3],
+                                    obf[obf.length - 1],
+                                    Type.Method
+                            )
+                    );
             }
         }
-        for (String line : ASMUtils.split(fields + "\n" + methods, "\n")) {
-            if (line.isEmpty()) continue;
-            String[] values = line.split(",");
-            if (values.length >= 2)
-                searges.put(values[1], values[0]);
-        }
+    }
+
+    public static void readMappings() {
+        String vanilla = new String(Objects.requireNonNull(ResourceManager.resources.get("mappings/vanilla.srg")), StandardCharsets.UTF_8);
+        String forge = new String(Objects.requireNonNull(ResourceManager.resources.get("mappings/forge.srg")), StandardCharsets.UTF_8);
+        readMapping(vanilla, getVanilla());
+        readMapping(forge, getSearges());
     }
 
     /**
@@ -117,37 +118,29 @@ public class Mapper {
         return Mode.Searge;
     }
 
-  /*  public static byte[] readStream(InputStream inStream) throws Exception {
-        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-        byte[] buffer = new byte[1024];
-        int len;
-        while ((len = inStream.read(buffer)) != -1) {
-            outStream.write(buffer, 0, len);
+    public static void setMode(Mode mode) {
+        Mapper.mode = mode;
+        switch (mode) {
+            case Vanilla:
+                mappings = vanilla;
+                break;
+            case Searge:
+                mappings = searges;
+                break;
+            case None:
+                break;
         }
-        outStream.close();
-        inStream.close();
-        return outStream.toByteArray();
     }
-
-    public static void main(String[] args) throws Throwable {
-        ResourceManager.resources.put("joined.srg", readStream(Objects.requireNonNull(Mapper.class.getResourceAsStream("/joined.srg"))));
-        ResourceManager.resources.put("fields.csv", readStream(Objects.requireNonNull(Mapper.class.getResourceAsStream("/fields.csv"))));
-        ResourceManager.resources.put("methods.csv", readStream(Objects.requireNonNull(Mapper.class.getResourceAsStream("/methods.csv"))));
-        readMappings();
-        setMode(Mode.Vanilla);
-        System.out.println(mapFieldWithSuper(EntityLivingBase.class.getName(), "posX", null));
-    }*/
 
     public static String applyMode(Map map) {
         switch (mode) {
             case Vanilla:
-                return map.obf;
-            case None:
-                return map.name;
             case Searge:
                 if (map.type == Type.Class)
                     return map.name;
-                return searges.get(map.name);
+                return map.obf;
+            case None:
+                return map.name;
         }
         return map.name;
     }
