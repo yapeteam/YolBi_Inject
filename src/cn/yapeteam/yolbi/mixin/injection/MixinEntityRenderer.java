@@ -11,7 +11,7 @@ import net.minecraft.client.renderer.EntityRenderer;
 @Mixin(EntityRenderer.class)
 public class MixinEntityRenderer {
     @Inject(
-            method = "renderWorldPass", desc = "(IFJ)V", hasReturn = false,
+            method = "renderWorldPass", desc = "(IFJ)V",
             target = @Target(
                     value = "INVOKESTATIC",
                     target = "net/minecraft/client/renderer/GlStateManager.disableFog()V",

@@ -1,9 +1,8 @@
 package cn.yapeteam.yolbi.mixin.injection;
 
-import cn.yapeteam.loader.mixin.annotations.Inject;
 import cn.yapeteam.loader.mixin.annotations.Mixin;
+import cn.yapeteam.loader.mixin.annotations.Overwrite;
 import cn.yapeteam.loader.mixin.annotations.Shadow;
-import cn.yapeteam.loader.mixin.annotations.Target;
 import cn.yapeteam.yolbi.YolBi;
 import cn.yapeteam.yolbi.event.impl.player.EventJump;
 import net.minecraft.client.Minecraft;
@@ -78,12 +77,7 @@ public class MixinEntityLivingBase extends EntityLivingBase {
     @Shadow
     public boolean isAirBorne;
 
-    @Inject(
-            method = "jump",
-            desc = "()V",
-            hasReturn = true,
-            target = @Target("HEAD")
-    )
+    @Overwrite
     protected void jump() {
         double jumpY = this.getJumpUpwardsMotion();
 

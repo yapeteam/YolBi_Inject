@@ -24,7 +24,6 @@ public class MixinEntityPlayerSP extends EntityPlayerSP {
 
     @Inject(
             method = "onUpdate", desc = "()V",
-            hasReturn = false,
             target = @Target(
                     value = "INVOKEVIRTUAL",
                     target = "net/minecraft/client/entity/EntityPlayerSP.isRiding()Z",
@@ -94,12 +93,8 @@ public class MixinEntityPlayerSP extends EntityPlayerSP {
         return false;
     }
 
-    @Inject(
-            method = "onUpdateWalkingPlayer", desc = "()V",
-            hasReturn = true,
-            target = @Target("HEAD")
-    )
-    public void onMotion() {
+    @Overwrite
+    public void onUpdateWalkingPlayer() {
         boolean flag = this.isSprinting();
         if (flag != this.serverSprintState) {
             if (flag) {
@@ -165,12 +160,8 @@ public class MixinEntityPlayerSP extends EntityPlayerSP {
         return;
     }
 
-    @Inject(
-            method = "sendChatMessage", desc = "(Ljava/lang/String;)V",
-            hasReturn = true,
-            target = @Target("HEAD")
-    )
-    public void onSendChatMessage(@Local(source = "message", index = 1) String message) {
+    @Overwrite
+    public void sendChatMessage(@Local(source = "message", index = 1) String message) {
         EventChat event = new EventChat(message);
         YolBi.instance.getEventManager().post(event);
         if (!event.isCancelled()) {

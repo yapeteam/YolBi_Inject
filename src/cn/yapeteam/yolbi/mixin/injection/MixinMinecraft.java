@@ -13,23 +13,23 @@ import org.lwjgl.input.Keyboard;
 
 @Mixin(Minecraft.class)
 public class MixinMinecraft {
-    @Inject(method = "runGameLoop", desc = "()V", hasReturn = false, target = @Target("HEAD"))
+    @Inject(method = "runGameLoop", desc = "()V", target = @Target("HEAD"))
     private void onLoop() {
         YolBi.instance.getEventManager().post(new EventLoop());
     }
 
-    @Inject(method = "runTick", desc = "()V", hasReturn = false, target = @Target("HEAD"))
+    @Inject(method = "runTick", desc = "()V", target = @Target("HEAD"))
     public void onTick() {
         YolBi.instance.getEventManager().post(new EventTick());
     }
 
-    @Inject(method = "shutdownMinecraftApplet", desc = "()V", hasReturn = false, target = @Target("HEAD"))
+    @Inject(method = "shutdownMinecraftApplet", desc = "()V", target = @Target("HEAD"))
     public void onShutdown() {
         YolBi.instance.shutdown();
     }
 
     @Inject(
-            method = "runTick", desc = "()V", hasReturn = false,
+            method = "runTick", desc = "()V",
             target = @Target(
                     value = "INVOKESTATIC",
                     target = "org/lwjgl/input/Keyboard.getEventKeyState()Z",

@@ -21,7 +21,6 @@ public class MixinPlayerControllerMP {
     @Inject(
             method = "attackEntity",
             desc = "(Lnet/minecraft/entity/player/EntityPlayer;Lnet/minecraft/entity/Entity;)V",
-            hasReturn = false,
             target = @Target("HEAD")
     )
     public void attackEntity(@Local(source = "targetEntity", index = 2) Entity targetEntity) {

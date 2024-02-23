@@ -13,7 +13,7 @@ import net.minecraft.client.gui.ScaledResolution;
 public class MixinGuiIngame {
     @Inject(
             method = "renderTooltip",
-            desc = "(Lnet/minecraft/client/gui/ScaledResolution;F)V", hasReturn = false,
+            desc = "(Lnet/minecraft/client/gui/ScaledResolution;F)V",
             target = @Target(
                     value = "INVOKESTATIC",
                     target = "net/minecraft/client/renderer/GlStateManager.color(FFFF)V",

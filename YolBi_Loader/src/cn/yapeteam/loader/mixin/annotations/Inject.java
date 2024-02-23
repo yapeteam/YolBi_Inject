@@ -10,7 +10,6 @@ import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.util.Objects;
 
 @Retention(RetentionPolicy.RUNTIME)
 @java.lang.annotation.Target(ElementType.METHOD)
@@ -20,8 +19,6 @@ public @interface Inject {
     String desc();
 
     Target target();
-
-    boolean hasReturn();
 
     class Helper {
         public static Inject fromNode(AnnotationNode annotation) {
@@ -39,11 +36,6 @@ public @interface Inject {
                 @Override
                 public String desc() {
                     return ASMUtils.getAnnotationValue(annotation, "desc");
-                }
-
-                @Override
-                public boolean hasReturn() {
-                    return Boolean.parseBoolean(Objects.requireNonNull(ASMUtils.getAnnotationValue(annotation, "hasReturn")).toString());
                 }
 
                 @Override

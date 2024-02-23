@@ -2,10 +2,8 @@ package cn.yapeteam.loader.mixin.operation.impl;
 
 import cn.yapeteam.loader.Loader;
 import cn.yapeteam.loader.Mapper;
-import cn.yapeteam.loader.ResourceManager;
 import cn.yapeteam.loader.logger.Logger;
 import cn.yapeteam.loader.mixin.Mixin;
-import cn.yapeteam.loader.mixin.Transformer;
 import cn.yapeteam.loader.mixin.annotations.Inject;
 import cn.yapeteam.loader.mixin.annotations.Local;
 import cn.yapeteam.loader.mixin.annotations.Target;
@@ -18,7 +16,6 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.*;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -49,16 +46,8 @@ public class InjectOperation implements Operation {
         return new AbstractInsnNode[]{first, last};
     }
 
-    private static MethodNode findTargetMethod(List<MethodNode> list, String owner, String name, String desc) {
-        name = Mapper.mapWithSuper(owner, name, desc, Mapper.Type.Method);
-        desc = DescParser.mapDesc(desc);
-        String finalName = name;
-        String finalDesc = desc;
-        return list.stream().filter(m -> m.name.equals(finalName) && m.desc.equals(finalDesc)).findFirst().orElse(null);
-    }
-
-    private static void processReturnLabel(MethodNode source, Inject info) {
-        if (!info.hasReturn()) {
+    private static void processReturnLabel(MethodNode source) {
+        if (source.desc.endsWith("V")) {
             if (source.instructions.get(source.instructions.size() - 1) instanceof LabelNode)
                 source.instructions.remove(source.instructions.get(source.instructions.size() - 1));
             while (!(source.instructions.get(source.instructions.size() - 1) instanceof LabelNode))
@@ -97,57 +86,20 @@ public class InjectOperation implements Operation {
         return parameters;
     }
 
-    private static boolean isLoadOpe(int opcode) {
-        for (Field field : Opcodes.class.getFields())
-            if (field.getName().endsWith("LOAD"))
-                try {
-                    if ((int) field.get(null) == opcode)
-                        return true;
-                } catch (Throwable ignored) {
-                }
-        return false;
-    }
-
-    private static boolean isStoreOpe(int opcode) {
-        for (Field field : Opcodes.class.getFields())
-            if (field.getName().endsWith("STORE"))
-                try {
-                    if ((int) field.get(null) == opcode)
-                        return true;
-                } catch (Throwable ignored) {
-                }
-        return false;
-    }
-
-    static class CustomLoader extends ClassLoader {
-        public Class<?> load(byte[] bytes) {
-            return defineClass(null, bytes, 0, bytes.length);
-        }
-    }
-
-    public static void main(String[] args) throws Throwable {
-        Mapper.setMode(Mapper.Mode.None);
-        Transformer transformer = new Transformer((name) -> ResourceManager.readStream(InjectOperation.class.getResourceAsStream("/" + name + ".class")));
-        //transformer.addMixin(source.class);
-        byte[] bytes = transformer.transform().get("target");
-        new CustomLoader().load(bytes).getMethod("target").invoke(null);
-    }
-
     private static void processLocalValues(MethodNode source, MethodNode target) {
         int max_index = 0;
         for (AbstractInsnNode instruction : target.instructions) {
-            if (instruction instanceof VarInsnNode && (isLoadOpe(instruction.getOpcode()) || isStoreOpe(instruction.getOpcode()))) {
+            if (instruction instanceof VarInsnNode && (Operation.isLoadOpe(instruction.getOpcode()) || Operation.isStoreOpe(instruction.getOpcode()))) {
                 VarInsnNode varInsnNode = (VarInsnNode) instruction;
                 max_index = Math.max(max_index, varInsnNode.var);
             }
         }
 
-
         Map<Integer, Integer> varMap = new HashMap<>();
         //Process local var store & load
         for (int i = 0; i < source.instructions.size(); i++) {
             AbstractInsnNode instruction = source.instructions.get(i);
-            if (instruction instanceof VarInsnNode && isStoreOpe(instruction.getOpcode())) {
+            if (instruction instanceof VarInsnNode && Operation.isStoreOpe(instruction.getOpcode())) {
                 VarInsnNode varInsnNode = (VarInsnNode) instruction;
                 varMap.put(varInsnNode.var, varInsnNode.var += max_index);
             }
@@ -162,7 +114,7 @@ public class InjectOperation implements Operation {
         }
         for (int i = 0; i < source.instructions.size(); i++) {
             AbstractInsnNode instruction = source.instructions.get(i);
-            if (instruction instanceof VarInsnNode && isLoadOpe(instruction.getOpcode())) {
+            if (instruction instanceof VarInsnNode && Operation.isLoadOpe(instruction.getOpcode())) {
                 VarInsnNode varInsnNode = (VarInsnNode) instruction;
                 Integer index = varMap.get(varInsnNode.var);
                 if (index != null)
@@ -217,12 +169,12 @@ public class InjectOperation implements Operation {
         for (MethodNode injection : injections) {
             Inject info = Inject.Helper.getAnnotation(injection);
             if (info == null) continue;
-            MethodNode targetMethod = findTargetMethod(target.methods, mixin.getTargetName(), info.method(), info.desc());
+            MethodNode targetMethod = Operation.findTargetMethod(target.methods, mixin.getTargetName(), info.method(), info.desc());
             if (targetMethod == null) {
                 Logger.error("No method found: {} in {}", Mapper.mapWithSuper(mixin.getTargetName(), info.method(), info.desc(), Mapper.Type.Method) + DescParser.mapDesc(info.desc()), target.name);
                 return;
             }
-            processReturnLabel(injection, info);
+            processReturnLabel(injection);
             processLocalValues(injection, targetMethod);
             try {
                 insert(injection, targetMethod, info);

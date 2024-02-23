@@ -1,9 +1,8 @@
 package cn.yapeteam.yolbi.mixin.injection;
 
-import cn.yapeteam.loader.mixin.annotations.Inject;
 import cn.yapeteam.loader.mixin.annotations.Mixin;
+import cn.yapeteam.loader.mixin.annotations.Overwrite;
 import cn.yapeteam.loader.mixin.annotations.Shadow;
-import cn.yapeteam.loader.mixin.annotations.Target;
 import cn.yapeteam.yolbi.YolBi;
 import cn.yapeteam.yolbi.event.impl.block.EventBlockBB;
 import net.minecraft.block.Block;
@@ -33,12 +32,7 @@ public class MixinBlock {
      *
      * @param collidingEntity the Entity colliding with this Block
      */
-    @Inject(
-            method = "addCollisionBoxesToList",
-            desc = "(Lnet/minecraft/world/World;Lnet/minecraft/util/BlockPos;Lnet/minecraft/block/state/IBlockState;Lnet/minecraft/util/AxisAlignedBB;Ljava/util/List;Lnet/minecraft/entity/Entity;)V",
-            hasReturn = true,
-            target = @Target("HEAD")
-    )
+    @Overwrite
     public void addCollisionBoxesToList(World worldIn, BlockPos pos, IBlockState state, AxisAlignedBB mask, List<AxisAlignedBB> list, Entity collidingEntity) {
         AxisAlignedBB axisalignedbb = this.getCollisionBoundingBox(worldIn, pos, state);
         EventBlockBB eventBlockBB = new EventBlockBB(pos, state.getBlock(), axisalignedbb);
