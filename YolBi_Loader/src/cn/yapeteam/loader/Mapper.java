@@ -1,5 +1,6 @@
 package cn.yapeteam.loader;
 
+import cn.yapeteam.loader.logger.Logger;
 import cn.yapeteam.loader.utils.ASMUtils;
 import cn.yapeteam.loader.utils.ClassUtils;
 import lombok.AllArgsConstructor;
@@ -162,7 +163,7 @@ public class Mapper {
         String finalName = name;
         java.util.Map<String, Map> owners = new HashMap<>();
         mappings.stream().filter(m ->
-                m.type == type && m.name.equals(finalName) && (desc == null || desc.equals(m.desc))
+                m.type == type && m.name.equals(finalName) && (desc == null || m.desc == null || desc.equals(m.desc))
         ).forEach(m -> owners.put(m.owner, m));
         String mappedOwner = map(null, owner, null, Type.Class);
         Class<?> theClass = ClassUtils.getClass(mappedOwner);
@@ -174,7 +175,11 @@ public class Mapper {
                         .findFirst().orElse(null);
                 if (entry != null) return applyMode(entry.getValue());
                 theClass = theClass.getSuperclass();
-            } else break;
+            } else {
+                Logger.error("Owner not found!");
+                Logger.exception(new Exception());
+                break;
+            }
         }
         return name;
     }
