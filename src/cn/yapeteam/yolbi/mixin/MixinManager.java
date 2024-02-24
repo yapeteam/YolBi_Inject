@@ -24,8 +24,10 @@ public class MixinManager {
         add(MixinPlayerControllerMP.class);
         add(MixinBlock.class);
         add(MixinEntityLivingBase.class);
+        add(MixinRendererLivingEntity.class);
     }
 
+    //for debug
     private static final File dir = new File("generatedClasses");
 
     public static void load() throws Throwable {

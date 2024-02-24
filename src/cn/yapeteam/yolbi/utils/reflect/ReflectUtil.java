@@ -85,7 +85,5 @@ public class ReflectUtil {
         }
     }
 
-    public static boolean hasOptifine() {
-        return ClassUtils.getClass("net.optifine.Log") != null;
-    }
+    public static final boolean hasOptifine = ClassUtils.getClass("net.optifine.Log") != null;
 }
