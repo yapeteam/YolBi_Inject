@@ -106,8 +106,10 @@ public class InjectOperation implements Operation {
                 for (String[] sourceParameter : sourceParameters)
                     if (getLocalVarIndex(source, sourceParameter[0]) == varInsnNode.var)
                         canChange = false;
-                if (canChange)
+                if (canChange) {
                     varMap.put(varInsnNode.var, varInsnNode.var += max_index);
+                    System.out.println((varInsnNode.var - max_index) + "->" + varMap.get(varInsnNode.var - max_index) + ":" + varInsnNode.getOpcode());
+                }
             }
         }
         //Access context local var
@@ -122,8 +124,10 @@ public class InjectOperation implements Operation {
             if (instruction instanceof VarInsnNode && (Operation.isLoadOpe(instruction.getOpcode()) || Operation.isStoreOpe(instruction.getOpcode()))) {
                 VarInsnNode varInsnNode = (VarInsnNode) instruction;
                 Integer index = varMap.get(varInsnNode.var);
-                if (index != null)
+                if (index != null) {
+                    System.out.println((varInsnNode.var) + "->" + index + ":" + varInsnNode.getOpcode());
                     varInsnNode.var = index;
+                }
             } else if (instruction instanceof IincInsnNode) {
                 IincInsnNode iincInsnNode = (IincInsnNode) instruction;
                 Integer index = varMap.get(iincInsnNode.var);

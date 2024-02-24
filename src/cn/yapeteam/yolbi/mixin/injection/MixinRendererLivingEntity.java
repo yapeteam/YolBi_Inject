@@ -12,7 +12,7 @@ import net.minecraft.util.ResourceLocation;
 
 @Mixin(RendererLivingEntity.class)
 @SuppressWarnings({"ParameterCanBeLocal", "UnusedAssignment"})
-public class MixinRendererLivingEntity<T extends EntityLivingBase> extends Render<T> {
+public class MixinRendererLivingEntity extends Render<EntityLivingBase> {
     protected MixinRendererLivingEntity(RenderManager renderManager) {
         super(renderManager);
     }
@@ -27,7 +27,7 @@ public class MixinRendererLivingEntity<T extends EntityLivingBase> extends Rende
             target = @Target(value = "INSTANCEOF", shift = Target.Shift.BEFORE)
     )
     public void onRender1(
-            @Local(source = "entity", index = 1) T entity,
+            @Local(source = "entity", index = 1) EntityLivingBase entity,
             @Local(source = "partialTicks", index = 9) float partialTicks,
             @Local(source = "f", index = 10) float f,
             @Local(source = "f1", index = 11) float f1,
@@ -57,7 +57,7 @@ public class MixinRendererLivingEntity<T extends EntityLivingBase> extends Rende
     }
 
     @Override
-    protected ResourceLocation getEntityTexture(T t) {
+    protected ResourceLocation getEntityTexture(EntityLivingBase t) {
         return null;
     }
 }
