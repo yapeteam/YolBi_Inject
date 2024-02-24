@@ -4,19 +4,13 @@ import cn.yapeteam.loader.mixin.annotations.*;
 import cn.yapeteam.yolbi.YolBi;
 import cn.yapeteam.yolbi.event.impl.render.EventRotationsRender;
 import cn.yapeteam.yolbi.utils.misc.ObjectStore;
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.RendererLivingEntity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.util.ResourceLocation;
 
 @Mixin(RendererLivingEntity.class)
 @SuppressWarnings({"ParameterCanBeLocal", "UnusedAssignment"})
-public class MixinRendererLivingEntity extends Render<EntityLivingBase> {
-    protected MixinRendererLivingEntity(RenderManager renderManager) {
-        super(renderManager);
-    }
-
+public class MixinRendererLivingEntity {
     @Shadow
     protected float interpolateRotation(float par1, float par2, float par3) {
         return 0;
@@ -35,9 +29,8 @@ public class MixinRendererLivingEntity extends Render<EntityLivingBase> {
     ) {
         EventRotationsRender event = new EventRotationsRender(this.interpolateRotation(entity.prevRotationYawHead, entity.rotationYawHead, partialTicks), this.interpolateRotation(entity.prevRenderYawOffset, entity.renderYawOffset, partialTicks), entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * partialTicks, partialTicks);
 
-        if (entity == renderManager.livingPlayer) {
+        if (entity == Minecraft.getMinecraft().thePlayer)
             YolBi.instance.getEventManager().post(event);
-        }
         f = event.getBodyYaw();
         f1 = event.getYaw();
         f2 = f1 - f;
@@ -54,10 +47,5 @@ public class MixinRendererLivingEntity extends Render<EntityLivingBase> {
     )
     public void onRender2(@Local(source = "f7", index = 13) float f7) {
         f7 = ((EventRotationsRender) ObjectStore.objects.get("EventRotationsRender")).getPitch();
-    }
-
-    @Override
-    protected ResourceLocation getEntityTexture(EntityLivingBase t) {
-        return null;
     }
 }

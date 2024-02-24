@@ -37,7 +37,6 @@ public class Rotations extends Module {
     public void onRender(EventRotationsRender event) {
         if (customRender) {
             float partialTicks = event.getPartialTicks();
-
             event.setYaw(smooth.getValue() ? interpolateRotation(lastYaw, yaw, partialTicks) : yaw);
             event.setBodyYaw(smooth.getValue() ? interpolateRotation(lastYaw, yaw, partialTicks) : yaw);
             event.setPitch(smooth.getValue() ? lastPitch + (pitch - lastPitch) * partialTicks : pitch);

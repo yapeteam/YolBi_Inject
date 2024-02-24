@@ -83,7 +83,7 @@ public class KillAura extends Module {
             }
             yaw += (float) (rotate[0] - yaw) / 1.2f;
             pitch += (float) (rotate[1] - pitch) / 1.2f;
-            if (System.currentTimeMillis() - tim >= (1000 / delay)) {
+            if (delay != 0 && System.currentTimeMillis() - tim >= (1000 / delay)) {
                 delay = random(min.getValue(), max.getValue());
                 tim = System.currentTimeMillis();
                 if (target != null) {
