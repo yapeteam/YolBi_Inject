@@ -21,8 +21,8 @@ import net.optifine.entity.model.CustomEntityModels;
 import net.optifine.reflect.Reflector;
 import org.apache.logging.log4j.Logger;
 
-@SuppressWarnings("DataFlowIssue")
 @Mixin(RendererLivingEntity.class)
+@SuppressWarnings("DataFlowIssue")
 public class MixinRendererLivingEntity<T extends EntityLivingBase> extends Render<T> {
     @Shadow
     private static final Logger logger = null;
