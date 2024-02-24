@@ -32,7 +32,10 @@ public class MixinBlock {
      *
      * @param collidingEntity the Entity colliding with this Block
      */
-    @Overwrite
+    @Overwrite(
+            method = "addCollisionBoxesToList",
+            desc = "(Lnet/minecraft/world/World;Lnet/minecraft/util/BlockPos;Lnet/minecraft/block/state/IBlockState;Lnet/minecraft/util/AxisAlignedBB;Ljava/util/List;Lnet/minecraft/entity/Entity;)V"
+    )
     public void addCollisionBoxesToList(World worldIn, BlockPos pos, IBlockState state, AxisAlignedBB mask, List<AxisAlignedBB> list, Entity collidingEntity) {
         AxisAlignedBB axisalignedbb = this.getCollisionBoundingBox(worldIn, pos, state);
         EventBlockBB eventBlockBB = new EventBlockBB(pos, state.getBlock(), axisalignedbb);

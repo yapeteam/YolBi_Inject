@@ -28,10 +28,12 @@ public class MixinEntityLivingBase extends EntityLivingBase {
     public float getJumpUpwardsMotion() {
         return 0.42F;
     }
+
     @Shadow
     public boolean isPotionActive(Potion potionIn) {
         return false;
     }
+
     @Shadow
     public PotionEffect getActivePotionEffect(Potion potionIn) {
         return null;
@@ -68,6 +70,7 @@ public class MixinEntityLivingBase extends EntityLivingBase {
     public boolean isSprinting() {
         return false;
     }
+
     @Shadow
     public double motionX;
     @Shadow
@@ -77,7 +80,9 @@ public class MixinEntityLivingBase extends EntityLivingBase {
     @Shadow
     public boolean isAirBorne;
 
-    @Overwrite
+    @Overwrite(
+            method = "jump",
+            desc = "()V")
     protected void jump() {
         double jumpY = this.getJumpUpwardsMotion();
 
@@ -87,7 +92,7 @@ public class MixinEntityLivingBase extends EntityLivingBase {
 
         EventJump event = new EventJump(jumpY, this.rotationYaw, this.isSprinting());
         //noinspection ConstantValue
-        if ((EntityLivingBase)this == Minecraft.getMinecraft().thePlayer) {
+        if ((EntityLivingBase) this == Minecraft.getMinecraft().thePlayer) {
             YolBi.instance.getEventManager().post(event);
         }
 

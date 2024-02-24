@@ -93,7 +93,7 @@ public class MixinEntityPlayerSP extends EntityPlayerSP {
         return false;
     }
 
-    @Overwrite
+    @Overwrite(method = "onUpdateWalkingPlayer", desc = "()V")
     public void onUpdateWalkingPlayer() {
         boolean flag = this.isSprinting();
         if (flag != this.serverSprintState) {
@@ -160,8 +160,8 @@ public class MixinEntityPlayerSP extends EntityPlayerSP {
         return;
     }
 
-    @Overwrite
-    public void sendChatMessage(@Local(source = "message", index = 1) String message) {
+    @Overwrite(method = "sendChatMessage", desc = "(Ljava/lang/String;)V")
+    public void sendChatMessage(String message) {
         EventChat event = new EventChat(message);
         YolBi.instance.getEventManager().post(event);
         if (!event.isCancelled()) {
