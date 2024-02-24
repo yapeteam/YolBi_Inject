@@ -119,7 +119,7 @@ public class InjectOperation implements Operation {
         }
         for (int i = 0; i < source.instructions.size(); i++) {
             AbstractInsnNode instruction = source.instructions.get(i);
-            if (instruction instanceof VarInsnNode && Operation.isLoadOpe(instruction.getOpcode())) {
+            if (instruction instanceof VarInsnNode && (Operation.isLoadOpe(instruction.getOpcode()) || Operation.isStoreOpe(instruction.getOpcode()))) {
                 VarInsnNode varInsnNode = (VarInsnNode) instruction;
                 Integer index = varMap.get(varInsnNode.var);
                 if (index != null)
