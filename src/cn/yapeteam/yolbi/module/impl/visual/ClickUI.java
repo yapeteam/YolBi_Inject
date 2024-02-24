@@ -19,7 +19,7 @@ public class ClickUI extends Module {
     private final NumberValue<Integer> blurRadius = new NumberValue<>("blurRadius", blur::getValue, 3, 0, 50, 1);
 
     public ClickUI() {
-        if (ReflectUtil.hasOptifine())
+        if (ReflectUtil.hasOptifine)
             blur.setCallback((oldV, newV) -> !mc.gameSettings.ofFastRender && newV);
         else blur.setVisibility(() -> true);
         addValues(pauseGame, blur, rainbow, blurRadius);
@@ -31,7 +31,7 @@ public class ClickUI extends Module {
     @Override
     protected void onEnable() {
         setEnabled(false);
-        if (ReflectUtil.hasOptifine() && mc.gameSettings.ofFastRender)
+        if (ReflectUtil.hasOptifine && mc.gameSettings.ofFastRender)
             blur.setValue(false);
         mc.displayGuiScreen(screen);
     }
