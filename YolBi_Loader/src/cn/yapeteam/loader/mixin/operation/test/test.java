@@ -22,6 +22,8 @@ public class test {
 
     public static void main(String[] args) throws Throwable {
         byte[] buffer = Files.readAllBytes(new File("net.minecraft.client.renderer.entity.RendererLivingEntity").toPath());//ResourceManager.readStream(InjectOperation.class.getResourceAsStream("/net/minecraft/client/renderer/entity/RendererLivingEntity.class"));
+        new CustomLoader().load(buffer);
+        if (true) return;
         ClassNode node = ASMUtils.node(buffer);
         node.methods.stream().filter(methodNode -> methodNode.name.equals("doRender")).forEach(m -> m.accept(new MethodVisitor(Opcodes.ASM9) {
             @Override

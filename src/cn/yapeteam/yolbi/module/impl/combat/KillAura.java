@@ -86,8 +86,10 @@ public class KillAura extends Module {
             if (System.currentTimeMillis() - tim >= (1000 / delay)) {
                 delay = random(min.getValue(), max.getValue());
                 tim = System.currentTimeMillis();
-                mc.thePlayer.swingItem();
-                mc.getNetHandler().getNetworkManager().sendPacket(new C02PacketUseEntity(mc.objectMouseOver.entityHit, C02PacketUseEntity.Action.ATTACK));
+                if (target != null) {
+                    mc.thePlayer.swingItem();
+                    mc.getNetHandler().getNetworkManager().sendPacket(new C02PacketUseEntity(target, C02PacketUseEntity.Action.ATTACK));
+                }
             }
         } else if (target == null) {
             List<Entity> entityList = new ArrayList<>(mc.theWorld.loadedEntityList);
