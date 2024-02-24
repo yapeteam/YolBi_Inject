@@ -25,6 +25,8 @@ import java.util.stream.Collectors;
 @ModuleInfo(name = "KillAura", category = ModuleCategory.COMBAT, key = Keyboard.KEY_R)
 public class KillAura extends Module {
     public KillAura() {
+        min.setCallback((oldV, newV) -> newV > max.getValue() ? oldV : newV);
+        max.setCallback((oldV, newV) -> newV < min.getValue() ? oldV : newV);
         addValues(range, min, max);
     }
 

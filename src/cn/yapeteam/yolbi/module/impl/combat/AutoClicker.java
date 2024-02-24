@@ -19,6 +19,8 @@ public class AutoClicker extends Module {
     private final NumberValue<Integer> max = new NumberValue<>("max", 10, 0, 100, 1);
 
     public AutoClicker() {
+        min.setCallback((oldV, newV) -> newV > max.getValue() ? oldV : newV);
+        max.setCallback((oldV, newV) -> newV < min.getValue() ? oldV : newV);
         addValues(min, max);
     }
 
