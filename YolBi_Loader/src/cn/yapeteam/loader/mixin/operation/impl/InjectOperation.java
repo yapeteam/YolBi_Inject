@@ -96,16 +96,21 @@ public class InjectOperation implements Operation {
         }
 
         Map<Integer, Integer> varMap = new HashMap<>();
+        ArrayList<String[]> sourceParameters = getLocalParameters(source);
         //Process local var store & load
         for (int i = 0; i < source.instructions.size(); i++) {
             AbstractInsnNode instruction = source.instructions.get(i);
             if (instruction instanceof VarInsnNode && Operation.isStoreOpe(instruction.getOpcode())) {
                 VarInsnNode varInsnNode = (VarInsnNode) instruction;
-                varMap.put(varInsnNode.var, varInsnNode.var += max_index);
+                boolean canChange = true;
+                for (String[] sourceParameter : sourceParameters)
+                    if (getLocalVarIndex(source, sourceParameter[0]) == varInsnNode.var)
+                        canChange = false;
+                if (canChange)
+                    varMap.put(varInsnNode.var, varInsnNode.var += max_index);
             }
         }
         //Access context local var
-        ArrayList<String[]> sourceParameters = getLocalParameters(source);
         for (String[] sourceParameter : sourceParameters) {
             varMap.put(
                     getLocalVarIndex(source, sourceParameter[0]),
