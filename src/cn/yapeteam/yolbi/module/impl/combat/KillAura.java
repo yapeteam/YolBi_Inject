@@ -2,7 +2,6 @@ package cn.yapeteam.yolbi.module.impl.combat;
 
 import cn.yapeteam.yolbi.event.Listener;
 import cn.yapeteam.yolbi.event.impl.player.EventMotion;
-import cn.yapeteam.yolbi.event.impl.player.EventUpdate;
 import cn.yapeteam.yolbi.event.impl.render.EventRender3D;
 import cn.yapeteam.yolbi.module.Module;
 import cn.yapeteam.yolbi.module.ModuleCategory;
@@ -11,7 +10,6 @@ import cn.yapeteam.yolbi.module.values.impl.NumberValue;
 import cn.yapeteam.yolbi.utils.render.RenderUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.network.play.client.C02PacketUseEntity;
 import net.minecraft.util.MathHelper;
 import org.lwjgl.input.Keyboard;
 
@@ -35,7 +33,7 @@ public class KillAura extends Module {
     private final NumberValue<Integer> min = new NumberValue<>("min", 10, 0, 100, 1);
     private final NumberValue<Integer> max = new NumberValue<>("max", 20, 0, 100, 1);
 
-    private long delay = 0, tim = 0;
+    private long delay = 0, time = 0;
 
     @Override
     public void onEnable() {
@@ -44,13 +42,7 @@ public class KillAura extends Module {
             return;
         }
         delay = random(min.getValue(), max.getValue());
-        tim = System.currentTimeMillis();
-        rotationTimer = System.currentTimeMillis();
-        rotate = new double[2];
-        rotate[0] = mc.thePlayer.rotationYaw;
-        rotate[1] = mc.thePlayer.rotationPitch;
-        yaw = mc.thePlayer.rotationYaw;
-        pitch = mc.thePlayer.rotationPitch;
+        time = System.currentTimeMillis();
     }
 
     @Override
@@ -59,52 +51,44 @@ public class KillAura extends Module {
     }
 
     public static long random(double minCPS, double maxCPS) {
-        int mi = Integer.parseInt(String.valueOf(minCPS).replace(".", "/").split("/")[0]), ma = Integer.parseInt(String.valueOf(maxCPS).replace(".", "/").split("/")[0]);
-        if (maxCPS - minCPS <= 0) return mi;
-        return new Random((long) (Math.random() * 1000)).nextInt((ma - mi)) + mi;
+        int min = (int) minCPS, max = (int) maxCPS;
+        if (maxCPS - minCPS <= 0) return min;
+        return newRandom().nextInt((max - min + 1)) + min;
     }
 
-    private Random newRandom() {
-        return new Random((long) (Math.random() * 114514));
-    }
-
-    private long rotationTimer;
-    private double[] rotate;
-    private float yaw, pitch;
-
-    @Listener
-    private void onUpdate(EventUpdate e) {
-        if (mc.thePlayer == null || mc.theWorld == null) return;
-        if (target != null && target.getDistanceToEntity(mc.thePlayer) <= range.getValue()) {
-            if (System.currentTimeMillis() - rotationTimer >= 500) {
-                rotate = getNeededRotations(target);
-                rotate[0] += (newRandom().nextInt(10) - 5) / 2f;
-                rotate[1] += (newRandom().nextInt(10) - 5) / 2f;
-            }
-            yaw += (float) (rotate[0] - yaw) / 1.2f;
-            pitch += (float) (rotate[1] - pitch) / 1.2f;
-            if (delay != 0 && System.currentTimeMillis() - tim >= (1000 / delay)) {
-                delay = random(min.getValue(), max.getValue());
-                tim = System.currentTimeMillis();
-                if (target != null) {
-                    mc.thePlayer.swingItem();
-                    mc.getNetHandler().getNetworkManager().sendPacket(new C02PacketUseEntity(target, C02PacketUseEntity.Action.ATTACK));
-                }
-            }
-        } else if (target == null) {
-            List<Entity> entityList = new ArrayList<>(mc.theWorld.loadedEntityList);
-            entityList = entityList.stream().filter(entity -> entity != mc.thePlayer && entity instanceof EntityLivingBase && entity.getDistanceToEntity(mc.thePlayer) <= range.getValue()).sorted(Comparator.comparingInt(entity -> (int) entity.getDistanceToEntity(mc.thePlayer))).collect(Collectors.toList());
-            if (!entityList.isEmpty()) target = entityList.get(0);
-        } else if (target.getDistanceToEntity(mc.thePlayer) > range.getValue()) target = null;
-        if (target != null && (target.isDead || !target.isEntityAlive())) target = null;
+    private static Random newRandom() {
+        return new Random((long) (Math.random() * Math.random() * 114514000L));
     }
 
     @Listener
     private void onMotion(EventMotion e) {
-        if (target != null) {
-            e.setYaw(yaw);
-            e.setPitch(pitch);
-        }
+        if (mc.thePlayer == null || mc.theWorld == null) return;
+        if (target != null && target.getDistanceToEntity(mc.thePlayer) <= range.getValue()) {
+            double[] rotations = getNeededRotations(target);
+            e.setYaw((float) rotations[0] + (newRandom().nextInt(10) - 5) / 2f);//jitter
+            e.setPitch((float) rotations[1] + (newRandom().nextInt(10) - 5) / 2f);
+            if (delay != 0 && System.currentTimeMillis() - time >= (1000 / delay)) {
+                delay = random(min.getValue(), max.getValue());
+                time = System.currentTimeMillis();
+                if (target != null) {
+                    mc.thePlayer.swingItem();
+                    mc.playerController.attackEntity(mc.thePlayer, target);
+                }
+            }
+        } else if (target == null) {
+            List<Entity> entityList = new ArrayList<>(mc.theWorld.loadedEntityList);
+            entityList = entityList.stream().filter(entity ->
+                    entity != mc.thePlayer &&
+                    entity instanceof EntityLivingBase &&
+                    entity.getDistanceToEntity(mc.thePlayer) <= range.getValue()
+            ).sorted(
+                    Comparator.comparingInt(entity -> (int) (entity.getDistanceToEntity(mc.thePlayer) * 100))
+            ).collect(Collectors.toList());
+            if (!entityList.isEmpty()) target = entityList.get(0);
+        } else if (target.getDistanceToEntity(mc.thePlayer) > range.getValue())
+            target = null;
+        if (target != null && (target.isDead || !target.isEntityAlive()))
+            target = null;
     }
 
     @Listener
