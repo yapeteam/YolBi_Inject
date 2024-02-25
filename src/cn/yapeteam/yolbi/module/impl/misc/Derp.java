@@ -12,9 +12,10 @@ public class Derp extends Module {
     private float yaw;
     private long time;
     private final NumberValue<Float> speed = new NumberValue<>("speed", 1f, 0f, 10f, 1f);
+    private final NumberValue<Float> pitch = new NumberValue<>("pitch", 90f, 0f, 360f, 1f);
 
     {
-        addValues(speed);
+        addValues(speed, pitch);
     }
 
     @Override
@@ -29,7 +30,7 @@ public class Derp extends Module {
         if ((System.currentTimeMillis() - time) / 1000f >= 1 / speed.getValue())
             time = System.currentTimeMillis();
         yaw = 360f * ((System.currentTimeMillis() - time) / (1000f / speed.getValue()));
-        e.setPitch(180);
+        e.setPitch(pitch.getValue());
         e.setYaw(yaw);
     }
 }
