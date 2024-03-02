@@ -21,10 +21,11 @@ public class MixinManager {
         add(MixinGuiIngame.class);
         add(MixinEntityPlayerSP.class);
         add(MixinEntityRenderer.class);
-        add(MixinPlayerControllerMP.class);
-        add(MixinBlock.class);
         add(MixinEntityLivingBase.class);
         add(MixinRendererLivingEntity.class);
+        add(MixinNetworkManager.class);
+        add(MixinPlayerControllerMP.class);
+        add(MixinBlock.class);
     }
 
     //for debug

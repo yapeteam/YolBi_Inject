@@ -176,8 +176,7 @@ public class Mapper {
                 if (entry != null) return applyMode(entry.getValue());
                 theClass = theClass.getSuperclass();
             } else {
-                Logger.error("Owner not found!");
-                Logger.exception(new Exception());
+                Logger.warn("Owner not found: {}", mappedOwner);
                 break;
             }
         }

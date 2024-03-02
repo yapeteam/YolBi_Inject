@@ -17,7 +17,6 @@ import net.minecraft.entity.Entity;
  */
 @Mixin(PlayerControllerMP.class)
 public class MixinPlayerControllerMP {
-
     @Inject(
             method = "attackEntity",
             desc = "(Lnet/minecraft/entity/player/EntityPlayer;Lnet/minecraft/entity/Entity;)V",
