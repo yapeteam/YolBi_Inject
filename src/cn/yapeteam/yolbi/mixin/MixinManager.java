@@ -25,6 +25,7 @@ public class MixinManager {
         add(MixinRendererLivingEntity.class);
         add(MixinNetworkManager.class);
         add(MixinPlayerControllerMP.class);
+        add(MixinEntityPlayer.class);
         add(MixinBlock.class);
     }
 
