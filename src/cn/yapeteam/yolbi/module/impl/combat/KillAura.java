@@ -62,7 +62,7 @@ public class KillAura extends Module {
         return new Random((long) (Math.random() * Math.random() * 114514000L));
     }
 
-    @Listener(Priority.LOWER)
+    @Listener(Priority.LOW)
     private void onMotion(EventMotion e) {
         if (mc.thePlayer == null || mc.theWorld == null) return;
         if (target != null && target.getDistanceToEntity(mc.thePlayer) <= range.getValue()) {
