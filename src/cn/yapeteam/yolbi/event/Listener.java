@@ -8,7 +8,5 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Listener {
-
-    byte value() default 2;
-
+    Priority value() default Priority.NORMAL;
 }

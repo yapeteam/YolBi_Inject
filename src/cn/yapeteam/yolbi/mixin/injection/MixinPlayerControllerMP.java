@@ -24,8 +24,9 @@ public class MixinPlayerControllerMP {
             target = @Target("HEAD")
     )
     public void attackEntity(@Local(source = "targetEntity", index = 2) Entity targetEntity) {
-        if (targetEntity != null && ((CancellableEvent) YolBi.instance.getEventManager().post(new EventAttack(targetEntity))).isCancelled())
+        if (targetEntity != null && ((CancellableEvent) YolBi.instance.getEventManager().post(new EventAttack(targetEntity))).isCancelled()) {
+            //noinspection UnnecessaryReturnStatement
             return;
-        System.currentTimeMillis();
+        }
     }
 }

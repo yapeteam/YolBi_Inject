@@ -82,7 +82,8 @@ public class MixinEntityLivingBase extends EntityLivingBase {
 
     @Overwrite(
             method = "jump",
-            desc = "()V")
+            desc = "()V"
+    )
     protected void jump() {
         double jumpY = this.getJumpUpwardsMotion();
 
@@ -92,9 +93,8 @@ public class MixinEntityLivingBase extends EntityLivingBase {
 
         EventJump event = new EventJump(jumpY, this.rotationYaw, this.isSprinting());
         //noinspection ConstantValue
-        if ((EntityLivingBase) this == Minecraft.getMinecraft().thePlayer) {
+        if ((EntityLivingBase) this == Minecraft.getMinecraft().thePlayer)
             YolBi.instance.getEventManager().post(event);
-        }
 
         this.motionY = event.getMotionY();
 
@@ -105,7 +105,5 @@ public class MixinEntityLivingBase extends EntityLivingBase {
         }
 
         this.isAirBorne = true;
-        //noinspection UnnecessaryReturnStatement
-        return;
     }
 }

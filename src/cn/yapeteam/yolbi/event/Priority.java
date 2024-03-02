@@ -1,7 +1,11 @@
 package cn.yapeteam.yolbi.event;
 
-public class Priority {
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
-    public static final byte HIGHER = 0, HIGH = 1, NORMAL = 2, LOW = 3, LOWER = 4;
-
+@Getter
+@AllArgsConstructor
+public enum Priority {
+    HIGHER(0), HIGH(1), NORMAL(2), LOW(3), LOWER(4);
+    private final int level;
 }

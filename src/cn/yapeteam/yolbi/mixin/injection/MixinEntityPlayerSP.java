@@ -4,6 +4,7 @@ import cn.yapeteam.loader.mixin.annotations.*;
 import cn.yapeteam.yolbi.YolBi;
 import cn.yapeteam.yolbi.event.impl.player.EventChat;
 import cn.yapeteam.yolbi.event.impl.player.EventMotion;
+import cn.yapeteam.yolbi.event.impl.player.EventPostMotion;
 import cn.yapeteam.yolbi.event.impl.player.EventUpdate;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -156,8 +157,7 @@ public class MixinEntityPlayerSP extends EntityPlayerSP {
                 this.lastReportedPitch = motionEvent.getPitch();
             }
         }
-        //noinspection UnnecessaryReturnStatement
-        return;
+        YolBi.instance.getEventManager().post(new EventPostMotion(this.posX, this.getEntityBoundingBox().minY, this.posZ, this.rotationYaw, this.rotationPitch, this.onGround));
     }
 
     @Overwrite(method = "sendChatMessage", desc = "(Ljava/lang/String;)V")

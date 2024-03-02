@@ -41,8 +41,7 @@ public class MixinBlock {
         EventBlockBB eventBlockBB = new EventBlockBB(pos, state.getBlock(), axisalignedbb);
         YolBi.instance.getEventManager().post(eventBlockBB);
         axisalignedbb = eventBlockBB.getAxisAlignedBB();
-        if (axisalignedbb != null && mask.intersectsWith(axisalignedbb)) {
+        if (axisalignedbb != null && mask.intersectsWith(axisalignedbb))
             list.add(axisalignedbb);
-        }
     }
 }

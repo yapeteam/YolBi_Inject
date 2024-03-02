@@ -1,7 +1,9 @@
 package cn.yapeteam.yolbi.module.impl.combat;
 
 import cn.yapeteam.yolbi.event.Listener;
+import cn.yapeteam.yolbi.event.Priority;
 import cn.yapeteam.yolbi.event.impl.player.EventMotion;
+import cn.yapeteam.yolbi.event.impl.player.EventPostMotion;
 import cn.yapeteam.yolbi.event.impl.render.EventRender3D;
 import cn.yapeteam.yolbi.module.Module;
 import cn.yapeteam.yolbi.module.ModuleCategory;
@@ -29,7 +31,7 @@ public class KillAura extends Module {
     }
 
     private Entity target = null;
-    private final NumberValue<Double> range = new NumberValue<>("range", 3d, 1d, 6d, 0.1d);
+    private final NumberValue<Float> range = new NumberValue<>("range", 3f, 1f, 6f, 0.1f);
     private final NumberValue<Integer> min = new NumberValue<>("min", 10, 0, 100, 1);
     private final NumberValue<Integer> max = new NumberValue<>("max", 20, 0, 100, 1);
 
@@ -60,21 +62,14 @@ public class KillAura extends Module {
         return new Random((long) (Math.random() * Math.random() * 114514000L));
     }
 
-    @Listener
+    @Listener(Priority.LOWER)
     private void onMotion(EventMotion e) {
         if (mc.thePlayer == null || mc.theWorld == null) return;
         if (target != null && target.getDistanceToEntity(mc.thePlayer) <= range.getValue()) {
             double[] rotations = getNeededRotations(target);
-            e.setYaw((float) rotations[0] + (newRandom().nextInt(10) - 5) / 2f);//jitter
+            //jitter
+            e.setYaw((float) rotations[0] + (newRandom().nextInt(10) - 5) / 2f);
             e.setPitch((float) rotations[1] + (newRandom().nextInt(10) - 5) / 2f);
-            if (delay != 0 && System.currentTimeMillis() - time >= (1000 / delay)) {
-                delay = random(min.getValue(), max.getValue());
-                time = System.currentTimeMillis();
-                if (target != null) {
-                    mc.thePlayer.swingItem();
-                    mc.playerController.attackEntity(mc.thePlayer, target);
-                }
-            }
         } else if (target == null) {
             List<Entity> entityList = new ArrayList<>(mc.theWorld.loadedEntityList);
             entityList = entityList.stream().filter(entity ->
@@ -89,6 +84,18 @@ public class KillAura extends Module {
             target = null;
         if (target != null && (target.isDead || !target.isEntityAlive()))
             target = null;
+    }
+
+    @Listener
+    private void onPostMotion(EventPostMotion e) {
+        if (delay != 0 && System.currentTimeMillis() - time >= (1000 / delay)) {
+            delay = random(min.getValue(), max.getValue());
+            time = System.currentTimeMillis();
+            if (target != null) {
+                mc.thePlayer.swingItem();
+                mc.playerController.attackEntity(mc.thePlayer, target);
+            }
+        }
     }
 
     @Listener
