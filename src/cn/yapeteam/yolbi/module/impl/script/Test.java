@@ -16,6 +16,5 @@ public class Test extends Module {
     @Listener
     public void attack(EventAttack e) {
         System.out.println(e.getTargetEntity().getName());
-        e.setCancelled(true);
     }
 }
