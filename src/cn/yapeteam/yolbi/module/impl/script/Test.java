@@ -11,8 +11,8 @@ import cn.yapeteam.yolbi.module.ModuleInfo;
  * @since 2024/1/7 21:06
  * IntelliJ IDEA
  */
-@ModuleInfo(name = "Attacktest", category = ModuleCategory.SCRIPT)
-public class Attacktest extends Module {
+@ModuleInfo(name = "Test", category = ModuleCategory.SCRIPT)
+public class Test extends Module {
     @Listener
     public void attack(EventAttack e) {
         System.out.println(e.getTargetEntity().getName());
