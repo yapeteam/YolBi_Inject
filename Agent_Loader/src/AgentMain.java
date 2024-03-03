@@ -6,12 +6,6 @@ import java.net.URLClassLoader;
 import java.util.Objects;
 
 public class AgentMain {
-    private static void loadJar(URLClassLoader urlClassLoader, File jar) throws Throwable {
-        Method method = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
-        method.setAccessible(true);
-        method.invoke(urlClassLoader, jar.toURI().toURL());
-    }
-
     public static void agentmain(String args, Instrumentation instrumentation) throws Throwable {
         URLClassLoader loader = null;
         for (Object o : Thread.getAllStackTraces().keySet().toArray()) {
@@ -29,9 +23,20 @@ public class AgentMain {
                 System.out.println(file.getAbsolutePath());
                 loadJar(loader, file);
             }
+        for (File file : Objects.requireNonNull(new File(yolbi_dir, "asm").listFiles()))
+            if (file.getName().endsWith(".jar")) {
+                System.out.println(file.getAbsolutePath());
+                loadJar(loader, file);
+            }
         Class.forName("cn.yapeteam.loader.InstrumentationWrapper", true, loader).getConstructor(Instrumentation.class).newInstance(instrumentation);
         Class.forName("cn.yapeteam.loader.Loader", true, loader).getMethod("preload", String.class).invoke(null, yolbi_dir);
         loadJar(loader, new File(yolbi_dir, "injection.jar"));
         Class.forName("cn.yapeteam.yolbi.Loader", true, loader).getMethod("start", String.class).invoke(null, new File(yolbi_dir, "injection.jar").getAbsolutePath());
+    }
+
+    private static void loadJar(URLClassLoader urlClassLoader, File jar) throws Throwable {
+        Method method = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
+        method.setAccessible(true);
+        method.invoke(urlClassLoader, jar.toURI().toURL());
     }
 }
