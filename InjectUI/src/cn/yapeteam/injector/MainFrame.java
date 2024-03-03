@@ -1,8 +1,6 @@
 package cn.yapeteam.injector;
 
 import com.sun.jna.platform.win32.WinNT;
-import com.sun.tools.attach.AgentInitializationException;
-import com.sun.tools.attach.AgentLoadException;
 import com.sun.tools.attach.AttachNotSupportedException;
 import com.sun.tools.attach.VirtualMachine;
 import lombok.Setter;
@@ -55,9 +53,13 @@ public class MainFrame extends JFrame {
                 } else {
                     try {
                         VirtualMachine virtualMachine = VirtualMachine.attach(String.valueOf(pid));
-                        virtualMachine.loadAgent(new File(Main.YolBi_Dir, Main.agentName).getAbsolutePath());
-                    } catch (AttachNotSupportedException | IOException | AgentLoadException |
-                             AgentInitializationException ignored) {
+                        new Thread(() -> {
+                            try {
+                                virtualMachine.loadAgent(new File(Main.YolBi_Dir, Main.agentName).getAbsolutePath());
+                            } catch (Throwable ignored) {
+                            }
+                        }).start();
+                    } catch (AttachNotSupportedException | IOException ignored) {
                         return;
                     }
                 }
@@ -79,13 +81,15 @@ public class MainFrame extends JFrame {
             }
         }).start();
         new Thread(() -> {
-            process.removeAllItems();
-            ArrayList<Pair<String, Integer>> minecraftProcesses = Utils.getMinecraftProcesses();
-            for (Pair<String, Integer> minecraftProcess : minecraftProcesses)
-                process.addItem(minecraftProcess.a);
-            targets = minecraftProcesses;
-            long time = System.currentTimeMillis();
-            while (true) if (System.currentTimeMillis() - time >= 100) break;
+            while (true) {
+                ArrayList<Pair<String, Integer>> minecraftProcesses = Utils.getMinecraftProcesses();
+                process.removeAllItems();
+                for (Pair<String, Integer> minecraftProcess : minecraftProcesses)
+                    process.addItem(minecraftProcess.a);
+                targets = minecraftProcesses;
+                long time = System.currentTimeMillis();
+                while (true) if (System.currentTimeMillis() - time >= 100) break;
+            }
         }).start();
     }
 }

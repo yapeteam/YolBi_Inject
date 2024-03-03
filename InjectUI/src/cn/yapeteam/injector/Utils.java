@@ -19,20 +19,28 @@ public class Utils {
     public static final Kernel32 kernel32 = Kernel32.INSTANCE;
     public static final User32 user32 = User32.INSTANCE;
 
+    public static String getWindowText(WinDef.HWND hWND) {
+        char[] text = new char[1024];
+        user32.GetWindowText(hWND, text, text.length);
+        StringBuilder sb = new StringBuilder();
+        for (char c : text) if (c != 0) sb.append(c);
+        return sb.toString();
+    }
+
+
     public static ArrayList<Pair<String, Integer>> getMinecraftProcesses() {
         ArrayList<Pair<String, Integer>> list = new ArrayList<>();
         WinDef.HWND hWND = user32.FindWindow("LWJGL", null);
         while (hWND != null) {
+            String title = null;
             if (hWND.getPointer() != Pointer.NULL) {
-                char[] text = new char[1024];
                 IntByReference pid = new IntByReference(-1);
-                user32.GetWindowText(hWND, text, text.length);
-                StringBuilder sb = new StringBuilder();
-                for (char c : text) if (c != 0) sb.append(c);
-                String title = sb.toString();
+                title = getWindowText(hWND);
                 user32.GetWindowThreadProcessId(hWND, pid);
                 list.add(new Pair<>(title, pid.getValue()));
             }
+            WinDef.HWND next = user32.FindWindow("LWJGL", null);
+            if (getWindowText(next).equals(title)) break;
             hWND = user32.FindWindow("LWJGL", null);
         }
         return list;

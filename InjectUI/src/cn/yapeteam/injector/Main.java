@@ -7,7 +7,7 @@ public class Main {
     public static final String dllName = "injection.dll", agentName = "agent.jar";
 
     public static void main(String[] args) throws Exception {
-        Utils.unzip(Main.class.getResourceAsStream("injection.zip"), YolBi_Dir);
+        Utils.unzip(Main.class.getResourceAsStream("/injection.zip"), YolBi_Dir);
         new MainFrame().setVisible(true);
     }
 }
