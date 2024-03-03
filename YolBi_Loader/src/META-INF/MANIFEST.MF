@@ -1,0 +1,20 @@
+Manifest-Version: 1.0
+Main-Class: cn.yapeteam.injector.Main
+Class-Path: annotations-24.0.0.jar annotations-24.0.0.jar gson-2.2.4.jar
+  guava-17.0.jar twitch-6.5.jar jinput-2.0.5.jar jutils-1.0.0.jar oshi-c
+ ore-1.1.jar realms-1.7.48.jar authlib-1.5.21.jar commons-io-2.4.jar htt
+ pcore-4.3.2.jar jopt-simple-4.6.jar httpclient-4.3.3.jar codecwav-20101
+ 023.jar commons-codec-1.9.jar commons-lang3-3.3.2.jar log4j-api-2.0-bet
+ a9.jar codecjorbis-20101023.jar log4j-core-2.0-beta9.jar soundsystem-20
+ 120107.jar commons-logging-1.1.3.jar commons-compress-1.8.1.jar icu4j-c
+ ore-mojang-51.2.jar netty-all-4.0.23.Final.jar libraryjavasound-2010112
+ 3.jar librarylwjglopenal-20100824.jar lwjgl-2.9.4-nightly-20150209.jar 
+ lwjgl_util-2.9.4-nightly-20150209.jar jinput-platform-2.0.5-natives-win
+ dows.jar twitch-platform-6.5-natives-windows-64.jar twitch-external-pla
+ tform-4.5-natives-windows-64.jar lwjgl-platform-2.9.4-nightly-20150209-
+ natives-windows.jar tools.jar kotlin-stdlib-jdk8-1.9.0.jar kotlin-stdli
+ b-1.9.0.jar kotlin-stdlib-common-1.9.0.jar annotations-13.0.jar kotlin-
+ stdlib-jdk7-1.9.0.jar jna.jar MCP.jar 1.8.9.jar lombok.jar asm-9.2.jar 
+ asm-tree-9.2.jar asm-util-9.2.jar flatlaf-3.1.1.jar asm-commons-9.2.jar
+  minecraft-1.8.9.jar flatlaf-intellij-themes-3.1.1.jar
+
