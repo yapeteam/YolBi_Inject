@@ -15,7 +15,6 @@ import java.util.ArrayList;
 
 public class MainFrame extends JFrame {
     private JPanel panel;
-    private JLabel title;
     private JButton inject;
     private JComboBox<String> method;
     private JComboBox<String> process;
