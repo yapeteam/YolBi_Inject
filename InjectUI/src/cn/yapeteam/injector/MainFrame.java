@@ -43,6 +43,7 @@ public class MainFrame extends JFrame {
 
         add(panel);
         progressBar.setVisible(false);
+        getRootPane().setDefaultButton(inject);
         inject.addActionListener(e -> {
             if (!targets.isEmpty() && process.getSelectedIndex() != -1 && method.getSelectedIndex() != -1) {
                 int pid = targets.get(process.getSelectedIndex()).b;
