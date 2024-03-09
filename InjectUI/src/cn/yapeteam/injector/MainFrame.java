@@ -17,7 +17,6 @@ import java.util.ArrayList;
 public class MainFrame extends JFrame {
     private JPanel panel;
     private JButton inject;
-    private JComboBox<String> method;
     private JComboBox<String> process;
     private JProgressBar progressBar1;
     private JProgressBar progressBar2;
@@ -49,7 +48,7 @@ public class MainFrame extends JFrame {
 
         getRootPane().setDefaultButton(inject);
         inject.addActionListener(e -> {
-            if (!targets.isEmpty() && process.getSelectedIndex() != -1 && method.getSelectedIndex() != -1) {
+            if (!targets.isEmpty() && process.getSelectedIndex() != -1) {
                 int pid = targets.get(process.getSelectedIndex()).b;
                 try {
                     VirtualMachine virtualMachine = VirtualMachine.attach(String.valueOf(pid));
@@ -66,7 +65,6 @@ public class MainFrame extends JFrame {
                     return;
                 }
                 process.setVisible(false);
-                method.setVisible(false);
                 inject.setVisible(false);
             }
         });
