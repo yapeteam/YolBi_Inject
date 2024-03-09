@@ -135,9 +135,11 @@ public class MainFrame extends JFrame {
         new Thread(() -> {
             while (true) {
                 ArrayList<Pair<String, Integer>> minecraftProcesses = Utils.getMinecraftProcesses();
+                int selected = process.getSelectedIndex();
                 process.removeAllItems();
                 for (Pair<String, Integer> minecraftProcess : minecraftProcesses)
                     process.addItem(minecraftProcess.a);
+                process.setSelectedIndex(selected);
                 targets = minecraftProcesses;
                 long time = System.currentTimeMillis();
                 while (true) if (System.currentTimeMillis() - time >= 500) break;
