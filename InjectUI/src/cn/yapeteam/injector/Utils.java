@@ -35,7 +35,6 @@ public class Utils {
                 String title = getWindowText(hWND);
                 user32.GetWindowThreadProcessId(hWND, pid);
                 list.add(new Pair<>(title, pid.getValue()));
-                System.out.println(title);
             }
             hWND = user32.FindWindowEx(null, hWND, "LWJGL", null);
         }
