@@ -30,16 +30,14 @@ public class Utils {
         ArrayList<Pair<String, Integer>> list = new ArrayList<>();
         WinDef.HWND hWND = user32.FindWindow("LWJGL", null);
         while (hWND != null) {
-            String title = null;
             if (hWND.getPointer() != Pointer.NULL) {
                 IntByReference pid = new IntByReference(-1);
-                title = getWindowText(hWND);
+                String title = getWindowText(hWND);
                 user32.GetWindowThreadProcessId(hWND, pid);
                 list.add(new Pair<>(title, pid.getValue()));
+                System.out.println(title);
             }
-            WinDef.HWND next = user32.FindWindow("LWJGL", null);
-            if (getWindowText(next).equals(title)) break;
-            hWND = user32.FindWindow("LWJGL", null);
+            hWND = user32.FindWindowEx(null, hWND, "LWJGL", null);
         }
         return list;
     }
