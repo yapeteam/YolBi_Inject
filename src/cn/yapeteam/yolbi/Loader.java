@@ -18,7 +18,7 @@ public class Loader {
             Logger.info("Initializing MixinLoader...");
             MixinManager.init();
             Logger.warn("Start transforming!");
-            MixinManager.load();
+            MixinManager.transform();
             Logger.success("Welcome {} ver {}", YolBi.name, YolBi.version);
             SocketSender.send("CLOSE");
             SocketSender.close();
@@ -28,7 +28,7 @@ public class Loader {
                             "Injected successfully",
                             Easing.EASE_IN_OUT_QUAD,
                             Easing.EASE_IN_OUT_QUAD,
-                            15000L, NotificationType.INIT
+                            2000, NotificationType.INIT
                     )
             );
             YolBi.instance.getHttpSeverV3().start();

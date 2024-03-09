@@ -7,6 +7,7 @@ import cn.yapeteam.loader.mixin.Transformer;
 import cn.yapeteam.loader.mixin.annotations.Mixin;
 import cn.yapeteam.yolbi.mixin.injection.*;
 
+import javax.swing.*;
 import java.io.File;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -33,10 +34,11 @@ public class MixinManager {
     //for debug
     private static final File dir = new File("generatedClasses");
 
-    public static void load() throws Throwable {
+    public static void transform() throws Throwable {
         boolean ignored = dir.mkdirs();
         Map<String, byte[]> map = transformer.transform();
         SocketSender.send("S2");
+        ArrayList<String> failed = new ArrayList<>();
         for (int i = 0; i < mixins.size(); i++) {
             Class<?> mixin = mixins.get(i);
             Class<?> targetClass = mixin.getAnnotation(Mixin.class).value();
@@ -45,8 +47,18 @@ public class MixinManager {
                 Files.write(new File(dir, targetClass.getName()).toPath(), bytes);
                 int code = JVMTIWrapper.instance.redefineClass(targetClass, bytes);
                 SocketSender.send("P2" + " " + (float) mixins.size() / (i + 1) * 100f);
+                if (code != 0)
+                    failed.add(mixin.getSimpleName());
                 Logger.success("Redefined {}, Return Code {}.", targetClass, code);
             }
+        }
+        if (!failed.isEmpty()) {
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append("Failed to transform").append(' ').append(failed.size() == 1 ? "class" : "classes").append(' ').append('\n');
+            for (String s : failed)
+                stringBuilder.append(s).append('\n');
+            stringBuilder.deleteCharAt(stringBuilder.lastIndexOf("\n"));
+            JOptionPane.showMessageDialog(null, stringBuilder, "Warning", JOptionPane.WARNING_MESSAGE);
         }
     }
 
