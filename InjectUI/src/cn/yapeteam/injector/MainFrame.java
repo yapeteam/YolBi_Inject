@@ -66,7 +66,8 @@ public class MainFrame extends JFrame {
                 method.setVisible(false);
                 inject.setVisible(false);
                 progressBar.setVisible(true);
-                setVisible(false);//todo progress display
+                //todo progress display
+                System.exit(0);
             }
         });
 
