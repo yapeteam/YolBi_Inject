@@ -13,7 +13,7 @@
     </properties>
     <border type="none" title=""/>
     <children>
-      <grid id="900b5" layout-manager="GridLayoutManager" row-count="3" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+      <grid id="900b5" layout-manager="GridLayoutManager" row-count="2" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
         <margin top="0" left="0" bottom="0" right="0"/>
         <constraints>
           <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
@@ -30,27 +30,9 @@
               <text value="YolBi Lite"/>
             </properties>
           </component>
-          <component id="f2397" class="javax.swing.JComboBox" binding="method">
-            <constraints>
-              <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
-            </constraints>
-            <properties>
-              <model>
-                <item value="Dll Inject"/>
-                <item value="Attach"/>
-              </model>
-              <name value="Inject Method"/>
-            </properties>
-          </component>
-          <component id="cb452" class="javax.swing.JComboBox" binding="process">
-            <constraints>
-              <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-            </constraints>
-            <properties/>
-          </component>
           <component id="e53f7" class="javax.swing.JButton" binding="inject">
             <constraints>
-              <grid row="2" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false">
+              <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false">
                 <minimum-size width="-1" height="30"/>
                 <preferred-size width="-1" height="30"/>
                 <maximum-size width="-1" height="30"/>
@@ -68,6 +50,12 @@
             <clientProperties>
               <hideActionText class="java.lang.Boolean" value="false"/>
             </clientProperties>
+          </component>
+          <component id="cb452" class="javax.swing.JComboBox" binding="process">
+            <constraints>
+              <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties/>
           </component>
         </children>
       </grid>

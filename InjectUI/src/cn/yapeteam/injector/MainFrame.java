@@ -51,21 +51,19 @@ public class MainFrame extends JFrame {
         inject.addActionListener(e -> {
             if (!targets.isEmpty() && process.getSelectedIndex() != -1 && method.getSelectedIndex() != -1) {
                 int pid = targets.get(process.getSelectedIndex()).b;
-                if (method.getSelectedIndex() == 0) {
+                try {
+                    VirtualMachine virtualMachine = VirtualMachine.attach(String.valueOf(pid));
+                    new Thread(() -> {
+                        try {
+                            virtualMachine.loadAgent(new File(Main.YolBi_Dir, Main.agentName).getAbsolutePath());
+                        } catch (Throwable ignored) {
+                        }
+                    }).start();
+                } catch (AttachNotSupportedException ex) {
                     WinNT.HANDLE hdl = Utils.kernel32.OpenProcess(0x1F1FFB, false, pid);
                     Utils.loadLibrary(hdl, new File(Main.YolBi_Dir, Main.dllName).getAbsolutePath());
-                } else {
-                    try {
-                        VirtualMachine virtualMachine = VirtualMachine.attach(String.valueOf(pid));
-                        new Thread(() -> {
-                            try {
-                                virtualMachine.loadAgent(new File(Main.YolBi_Dir, Main.agentName).getAbsolutePath());
-                            } catch (Throwable ignored) {
-                            }
-                        }).start();
-                    } catch (AttachNotSupportedException | IOException ignored) {
-                        return;
-                    }
+                } catch (IOException ignored) {
+                    return;
                 }
                 process.setVisible(false);
                 method.setVisible(false);
