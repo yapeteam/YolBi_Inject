@@ -1,5 +1,6 @@
 package cn.yapeteam.yolbi;
 
+import cn.yapeteam.loader.SocketSender;
 import cn.yapeteam.loader.logger.Logger;
 import cn.yapeteam.yolbi.mixin.MixinManager;
 import cn.yapeteam.yolbi.notification.Notification;
@@ -19,6 +20,8 @@ public class Loader {
             Logger.warn("Start transforming!");
             MixinManager.load();
             Logger.success("Welcome {} ver {}", YolBi.name, YolBi.version);
+            SocketSender.send("CLOSE");
+            SocketSender.close();
             YolBi.initialize(new File(jarPath));
             YolBi.instance.getNotificationManager().post(
                     new Notification(

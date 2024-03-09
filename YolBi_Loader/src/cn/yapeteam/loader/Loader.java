@@ -1,7 +1,6 @@
 package cn.yapeteam.loader;
 
 import cn.yapeteam.loader.logger.Logger;
-import cn.yapeteam.loader.ui.Frame;
 import com.formdev.flatlaf.FlatDarkLaf;
 import org.objectweb.asm.Opcodes;
 
@@ -12,9 +11,9 @@ import java.io.File;
 @SuppressWarnings("unused")
 public class Loader {
     public static final int ASM_API = Opcodes.ASM5;
-    public static Frame frame;
     public static String YOLBI_DIR = null;
     public static Thread client_thread = null;
+    public static final int port = 20181;
 
     public static void preload(String yolbi_dir) {
         Logger.init();
@@ -27,6 +26,7 @@ public class Loader {
             Logger.info("Reading mappings, mode: {}", mode.name());
             Mapper.setMode(mode);
             Mapper.readMappings();
+            SocketSender.init();
             try {
                 for (Object o : Thread.getAllStackTraces().keySet().toArray()) {
                     Thread thread = (Thread) o;
@@ -40,12 +40,9 @@ public class Loader {
             } catch (UnsupportedLookAndFeelException e) {
                 Logger.exception(e);
             }
-            frame = new Frame();
-            frame.display();
             Logger.warn("Start Mapping Injection!");
             JarMapper.dispose(new File(yolbi_dir, "injection/injection.jar"), new File(yolbi_dir, "injection.jar"));
             Logger.success("Completed");
-            frame.close();
         } catch (Throwable e) {
             Logger.exception(e);
             try {

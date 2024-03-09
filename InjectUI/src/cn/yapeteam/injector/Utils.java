@@ -6,9 +6,7 @@ import com.sun.jna.Pointer;
 import com.sun.jna.platform.win32.*;
 import com.sun.jna.ptr.IntByReference;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -86,10 +84,22 @@ public class Utils {
         zipInputStream.close();
     }
 
-    private static void mkdir(File file) {
+    public static void mkdir(File file) {
         if (null == file || file.exists())
             return;
         mkdir(file.getParentFile());
         boolean ignored = file.mkdir();
+    }
+
+    public static byte[] readStream(InputStream inStream) throws IOException {
+        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+        byte[] buffer = new byte[1024];
+        int len;
+        try (InputStream input = inStream;
+             ByteArrayOutputStream output = outStream) {
+            while ((len = input.read(buffer)) != -1)
+                output.write(buffer, 0, len);
+            return output.toByteArray();
+        }
     }
 }

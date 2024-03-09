@@ -1,6 +1,7 @@
 package cn.yapeteam.yolbi.mixin;
 
 import cn.yapeteam.loader.JVMTIWrapper;
+import cn.yapeteam.loader.SocketSender;
 import cn.yapeteam.loader.logger.Logger;
 import cn.yapeteam.loader.mixin.Transformer;
 import cn.yapeteam.loader.mixin.annotations.Mixin;
@@ -35,12 +36,15 @@ public class MixinManager {
     public static void load() throws Throwable {
         boolean ignored = dir.mkdirs();
         Map<String, byte[]> map = transformer.transform();
-        for (Class<?> mixin : mixins) {
+        SocketSender.send("S2");
+        for (int i = 0; i < mixins.size(); i++) {
+            Class<?> mixin = mixins.get(i);
             Class<?> targetClass = mixin.getAnnotation(Mixin.class).value();
             if (targetClass != null) {
                 byte[] bytes = map.get(targetClass.getName());
                 Files.write(new File(dir, targetClass.getName()).toPath(), bytes);
                 int code = JVMTIWrapper.instance.redefineClass(targetClass, bytes);
+                SocketSender.send("P2" + " " + (float) mixins.size() / (i + 1) * 100f);
                 Logger.success("Redefined {}, Return Code {}.", targetClass, code);
             }
         }

@@ -9,8 +9,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.ArrayList;
 
 public class MainFrame extends JFrame {
@@ -18,10 +19,11 @@ public class MainFrame extends JFrame {
     private JButton inject;
     private JComboBox<String> method;
     private JComboBox<String> process;
-    private JProgressBar progressBar;
+    private JProgressBar progressBar1;
+    private JProgressBar progressBar2;
 
     @Setter
-    private volatile float value = 0;
+    private volatile float value1 = 0, value2 = 0;
     private ArrayList<Pair<String, Integer>> targets = new ArrayList<>();
 
     public MainFrame() {
@@ -42,7 +44,9 @@ public class MainFrame extends JFrame {
         });
 
         add(panel);
-        progressBar.setVisible(false);
+        progressBar1.setVisible(false);
+        progressBar2.setVisible(false);
+
         getRootPane().setDefaultButton(inject);
         inject.addActionListener(e -> {
             if (!targets.isEmpty() && process.getSelectedIndex() != -1 && method.getSelectedIndex() != -1) {
@@ -66,19 +70,70 @@ public class MainFrame extends JFrame {
                 process.setVisible(false);
                 method.setVisible(false);
                 inject.setVisible(false);
-                progressBar.setVisible(true);
-                //todo progress display
-                System.exit(0);
             }
         });
-
         new Thread(() -> {
             float cache = 0;
             while (true) {
                 long time = System.currentTimeMillis();
-                while (true) if (time + 20 <= System.currentTimeMillis()) break;
-                cache += (value - cache) / 10f;
-                progressBar.setValue((int) cache);
+                while (true) if (time + 10 <= System.currentTimeMillis()) break;
+                cache += (value1 - cache) / 100f;
+                progressBar1.setValue((int) cache);
+            }
+        }).start();
+        new Thread(() -> {
+            float cache = 0;
+            while (true) {
+                long time = System.currentTimeMillis();
+                while (true) if (time + 10 <= System.currentTimeMillis()) break;
+                cache += (value2 - cache) / 100f;
+                progressBar2.setValue((int) cache);
+            }
+        }).start();
+        new Thread(() -> {
+            try (ServerSocket serverSocket = new ServerSocket(Main.port)) {
+                while (true) {
+                    Socket socket = serverSocket.accept();
+                    new Thread(() -> {
+                        try {
+                            InputStream stream = socket.getInputStream();
+                            BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+                            while (true) {
+                                String message = reader.readLine();
+                                String[] values = message.split(" ");
+                                if (values.length == 2) {
+                                    float value = Float.parseFloat(values[1]);
+                                    switch (values[0]) {
+                                        case "P1":
+                                            value1 = value;
+                                            break;
+                                        case "P2":
+                                            value2 = value;
+                                            break;
+                                    }
+                                } else switch (message) {
+                                    case "S1":
+                                        progressBar1.setVisible(true);
+                                        break;
+                                    case "S2":
+                                        progressBar2.setVisible(true);
+                                        break;
+                                    case "E1":
+                                        progressBar1.setVisible(false);
+                                        break;
+                                    case "E2":
+                                        progressBar2.setVisible(false);
+                                        break;
+                                    case "CLOSE":
+                                        System.exit(0);
+                                }
+                            }
+                        } catch (IOException ignored) {
+                        }
+                    }).start();
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
         }).start();
         new Thread(() -> {
@@ -89,7 +144,7 @@ public class MainFrame extends JFrame {
                     process.addItem(minecraftProcess.a);
                 targets = minecraftProcesses;
                 long time = System.currentTimeMillis();
-                while (true) if (System.currentTimeMillis() - time >= 100) break;
+                while (true) if (System.currentTimeMillis() - time >= 500) break;
             }
         }).start();
     }

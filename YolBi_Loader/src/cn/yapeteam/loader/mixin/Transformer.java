@@ -1,5 +1,6 @@
 package cn.yapeteam.loader.mixin;
 
+import cn.yapeteam.loader.SocketSender;
 import cn.yapeteam.loader.mixin.operation.Operation;
 import cn.yapeteam.loader.mixin.operation.impl.InjectOperation;
 import cn.yapeteam.loader.mixin.operation.impl.OverwriteOperation;
@@ -41,6 +42,7 @@ public class Transformer {
             byte[] class_bytes = ASMUtils.rewriteClass(mixin.getTarget());
             classMap.put(name, class_bytes);
         }
+        SocketSender.send("E2");
         return classMap;
     }
 }

@@ -36,6 +36,7 @@ public class JarMapper {
     }
 
     public static void dispose(File file, File out) throws Throwable {
+        SocketSender.send("S1");
         var all = 0;
         try (val zis = new ZipInputStream(Files.newInputStream(file.toPath()))) {
             while (zis.getNextEntry() != null) all++;
@@ -46,7 +47,9 @@ public class JarMapper {
             int count = 0;
             while ((se = zis.getNextEntry()) != null) {
                 count++;
-                Loader.frame.setValue((float) count / all * 100f);
+                int finalCount = count;
+                int finalAll = all;
+                new Thread(() -> SocketSender.send("P1" + " " + (float) finalCount / finalAll * 100f)).start();
                 if (!se.isDirectory() && se.getName().endsWith(".class")) {
                     var bytes = readStream(zis);
                     bytes = ClassMapper.map(bytes);
