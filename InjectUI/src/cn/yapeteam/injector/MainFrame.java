@@ -139,7 +139,8 @@ public class MainFrame extends JFrame {
                 process.removeAllItems();
                 for (Pair<String, Integer> minecraftProcess : minecraftProcesses)
                     process.addItem(minecraftProcess.a);
-                process.setSelectedIndex(selected);
+                if (selected != -1)
+                    process.setSelectedIndex(selected);
                 targets = minecraftProcesses;
                 long time = System.currentTimeMillis();
                 while (true) if (System.currentTimeMillis() - time >= 500) break;
