@@ -5,8 +5,8 @@ import cn.yapeteam.loader.logger.Logger;
 import cn.yapeteam.loader.mixin.Mixin;
 import cn.yapeteam.loader.mixin.annotations.Overwrite;
 import cn.yapeteam.loader.mixin.operation.Operation;
-import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm_9_2.tree.ClassNode;
+import org.objectweb.asm_9_2.tree.MethodNode;
 
 import java.util.List;
 import java.util.stream.Collectors;

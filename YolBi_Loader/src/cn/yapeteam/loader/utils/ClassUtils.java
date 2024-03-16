@@ -14,7 +14,6 @@ public class ClassUtils {
         name = name.replace('/', '.');
         try {
             clazz = Class.forName(name);
-            //clazz = Class.forName(name, false, Loader.client_thread.getContextClassLoader());
         } catch (Throwable ignored) {
         }
         return clazz;

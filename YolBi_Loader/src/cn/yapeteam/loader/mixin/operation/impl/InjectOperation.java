@@ -11,10 +11,10 @@ import cn.yapeteam.loader.mixin.operation.Operation;
 import cn.yapeteam.loader.mixin.utils.DescParser;
 import cn.yapeteam.loader.utils.ASMUtils;
 import org.jetbrains.annotations.NotNull;
-import org.objectweb.asm.Label;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.tree.*;
+import org.objectweb.asm_9_2.Label;
+import org.objectweb.asm_9_2.MethodVisitor;
+import org.objectweb.asm_9_2.Opcodes;
+import org.objectweb.asm_9_2.tree.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;

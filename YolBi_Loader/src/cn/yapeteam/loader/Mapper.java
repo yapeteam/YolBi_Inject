@@ -6,7 +6,7 @@ import cn.yapeteam.loader.utils.ClassUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
-import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm_9_2.tree.ClassNode;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;

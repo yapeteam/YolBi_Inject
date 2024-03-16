@@ -6,9 +6,9 @@ import cn.yapeteam.loader.mixin.annotations.Super;
 import cn.yapeteam.loader.mixin.utils.DescParser;
 import cn.yapeteam.loader.utils.ASMUtils;
 import lombok.AllArgsConstructor;
-import org.objectweb.asm.Handle;
-import org.objectweb.asm.Type;
-import org.objectweb.asm.tree.*;
+import org.objectweb.asm_9_2.Handle;
+import org.objectweb.asm_9_2.Type;
+import org.objectweb.asm_9_2.tree.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;

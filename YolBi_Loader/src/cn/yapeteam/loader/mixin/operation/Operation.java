@@ -4,8 +4,8 @@ package cn.yapeteam.loader.mixin.operation;
 import cn.yapeteam.loader.Mapper;
 import cn.yapeteam.loader.mixin.Mixin;
 import cn.yapeteam.loader.mixin.utils.DescParser;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm_9_2.Opcodes;
+import org.objectweb.asm_9_2.tree.MethodNode;
 
 import java.lang.reflect.Field;
 import java.util.List;

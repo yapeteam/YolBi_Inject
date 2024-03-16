@@ -2,7 +2,7 @@ package cn.yapeteam.loader;
 
 import cn.yapeteam.loader.logger.Logger;
 import com.formdev.flatlaf.FlatDarkLaf;
-import org.objectweb.asm.Opcodes;
+import org.objectweb.asm_9_2.Opcodes;
 
 import javax.swing.*;
 import java.awt.*;

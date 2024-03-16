@@ -5,10 +5,10 @@ import cn.yapeteam.loader.ResourceManager;
 import cn.yapeteam.loader.mixin.Transformer;
 import cn.yapeteam.loader.mixin.operation.impl.InjectOperation;
 import cn.yapeteam.loader.utils.ASMUtils;
-import org.objectweb.asm.Label;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm_9_2.Label;
+import org.objectweb.asm_9_2.MethodVisitor;
+import org.objectweb.asm_9_2.Opcodes;
+import org.objectweb.asm_9_2.tree.ClassNode;
 
 import java.io.File;
 import java.nio.file.Files;

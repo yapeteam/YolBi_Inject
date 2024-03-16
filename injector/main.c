@@ -356,9 +356,9 @@ void Inject(JNIEnv *env, jvmtiEnv *jti, const char yolbi_dir[260])
 
     jclass Start = findThreadClass("cn/yapeteam/yolbi/Loader", clientThread);
     printf("%d\n", Start);
-    jmethodID start = (*jniEnv)->GetStaticMethodID(jniEnv, Start, "start", "(Ljava/lang/String;)V");
+    jmethodID start = (*jniEnv)->GetStaticMethodID(jniEnv, Start, "start", "()V");
     printf("%d\n", start);
-    (*jniEnv)->CallStaticVoidMethod(jniEnv, Start, start, (*jniEnv)->NewStringUTF(jniEnv, injectionOutPath));
+    (*jniEnv)->CallStaticVoidMethod(jniEnv, Start, start);
 
     (*jvm)->DetachCurrentThread(jvm);
     return;

@@ -23,15 +23,10 @@ public class AgentMain {
                 System.out.println(file.getAbsolutePath());
                 loadJar(loader, file);
             }
-        for (File file : Objects.requireNonNull(new File(yolbi_dir, "asm").listFiles()))
-            if (file.getName().endsWith(".jar")) {
-                System.out.println(file.getAbsolutePath());
-                loadJar(loader, file);
-            }
         Class.forName("cn.yapeteam.loader.InstrumentationWrapper", true, loader).getConstructor(Instrumentation.class).newInstance(instrumentation);
         Class.forName("cn.yapeteam.loader.Loader", true, loader).getMethod("preload", String.class).invoke(null, yolbi_dir);
         loadJar(loader, new File(yolbi_dir, "injection.jar"));
-        Class.forName("cn.yapeteam.yolbi.Loader", true, loader).getMethod("start", String.class).invoke(null, new File(yolbi_dir, "injection.jar").getAbsolutePath());
+        Class.forName("cn.yapeteam.yolbi.Loader", true, loader).getMethod("start").invoke(null);
     }
 
     private static void loadJar(URLClassLoader urlClassLoader, File jar) throws Throwable {

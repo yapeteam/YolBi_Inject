@@ -2,15 +2,15 @@ package cn.yapeteam.loader.utils;
 
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.tree.AnnotationNode;
-import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm_9_2.ClassReader;
+import org.objectweb.asm_9_2.ClassWriter;
+import org.objectweb.asm_9_2.tree.AnnotationNode;
+import org.objectweb.asm_9_2.tree.ClassNode;
 
 import java.util.ArrayList;
 
-import static org.objectweb.asm.ClassWriter.COMPUTE_FRAMES;
-import static org.objectweb.asm.ClassWriter.COMPUTE_MAXS;
+import static org.objectweb.asm_9_2.ClassWriter.COMPUTE_FRAMES;
+import static org.objectweb.asm_9_2.ClassWriter.COMPUTE_MAXS;
 
 public class ASMUtils {
     @Contract(pure = true)

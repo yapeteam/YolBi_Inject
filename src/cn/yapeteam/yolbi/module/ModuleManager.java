@@ -24,8 +24,8 @@ import java.util.zip.ZipInputStream;
 public class ModuleManager {
     private final List<Module> modules = new ArrayList<>();
 
-    public ModuleManager(File jar) {
-        try (ZipInputStream zis = new ZipInputStream(Files.newInputStream(jar.toPath()))) {
+    public void load() {
+        try (ZipInputStream zis = new ZipInputStream(Files.newInputStream(new File(YolBi.YOLBI_DIR, "injection.jar").toPath()))) {
             ZipEntry entry;
             while ((entry = zis.getNextEntry()) != null) {
                 if (!entry.isDirectory()) {
@@ -35,7 +35,7 @@ public class ModuleManager {
                         try {
                             Class<?> aClass = Class.forName(name);
                             if (aClass.getSuperclass() == Module.class && aClass.getAnnotation(ModuleInfo.class) != null && aClass.getAnnotation(Deprecated.class) == null)
-                                registerModule((Class<? extends Module>) aClass);
+                                registerModule(aClass);
                         } catch (Throwable e) {
                             Logger.exception(e);
                         }
@@ -60,10 +60,10 @@ public class ModuleManager {
         });
     }
 
-    private void registerModule(@NotNull Class<? extends Module> aClass) {
+    private void registerModule(@NotNull Class<?> aClass) {
         if (aClass.getAnnotation(Deprecated.class) == null && aClass.getAnnotation(ModuleInfo.class) != null && modules.stream().noneMatch(module -> module.getClass() == aClass)) {
             try {
-                Module module = aClass.getConstructor().newInstance();
+                Module module = (Module) aClass.newInstance();
                 ModuleInfo info = aClass.getAnnotation(ModuleInfo.class);
                 if (module.getName() == null)
                     module.setName(info.name());

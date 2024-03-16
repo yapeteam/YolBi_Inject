@@ -2,7 +2,7 @@ package cn.yapeteam.loader.mixin;
 
 import cn.yapeteam.loader.utils.ASMUtils;
 import lombok.Getter;
-import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm_9_2.tree.ClassNode;
 
 @Getter
 public class Mixin {

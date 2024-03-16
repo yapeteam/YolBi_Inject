@@ -41,16 +41,17 @@ public class YolBi {
         return fontManager;
     }
 
-    public static void initialize(File jar) {
+    public static void initialize() {
         boolean ignored = YOLBI_DIR.mkdirs();
         instance.eventManager = new EventManager();
         instance.commandManager = new CommandManager();
         instance.configManager = new ConfigManager();
-        instance.moduleManager = new ModuleManager(jar);
+        instance.moduleManager = new ModuleManager();
         instance.notificationManager = new NotificationManager();
         instance.eventManager.register(instance.commandManager);
         instance.eventManager.register(instance.moduleManager);
         instance.eventManager.register(Shader.class);
+        instance.moduleManager.load();
         instance.moduleManager.getModule(HeadUpDisplay.class).setEnabled(true);
         try {
             YolBi.instance.getConfigManager().load();

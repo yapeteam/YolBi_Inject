@@ -8,11 +8,10 @@ import cn.yapeteam.yolbi.notification.NotificationType;
 import cn.yapeteam.yolbi.utils.animation.Easing;
 
 import java.awt.*;
-import java.io.File;
 
 @SuppressWarnings("unused")
 public class Loader {
-    public static void start(String jarPath) {
+    public static void start() {
         try {
             Logger.info("Start Loading!");
             Logger.info("Initializing MixinLoader...");
@@ -22,7 +21,7 @@ public class Loader {
             Logger.success("Welcome {} ver {}", YolBi.name, YolBi.version);
             SocketSender.send("CLOSE");
             SocketSender.close();
-            YolBi.initialize(new File(jarPath));
+            YolBi.initialize();
             YolBi.instance.getNotificationManager().post(
                     new Notification(
                             "Injected successfully",
