@@ -48,7 +48,6 @@ public class YolBi {
         instance.configManager = new ConfigManager();
         instance.moduleManager = new ModuleManager();
         instance.notificationManager = new NotificationManager();
-        //instance.packetDelayHandler = new PacketDelayHandler();
         instance.eventManager.register(instance.commandManager);
         instance.eventManager.register(instance.moduleManager);
         instance.eventManager.register(Shader.class);

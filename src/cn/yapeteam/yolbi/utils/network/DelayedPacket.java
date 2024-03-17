@@ -1,11 +1,10 @@
-package cn.yapeteam.yolbi.handler.packet;
+package cn.yapeteam.yolbi.utils.network;
 
 import cn.yapeteam.yolbi.utils.misc.TimerUtil;
 import lombok.Getter;
 import net.minecraft.network.Packet;
 
 public class DelayedPacket {
-
     private final Packet packet;
 
     @Getter
