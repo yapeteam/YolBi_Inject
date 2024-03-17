@@ -83,6 +83,10 @@ public class Panel extends AbstractComponent {
 
     @Override
     public void drawComponent(int mouseX, int mouseY, float partialTicks, Limitation ignored) {
+        if (isDragging()) {
+            setX(mouseX - dragX);
+            setY(mouseY - dragY);
+        }
         if (!getChildComponents().isEmpty()) {
             float allExpand = 0;
             for (AbstractComponent component : getChildComponents())
@@ -96,10 +100,6 @@ public class Panel extends AbstractComponent {
                 setWheel(0);
             }
             getChildComponents().forEach(AbstractComponent::update);
-        }
-        if (isDragging()) {
-            setX(mouseX - dragX);
-            setY(mouseY - dragY);
         }
         RenderUtil.drawBloomShadow(getX(), getY(), getWidth(), getHeight(), 5, new Color(0), false);
         roundedRect.setWidth(getWidth());

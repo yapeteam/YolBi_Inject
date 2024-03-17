@@ -10,6 +10,7 @@ import cn.yapeteam.yolbi.module.ModuleCategory;
 import cn.yapeteam.yolbi.module.ModuleInfo;
 import cn.yapeteam.yolbi.module.values.impl.NumberValue;
 import cn.yapeteam.yolbi.utils.render.RenderUtil;
+import lombok.Getter;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.MathHelper;
@@ -30,6 +31,7 @@ public class KillAura extends Module {
         addValues(range, min, max);
     }
 
+    @Getter
     private Entity target = null;
     private final NumberValue<Float> range = new NumberValue<>("range", 3f, 1f, 6f, 0.1f);
     private final NumberValue<Integer> min = new NumberValue<>("min", 10, 0, 100, 1);

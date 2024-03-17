@@ -7,6 +7,7 @@ import cn.yapeteam.loader.mixin.annotations.Target;
 import cn.yapeteam.yolbi.YolBi;
 import cn.yapeteam.yolbi.event.impl.network.EventPacketReceive;
 import cn.yapeteam.yolbi.event.impl.network.EventPacketSend;
+import cn.yapeteam.yolbi.utils.network.PacketUtil;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
 
@@ -23,10 +24,13 @@ public class MixinNetworkManager {
             )
     )
     public void onPacketSend(@Local(source = "packet", index = 1) Packet packet) {
-        EventPacketSend eventPacketSend = new EventPacketSend(packet);
-        YolBi.instance.getEventManager().post(eventPacketSend);
-        packet = eventPacketSend.getPacket();
-        if (eventPacketSend.isCancelled()) return;
+        if (!PacketUtil.shouldSkip(packet)) {
+            EventPacketSend eventPacketSend = new EventPacketSend(packet);
+            if (!PacketUtil.shouldIgnorePacket(packet)) YolBi.instance.getEventManager().post(eventPacketSend);
+            packet = eventPacketSend.getPacket();
+            PacketUtil.remove(packet);
+            if (eventPacketSend.isCancelled()) return;
+        }
     }
 
     @Inject(
@@ -39,8 +43,11 @@ public class MixinNetworkManager {
             )
     )
     public void onPacketReceive(@Local(source = "packet", index = 2) Packet packet) {
-        EventPacketReceive event = new EventPacketReceive(packet);
-        YolBi.instance.getEventManager().post(event);
-        if (event.isCancelled()) return;
+        if (!PacketUtil.shouldSkip(packet)) {
+            EventPacketReceive event = new EventPacketReceive(packet);
+            YolBi.instance.getEventManager().post(event);
+            PacketUtil.remove(packet);
+            if (event.isCancelled()) return;
+        }
     }
 }

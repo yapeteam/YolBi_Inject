@@ -7,7 +7,6 @@ import cn.yapeteam.yolbi.module.ModuleCategory;
 import cn.yapeteam.yolbi.module.ModuleInfo;
 import cn.yapeteam.yolbi.module.values.impl.NumberValue;
 import cn.yapeteam.yolbi.utils.reflect.ReflectUtil;
-import net.minecraft.network.play.client.C02PacketUseEntity;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
@@ -15,8 +14,8 @@ import java.util.Random;
 
 @ModuleInfo(name = "AutoClicker", category = ModuleCategory.COMBAT, key = Keyboard.KEY_F)
 public class AutoClicker extends Module {
-    private final NumberValue<Integer> min = new NumberValue<>("min", 10, 0, 100, 1);
-    private final NumberValue<Integer> max = new NumberValue<>("max", 10, 0, 100, 1);
+    private final NumberValue<Integer> min = new NumberValue<>("min", 8, 0, 100, 1);
+    private final NumberValue<Integer> max = new NumberValue<>("max", 15, 0, 100, 1);
 
     public AutoClicker() {
         min.setCallback((oldV, newV) -> newV > max.getValue() ? oldV : newV);
@@ -24,31 +23,33 @@ public class AutoClicker extends Module {
         addValues(min, max);
     }
 
-    private long delay = 0, tim = 0;
+    private long delay = 0, time = 0;
 
     @Override
     public void onEnable() {
         delay = random(min.getValue(), max.getValue());
-        tim = System.currentTimeMillis();
+        time = System.currentTimeMillis();
     }
 
     @Listener
     private void onUpdate(EventUpdate e) {
+        delay = random(min.getValue(), max.getValue());
         if (!Mouse.isButtonDown(0) || mc.currentScreen != null) return;
-        if (System.currentTimeMillis() - tim >= (1000 / delay)) {
-            delay = random(min.getValue(), max.getValue());
-            tim = System.currentTimeMillis();
+        if (System.currentTimeMillis() - time >= (1000 / delay)) {
+            time = System.currentTimeMillis();
             mc.thePlayer.swingItem();
-            if (mc.objectMouseOver.entityHit != null)
-                mc.getNetHandler().getNetworkManager().sendPacket(new C02PacketUseEntity(mc.objectMouseOver.entityHit, C02PacketUseEntity.Action.ATTACK));
-            else ReflectUtil.Minecraft$clickMouse(mc);
+            ReflectUtil.Minecraft$clickMouse(mc);
         }
     }
 
     public static long random(double minCPS, double maxCPS) {
-        int mi = Integer.parseInt(String.valueOf(minCPS).replace(".", "/").split("/")[0]), ma = Integer.parseInt(String.valueOf(maxCPS).replace(".", "/").split("/")[0]);
-        if (maxCPS - minCPS <= 0) return mi;
-        return new Random((long) (Math.random() * 1000)).nextInt((ma - mi)) + mi;
+        int min = (int) minCPS, max = (int) maxCPS;
+        if (maxCPS - minCPS <= 0) return min;
+        return newRandom().nextInt((max - min + 1)) + min;
+    }
+
+    private static Random newRandom() {
+        return new Random((long) (Math.random() * Math.random() * 114514000L));
     }
 
     @Override

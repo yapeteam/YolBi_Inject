@@ -53,13 +53,14 @@ public class ImplScreen extends GuiScreen {
             panels.clear();
             float x = panelStartX;
             for (ModuleCategory category : ModuleCategory.values()) {
+                int size = YolBi.instance.getModuleManager().getModulesByCategory(category).size();
+                if (size == 0) continue;
                 Panel panel = new Panel(this, category);
                 panel.setX(x);
                 panel.setY(panelY);
                 panel.setWidth(panelWidth);
                 panel.setHeight(panelTopHeight + Math.min(
-                        YolBi.instance.getModuleManager().getModulesByCategory(category).size() *
-                        (moduleHeight + moduleSpacing), panelMaxHeight
+                        size * (moduleHeight + moduleSpacing), panelMaxHeight
                 ));
                 panels.add(panel);
                 x += panelWidth + panelSpacing;

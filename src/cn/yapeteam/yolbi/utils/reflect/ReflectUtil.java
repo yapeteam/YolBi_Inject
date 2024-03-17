@@ -12,7 +12,9 @@ import net.minecraft.util.ResourceLocation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Objects;
 
+@SuppressWarnings("unchecked")
 public class ReflectUtil {
     private static Field EntityRenderer$theShaderGroup, ShaderGroup$listShaders;
     private static Method EntityRenderer$loadShader, Minecraft$clickMouse;
@@ -86,4 +88,34 @@ public class ReflectUtil {
     }
 
     public static final boolean hasOptifine = ClassUtils.getClass("net.optifine.Log") != null;
+
+    public static Field getField(Class<?> clz, String name) {
+        try {
+            Field field = clz.getDeclaredField(Mapper.mapFieldWithSuper(clz.getName(), name, null));
+            field.setAccessible(true);
+            return field;
+        } catch (NoSuchFieldException e) {
+            Logger.exception(e);
+        }
+        return null;
+    }
+
+    public static <T> T getField(Object obj, String name) {
+        try {
+            return (T) Objects.requireNonNull(getField(obj.getClass(), name)).get(obj);
+        } catch (IllegalAccessException e) {
+            Logger.exception(e);
+        }
+        return null;
+    }
+
+    public static <T> T getField(Field field, Object obj) {
+        try {
+            Object o = field.get(obj);
+            if (o != null) return (T) o;
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException();
+        }
+        throw new RuntimeException();
+    }
 }

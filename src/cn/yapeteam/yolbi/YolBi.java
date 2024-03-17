@@ -5,6 +5,7 @@ import cn.yapeteam.yolbi.command.CommandManager;
 import cn.yapeteam.yolbi.config.ConfigManager;
 import cn.yapeteam.yolbi.event.EventManager;
 import cn.yapeteam.yolbi.font.FontManager;
+import cn.yapeteam.yolbi.handler.packet.PacketDelayHandler;
 import cn.yapeteam.yolbi.module.ModuleManager;
 import cn.yapeteam.yolbi.module.impl.visual.HeadUpDisplay;
 import cn.yapeteam.yolbi.notification.NotificationManager;
@@ -27,6 +28,7 @@ public class YolBi {
     private ModuleManager moduleManager;
     private FontManager fontManager;
     private NotificationManager notificationManager;
+    private PacketDelayHandler packetDelayHandler;
     private HttpSeverV3 httpSeverV3;
 
     public EventManager getEventManager() {
@@ -48,6 +50,7 @@ public class YolBi {
         instance.configManager = new ConfigManager();
         instance.moduleManager = new ModuleManager();
         instance.notificationManager = new NotificationManager();
+        instance.packetDelayHandler = new PacketDelayHandler();
         instance.eventManager.register(instance.commandManager);
         instance.eventManager.register(instance.moduleManager);
         instance.eventManager.register(Shader.class);
