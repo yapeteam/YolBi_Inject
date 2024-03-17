@@ -10,7 +10,7 @@ import java.io.File;
 
 @SuppressWarnings("unused")
 public class Loader {
-    public static final int ASM_API = Opcodes.ASM5;
+    public static final int ASM_API = Opcodes.ASM9;
     public static String YOLBI_DIR = null;
     public static Thread client_thread = null;
     public static final int port = 20181;
