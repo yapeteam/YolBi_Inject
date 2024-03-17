@@ -117,7 +117,7 @@ public class ClassMapper {
 
 
     private static boolean hasType(String type) {
-        return Mapper.getMappings().stream().anyMatch(m -> m.getType() == Mapper.Type.Class && m.getName().equals(type));
+        return Mapper.getVanilla().stream().anyMatch(m -> m.getType() == Mapper.Type.Class && m.getName().equals(type));
     }
 
     public static byte[] readStream(InputStream inStream) throws Exception {
