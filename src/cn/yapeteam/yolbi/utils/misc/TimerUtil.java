@@ -16,7 +16,7 @@ public class TimerUtil {
         this.lastTime = System.currentTimeMillis() - time;
     }
 
-    public boolean delay(long time) {
+    public boolean hasTimePassed(long time) {
         return getTimeElapsed() >= time;
     }
 

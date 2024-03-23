@@ -6,11 +6,13 @@ import cn.yapeteam.yolbi.YolBi;
 import cn.yapeteam.yolbi.event.impl.network.EventFinalPacketSend;
 import cn.yapeteam.yolbi.utils.IMinecraft;
 import io.netty.util.concurrent.GenericFutureListener;
+import net.minecraft.network.INetHandler;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
 import net.minecraft.network.handshake.client.C00Handshake;
 import net.minecraft.network.login.client.C00PacketLoginStart;
 import net.minecraft.network.login.client.C01PacketEncryptionResponse;
+import net.minecraft.network.play.INetHandlerPlayServer;
 import net.minecraft.network.play.client.C07PacketPlayerDigging;
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
 import net.minecraft.network.status.client.C00PacketServerQuery;
@@ -22,8 +24,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 
+@SuppressWarnings("unused")
 public class PacketUtil implements IMinecraft {
-    public static void sendPacket(Packet packet) {
+    public static void sendPacket(Packet<INetHandlerPlayServer> packet) {
         mc.getNetHandler().getNetworkManager().sendPacket(packet);
     }
 
@@ -41,7 +44,7 @@ public class PacketUtil implements IMinecraft {
         }
     }
 
-    public static void sendPacketFinal(Packet packet) {
+    public static void sendPacketFinal(Packet<INetHandlerPlayServer> packet) {
         if (flushOutboundQueue != null && dispatchPacket != null) {
             EventFinalPacketSend event = new EventFinalPacketSend(packet);
             if (!PacketUtil.shouldIgnorePacket(packet))
@@ -56,7 +59,7 @@ public class PacketUtil implements IMinecraft {
         }
     }
 
-    public static void sendPacketNoEvent(Packet packet) {
+    public static void sendPacketNoEvent(Packet<INetHandlerPlayServer> packet) {
         PacketUtil.skip(packet);
         mc.getNetHandler().getNetworkManager().sendPacket(packet);
     }
@@ -73,19 +76,19 @@ public class PacketUtil implements IMinecraft {
         }
     }
 
-    public static ArrayList<Packet> skip_list = new ArrayList<>();
+    public static ArrayList<Packet<? extends INetHandler>> skip_list = new ArrayList<>();
 
-    public static void skip(Packet packet) {
+    public static void skip(Packet<? extends INetHandler> packet) {
         if (!skip_list.contains(packet)) {
             skip_list.add(packet);
         }
     }
 
-    public static void remove(Packet packet) {
+    public static void remove(Packet<? extends INetHandler> packet) {
         skip_list.remove(packet);
     }
 
-    public static boolean shouldSkip(Packet packet) {
+    public static boolean shouldSkip(Packet<? extends INetHandler> packet) {
         return skip_list.contains(packet);
     }
 
@@ -99,8 +102,7 @@ public class PacketUtil implements IMinecraft {
         }
     }
 
-    public static boolean shouldIgnorePacket(Packet packet) {
+    public static boolean shouldIgnorePacket(Packet<? extends INetHandler> packet) {
         return packet instanceof C00PacketLoginStart || packet instanceof C01PacketEncryptionResponse || packet instanceof C00Handshake || packet instanceof C00PacketServerQuery || packet instanceof C01PacketPing;
     }
-
 }

@@ -4,15 +4,15 @@ import cn.yapeteam.yolbi.event.type.CancellableEvent;
 import lombok.AllArgsConstructor;
 import lombok.Setter;
 import net.minecraft.network.Packet;
+import net.minecraft.network.play.INetHandlerPlayServer;
 
+@Setter
 @AllArgsConstructor
 public class EventPacketSend extends CancellableEvent {
 
-    @Setter
-    private Packet packet;
+    private Packet<INetHandlerPlayServer> packet;
 
-    public <T extends Packet> T getPacket() {
+    public <T extends Packet<INetHandlerPlayServer>> T getPacket() {
         return (T) packet;
     }
-
 }

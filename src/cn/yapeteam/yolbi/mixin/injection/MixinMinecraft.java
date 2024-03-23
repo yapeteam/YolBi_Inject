@@ -6,6 +6,7 @@ import cn.yapeteam.loader.mixin.annotations.Mixin;
 import cn.yapeteam.loader.mixin.annotations.Target;
 import cn.yapeteam.yolbi.YolBi;
 import cn.yapeteam.yolbi.event.impl.game.EventKey;
+import cn.yapeteam.yolbi.event.impl.game.EventLoadWorld;
 import cn.yapeteam.yolbi.event.impl.game.EventLoop;
 import cn.yapeteam.yolbi.event.impl.game.EventTick;
 import net.minecraft.client.Minecraft;
@@ -39,5 +40,10 @@ public class MixinMinecraft {
     public void onKey(@Local(source = "key", index = 1) int key) {
         if (Minecraft.getMinecraft().currentScreen == null && Keyboard.getEventKeyState())
             YolBi.instance.getEventManager().post(new EventKey(key));
+    }
+
+    @Inject(method = "loadWorld", desc = "(Lnet/minecraft/client/multiplayer/WorldClient;Ljava/lang/String;)V", target = @Target("HEAD"))
+    public void onLoadWorld() {
+        YolBi.instance.getEventManager().post(new EventLoadWorld());
     }
 }

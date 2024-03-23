@@ -123,7 +123,7 @@ public class NoteBot extends Module {
         }
         if (!playing) {
             if (!clicked) {
-                if (!timerUtil.delay(100)) return;
+                if (!timerUtil.hasTimePassed(100)) return;
                 timerUtil.reset();
                 int radius = 10;
                 BlockPos playerPos = mc.thePlayer.getPosition();
@@ -157,7 +157,7 @@ public class NoteBot extends Module {
             }
 
             boolean complete = true;
-            if (timerUtil.delay(10)) {
+            if (timerUtil.hasTimePassed(10)) {
                 timerUtil.reset();
                 for (BNIPair bniPair : checkedList) {
                     if (bniPair.getTimes() != 0) complete = false;
