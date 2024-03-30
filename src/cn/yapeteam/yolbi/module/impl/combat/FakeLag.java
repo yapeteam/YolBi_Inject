@@ -28,7 +28,7 @@ public class FakeLag extends Module {
     private final BooleanValue fakeLagBlockValue = new BooleanValue("fakeLagBloc", true);
     private final BooleanValue fakeLagAttackValue = new BooleanValue("fakeLagAttack", true);
     private final BooleanValue fakeLagSpoofValue = new BooleanValue("fakeLagSpoof", false);
-    private final NumberValue<Integer> lagDelayValue = new NumberValue<>("lagDelay", 0, 0, 2000, 1);
+    private final NumberValue<Integer> lagDelayValue = new NumberValue<>("lagDelay", 1, 1, 2000, 1);
     private final NumberValue<Integer> lagDurationValue = new NumberValue<>("lagDuration", 200, 0, 1000, 1);
     private final CopyOnWriteArrayList<Packet<? extends INetHandler>> packetBuffer = new CopyOnWriteArrayList<>();
     private boolean isSent = false;

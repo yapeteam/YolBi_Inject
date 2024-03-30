@@ -36,7 +36,16 @@ public class ClassMapper {
                     if (aValue instanceof Type) {
                         Type type = (Type) aValue;
                         String name = type.getClassName();
-                        aValue = Type.getType("L" + type.getClassName().replace(name, Mapper.getObfClass(name)).replace('.', '/') + ";");
+                        int count = 0;
+                        if (name.contains("[]"))
+                            while (name.contains("[]")) {
+                                name = replaceFirst(name, "[]", "");
+                                count++;
+                            }
+                        StringBuilder builder = new StringBuilder();
+                        for (int j = 0; j < count; j++)
+                            builder.append("[");
+                        aValue = Type.getType(builder + "L" + name.replace(name, Mapper.getObfClass(name)).replace('.', '/') + ";");
                     }
                     values.add(aValue);
                 }
@@ -137,7 +146,6 @@ public class ClassMapper {
         public String name, desc;
     }
 
-
     public static void method(MethodNode source, ClassNode parent, String targetName) throws Throwable {
         if (source.visibleAnnotations != null) {
             for (AnnotationNode visibleAnnotation : source.visibleAnnotations) {
@@ -175,7 +183,16 @@ public class ClassMapper {
                 if (ldcInsnNode.cst instanceof Type) {
                     Type type = (Type) ldcInsnNode.cst;
                     String name = type.getClassName();
-                    ldcInsnNode.cst = Type.getType("L" + type.getClassName().replace(name, Mapper.getObfClass(name)).replace('.', '/') + ";");
+                    int count = 0;
+                    if (name.contains("[]"))
+                        while (name.contains("[]")) {
+                            name = replaceFirst(name, "[]", "");
+                            count++;
+                        }
+                    StringBuilder builder = new StringBuilder();
+                    for (int i = 0; i < count; i++)
+                        builder.append("[");
+                    ldcInsnNode.cst = Type.getType(builder + "L" + name.replace(name, Mapper.getObfClass(name)).replace('.', '/') + ";");
                 }
             } else if (instruction instanceof InvokeDynamicInsnNode) {
                 InvokeDynamicInsnNode invokeDynamicInsnNode = (InvokeDynamicInsnNode) instruction;

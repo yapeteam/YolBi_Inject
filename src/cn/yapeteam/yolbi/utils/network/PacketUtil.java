@@ -23,6 +23,7 @@ import net.minecraft.util.EnumFacing;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 @SuppressWarnings("unused")
 public class PacketUtil implements IMinecraft {
@@ -32,10 +33,27 @@ public class PacketUtil implements IMinecraft {
 
     public static Method flushOutboundQueue = null, dispatchPacket = null;
 
+    private static String argumentTypesToString(Class<?>[] argTypes) {
+        StringBuilder buf = new StringBuilder();
+        buf.append("(");
+        if (argTypes != null) {
+            for (int i = 0; i < argTypes.length; i++) {
+                if (i > 0) {
+                    buf.append(", ");
+                }
+                Class<?> c = argTypes[i];
+                buf.append((c == null) ? "null" : c.getName());
+            }
+        }
+        buf.append(")");
+        return buf.toString();
+    }
+
     static {
         try {
             flushOutboundQueue = NetworkManager.class.getDeclaredMethod(Mapper.map("net.minecraft.network.NetworkManager", "flushOutboundQueue", "()V", Mapper.Type.Method));
-            dispatchPacket = NetworkManager.class.getDeclaredMethod(Mapper.map("net.minecraft.network.NetworkManager", "dispatchPacket", "(Lnet/minecraft/network/Packet;Lio/netty/util/concurrent/GenericFutureListener;)V", Mapper.Type.Method), Packet.class, GenericFutureListener[].class);
+            Arrays.stream(NetworkManager.class.getDeclaredMethods()).forEach(method -> System.out.println(argumentTypesToString(method.getParameterTypes())));
+            dispatchPacket = NetworkManager.class.getDeclaredMethod(Mapper.map("net.minecraft.network.NetworkManager", "dispatchPacket", "(Lnet/minecraft/network/Packet;[Lio/netty/util/concurrent/GenericFutureListener;)V", Mapper.Type.Method), Packet.class, GenericFutureListener[].class);
 
             flushOutboundQueue.setAccessible(true);
             dispatchPacket.setAccessible(true);

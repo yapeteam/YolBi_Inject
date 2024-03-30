@@ -87,16 +87,17 @@ public abstract class Module {
                 content.addProperty("enabled", enabled);
                 content.addProperty("key", key);
                 for (Value<?> value : values) {
-                    if (value instanceof BooleanValue)
-                        content.addProperty(value.getName(), ((BooleanValue) value).getValue());
-                    else if (value instanceof ColorValue)
-                        content.addProperty(value.getName(), ((ColorValue) value).getColor());
-                    else if (value instanceof ModeValue)
-                        content.addProperty(value.getName(), ((ModeValue<?>) value).getValue().toString());
-                    else if (value instanceof NumberValue)
-                        content.addProperty(value.getName(), ((NumberValue<?>) value).getValue());
-                    else if (value instanceof TextValue)
-                        content.addProperty(value.getName(), ((TextValue) value).getValue());
+                    if (value.getValue() != null)
+                        if (value instanceof BooleanValue)
+                            content.addProperty(value.getName(), ((BooleanValue) value).getValue());
+                        else if (value instanceof ColorValue)
+                            content.addProperty(value.getName(), ((ColorValue) value).getColor());
+                        else if (value instanceof ModeValue)
+                            content.addProperty(value.getName(), ((ModeValue<?>) value).getValue().toString());
+                        else if (value instanceof NumberValue)
+                            content.addProperty(value.getName(), ((NumberValue<?>) value).getValue());
+                        else if (value instanceof TextValue)
+                            content.addProperty(value.getName(), ((TextValue) value).getValue());
                 }
             }
 

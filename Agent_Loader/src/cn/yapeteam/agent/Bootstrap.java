@@ -1,3 +1,5 @@
+package cn.yapeteam.agent;
+
 import java.io.File;
 import java.lang.instrument.Instrumentation;
 import java.lang.reflect.Method;
@@ -5,7 +7,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Objects;
 
-public class AgentMain {
+public class Bootstrap {
     public static void agentmain(String args, Instrumentation instrumentation) throws Throwable {
         URLClassLoader loader = null;
         for (Object o : Thread.getAllStackTraces().keySet().toArray()) {
