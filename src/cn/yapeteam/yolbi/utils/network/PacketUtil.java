@@ -23,7 +23,6 @@ import net.minecraft.util.EnumFacing;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 @SuppressWarnings("unused")
 public class PacketUtil implements IMinecraft {
@@ -52,7 +51,6 @@ public class PacketUtil implements IMinecraft {
     static {
         try {
             flushOutboundQueue = NetworkManager.class.getDeclaredMethod(Mapper.map("net.minecraft.network.NetworkManager", "flushOutboundQueue", "()V", Mapper.Type.Method));
-            Arrays.stream(NetworkManager.class.getDeclaredMethods()).forEach(method -> System.out.println(argumentTypesToString(method.getParameterTypes())));
             dispatchPacket = NetworkManager.class.getDeclaredMethod(Mapper.map("net.minecraft.network.NetworkManager", "dispatchPacket", "(Lnet/minecraft/network/Packet;[Lio/netty/util/concurrent/GenericFutureListener;)V", Mapper.Type.Method), Packet.class, GenericFutureListener[].class);
 
             flushOutboundQueue.setAccessible(true);
