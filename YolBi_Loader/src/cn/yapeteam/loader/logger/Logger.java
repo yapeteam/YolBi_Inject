@@ -17,11 +17,12 @@ import java.util.regex.Pattern;
 public class Logger {
     @Getter
     private static File log;
+    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 
     public static void init() {
         try {
             log = new File(new SimpleDateFormat("yyyy-MM-dd_HH.mm.ss").format(new Date()) + ".log");
-            log.createNewFile();
+            boolean ignored = log.createNewFile();
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 try {
                     writeCache();
@@ -30,7 +31,7 @@ public class Logger {
                 }
             }));
         } catch (Throwable e) {
-            e.printStackTrace();
+            throw new RuntimeException("Failed to initialize logger", e);
         }
     }
 
@@ -69,7 +70,7 @@ public class Logger {
             if (o1 != null)
                 str = replaceFirst(str, "{}", o1.toString());
             else str = replaceFirst(str, "{}", "null");
-        str = "[" + new SimpleDateFormat("HH:mm:ss").format(new Date()) + "]" + " " + color + str + ConsoleColors.RESET;
+        str = "[" + dateFormat.format(new Date()) + "]" + " " + color + str + ConsoleColors.RESET;
         System.out.println(str);
         cache.add(str);
         if (cache.size() >= 50)
