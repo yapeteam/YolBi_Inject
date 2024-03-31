@@ -43,8 +43,9 @@ public class NoteBot extends Module {
                     boolean ignored = dir.mkdirs();
                 }
                 if (dir.list() != null) {
-                    list.setModes(Arrays.stream(Objects.requireNonNull(dir.list())).filter(s -> s.endsWith(".mid") || s.endsWith(".nbs")).toArray(String[]::new));
-                    list.setValue(list.getModes()[0]);
+                    list.setModes(Arrays.stream(Objects.requireNonNull(dir.list())).filter(s -> (s.endsWith(".mid") || s.endsWith(".nbs"))).toArray(String[]::new));
+                    if (list.getModes().length != 0)
+                        list.setValue(list.getModes()[0]);
                 }
             }
             return false;
