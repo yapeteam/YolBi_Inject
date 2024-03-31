@@ -19,6 +19,7 @@ import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockNote;
+import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.network.play.client.C07PacketPlayerDigging;
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
 import net.minecraft.util.BlockPos;
@@ -195,6 +196,7 @@ public class NoteBot extends Module {
                     rotation = RotationsUtil.getRotationsToBlockPos(pos);
                     e.setYaw(rotation[0]);
                     e.setPitch(rotation[1]);
+                    mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C05PacketPlayerLook(rotation[0], rotation[1], e.isOnGround()));
                     mc.thePlayer.swingItem();
                     mc.getNetHandler().getNetworkManager().sendPacket(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.START_DESTROY_BLOCK, pos, EnumFacing.UP));
                 } else System.err.println("Bad: " + note.getNote() + ", " + note.getInst());
@@ -206,7 +208,6 @@ public class NoteBot extends Module {
             playingMusic = null;
             setEnabled(false);
         }
-
     }
 
     private void play(File file) {
