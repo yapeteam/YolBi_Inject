@@ -5,6 +5,7 @@ import cn.yapeteam.loader.utils.ASMUtils;
 import cn.yapeteam.loader.utils.ClassUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.val;
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm_9_2.tree.ClassNode;
 
@@ -103,6 +104,8 @@ public class Mapper {
         readMapping(forge, getSearges());
     }
 
+    private static final java.util.Map<String, String> cache = new HashMap<>();
+
     /**
      * @param owner Class except
      * @param name  Name
@@ -111,12 +114,20 @@ public class Mapper {
      * @return ObfName
      */
     public static String map(@Nullable String owner, String name, @Nullable String desc, Type type) {
-        return applyMode(mappings.stream().filter(m ->
-                (m.type == type) &&
-                (type == Type.Class || owner == null || m.owner.equals(owner.replace('.', '/'))) &&
-                (m.name.equals(name.replace('.', '/'))) &&
-                (type == Type.Class || desc == null || m.desc.equals(desc))
-        ).findFirst().orElse(new Map(owner, name, "null", name, type)));
+        if (owner != null) owner = owner.replace('.', '/');
+        String identifier = owner + "." + name + " " + desc;
+        String value = cache.get(identifier);
+        if (value != null) return value;
+        String finalOwner = owner;
+        val map = mappings.stream().filter(m ->
+                m.type == type &&
+                        (type == Type.Class || finalOwner == null || m.owner.equals(finalOwner.replace('.', '/'))) &&
+                        (m.name.equals(name.replace('.', '/'))) &&
+                        (type == Type.Class || desc == null || m.desc.equals(desc))
+        ).findFirst().orElse(new Map(owner, name, "null", name, type));
+        String result = applyMode(map);
+        cache.put(identifier, result);
+        return result;
     }
 
     public static Mode guessMappingMode() {
@@ -159,11 +170,12 @@ public class Mapper {
 
     public static String mapWithSuper(String owner, String name, String desc, Type type) {
         owner = owner.replace('.', '/');
-        name = name.replace('.', '/');
-        String finalName = name;
+        String identifier = owner + "." + name + " " + desc;
+        String value = cache.get(identifier);
+        if (value != null) return value;
         java.util.Map<String, Map> owners = new HashMap<>();
         mappings.stream().filter(m ->
-                m.type == type && m.name.equals(finalName) && (desc == null || m.desc == null || desc.equals(m.desc))
+                m.type == type && m.name.equals(name) && (desc == null || m.desc == null || desc.equals(m.desc))
         ).forEach(m -> owners.put(m.owner, m));
         String mappedOwner = map(null, owner, null, Type.Class);
         Class<?> theClass = ClassUtils.getClass(mappedOwner);
@@ -173,7 +185,10 @@ public class Mapper {
                 java.util.Map.Entry<String, Map> entry = owners.entrySet().stream()
                         .filter(m -> map(null, m.getKey(), null, Type.Class).equals(finalTheClass.getName().replace('.', '/')))
                         .findFirst().orElse(null);
-                if (entry != null) return applyMode(entry.getValue());
+                if (entry != null) {
+                    cache.put(identifier, applyMode(entry.getValue()));
+                    return applyMode(entry.getValue());
+                }
                 theClass = theClass.getSuperclass();
             } else {
                 Logger.warn("Owner not found: {}", mappedOwner);
@@ -196,8 +211,13 @@ public class Mapper {
     }
 
     public static String getFriendlyClass(String obf) {
+        String value = cache.get(obf);
+        if (value != null) return value;
         Map map = mappings.stream().filter(m -> m.type == Type.Class && m.obf.equals(obf.replace('.', '/'))).findFirst().orElse(null);
-        if (map != null) return map.name;
+        if (map != null) {
+            cache.put(obf, map.name);
+            return map.name;
+        }
         return obf;
     }
 }
