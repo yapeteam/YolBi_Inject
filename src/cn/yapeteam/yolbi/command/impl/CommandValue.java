@@ -1,10 +1,10 @@
 package cn.yapeteam.yolbi.command.impl;
 
+import cn.yapeteam.loader.api.module.values.Value;
+import cn.yapeteam.loader.api.module.values.impl.*;
 import cn.yapeteam.yolbi.YolBi;
 import cn.yapeteam.yolbi.command.AbstractCommand;
 import cn.yapeteam.yolbi.module.Module;
-import cn.yapeteam.yolbi.module.values.Value;
-import cn.yapeteam.yolbi.module.values.impl.*;
 
 import java.awt.*;
 

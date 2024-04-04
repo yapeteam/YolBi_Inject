@@ -1,7 +1,7 @@
-package cn.yapeteam.yolbi.module.values.impl;
+package cn.yapeteam.loader.api.module.values.impl;
 
-import cn.yapeteam.yolbi.module.values.Value;
-import cn.yapeteam.yolbi.module.values.Visibility;
+import cn.yapeteam.loader.api.module.values.Value;
+import cn.yapeteam.loader.api.module.values.Visibility;
 
 public class BooleanValue extends Value<Boolean> {
     public BooleanValue(String name, boolean value) {

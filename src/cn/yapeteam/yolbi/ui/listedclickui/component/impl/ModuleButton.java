@@ -1,9 +1,9 @@
 package cn.yapeteam.yolbi.ui.listedclickui.component.impl;
 
+import cn.yapeteam.loader.api.module.values.Value;
 import cn.yapeteam.yolbi.YolBi;
 import cn.yapeteam.yolbi.font.AbstractFontRenderer;
 import cn.yapeteam.yolbi.module.Module;
-import cn.yapeteam.yolbi.module.values.Value;
 import cn.yapeteam.yolbi.ui.listedclickui.ImplScreen;
 import cn.yapeteam.yolbi.ui.listedclickui.component.AbstractComponent;
 import cn.yapeteam.yolbi.ui.listedclickui.component.Limitation;

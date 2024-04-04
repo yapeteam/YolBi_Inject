@@ -1,5 +1,7 @@
 package cn.yapeteam.yolbi.module;
 
+import cn.yapeteam.loader.api.module.ModuleCategory;
+import cn.yapeteam.loader.api.module.ModuleInfo;
 import cn.yapeteam.loader.logger.Logger;
 import cn.yapeteam.yolbi.YolBi;
 import cn.yapeteam.yolbi.event.Listener;

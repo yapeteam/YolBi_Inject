@@ -1,12 +1,12 @@
 package cn.yapeteam.yolbi.ui.listedclickui.component.impl;
 
+import cn.yapeteam.loader.api.module.values.Value;
+import cn.yapeteam.loader.api.module.values.impl.BooleanValue;
+import cn.yapeteam.loader.api.module.values.impl.ColorValue;
+import cn.yapeteam.loader.api.module.values.impl.ModeValue;
+import cn.yapeteam.loader.api.module.values.impl.NumberValue;
 import cn.yapeteam.yolbi.YolBi;
 import cn.yapeteam.yolbi.font.AbstractFontRenderer;
-import cn.yapeteam.yolbi.module.values.Value;
-import cn.yapeteam.yolbi.module.values.impl.BooleanValue;
-import cn.yapeteam.yolbi.module.values.impl.ColorValue;
-import cn.yapeteam.yolbi.module.values.impl.ModeValue;
-import cn.yapeteam.yolbi.module.values.impl.NumberValue;
 import cn.yapeteam.yolbi.ui.listedclickui.ImplScreen;
 import cn.yapeteam.yolbi.ui.listedclickui.component.AbstractComponent;
 import cn.yapeteam.yolbi.ui.listedclickui.component.Limitation;

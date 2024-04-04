@@ -1,9 +1,10 @@
 package cn.yapeteam.yolbi.module;
 
+import cn.yapeteam.loader.api.module.ModuleCategory;
+import cn.yapeteam.loader.api.module.values.Value;
+import cn.yapeteam.loader.api.module.values.impl.*;
 import cn.yapeteam.yolbi.YolBi;
 import cn.yapeteam.yolbi.config.Config;
-import cn.yapeteam.yolbi.module.values.Value;
-import cn.yapeteam.yolbi.module.values.impl.*;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import lombok.Getter;

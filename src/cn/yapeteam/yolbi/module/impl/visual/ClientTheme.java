@@ -1,11 +1,11 @@
 package cn.yapeteam.yolbi.module.impl.visual;
 
+import cn.yapeteam.loader.api.module.ModuleCategory;
+import cn.yapeteam.loader.api.module.ModuleInfo;
+import cn.yapeteam.loader.api.module.values.impl.ColorValue;
+import cn.yapeteam.loader.api.module.values.impl.ModeValue;
+import cn.yapeteam.loader.api.module.values.impl.NumberValue;
 import cn.yapeteam.yolbi.module.Module;
-import cn.yapeteam.yolbi.module.ModuleCategory;
-import cn.yapeteam.yolbi.module.ModuleInfo;
-import cn.yapeteam.yolbi.module.values.impl.ColorValue;
-import cn.yapeteam.yolbi.module.values.impl.ModeValue;
-import cn.yapeteam.yolbi.module.values.impl.NumberValue;
 import cn.yapeteam.yolbi.utils.render.ColorUtil;
 
 import java.awt.*;

@@ -1,8 +1,8 @@
 package cn.yapeteam.yolbi.ui.listedclickui;
 
+import cn.yapeteam.loader.api.module.ModuleCategory;
 import cn.yapeteam.loader.mixin.annotations.Super;
 import cn.yapeteam.yolbi.YolBi;
-import cn.yapeteam.yolbi.module.ModuleCategory;
 import cn.yapeteam.yolbi.module.impl.visual.ClickUI;
 import cn.yapeteam.yolbi.module.impl.visual.ClientTheme;
 import cn.yapeteam.yolbi.ui.listedclickui.component.AbstractComponent;

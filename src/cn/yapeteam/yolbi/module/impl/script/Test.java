@@ -1,12 +1,12 @@
 package cn.yapeteam.yolbi.module.impl.script;
 
+import cn.yapeteam.loader.api.module.ModuleCategory;
+import cn.yapeteam.loader.api.module.ModuleInfo;
 import cn.yapeteam.yolbi.event.Listener;
 import cn.yapeteam.yolbi.event.impl.network.EventPacketReceive;
 import cn.yapeteam.yolbi.event.impl.network.EventPacketSend;
 import cn.yapeteam.yolbi.event.impl.player.EventAttack;
 import cn.yapeteam.yolbi.module.Module;
-import cn.yapeteam.yolbi.module.ModuleCategory;
-import cn.yapeteam.yolbi.module.ModuleInfo;
 
 /**
  * @author yuxiangll

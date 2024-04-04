@@ -1,18 +1,18 @@
 package cn.yapeteam.yolbi.module.impl.misc;
 
+import cn.yapeteam.loader.api.module.ModuleCategory;
+import cn.yapeteam.loader.api.module.ModuleInfo;
+import cn.yapeteam.loader.api.module.values.impl.BooleanValue;
+import cn.yapeteam.loader.api.module.values.impl.ModeValue;
 import cn.yapeteam.yolbi.YolBi;
 import cn.yapeteam.yolbi.event.Listener;
 import cn.yapeteam.yolbi.event.impl.block.EventNote;
 import cn.yapeteam.yolbi.event.impl.player.EventMotion;
 import cn.yapeteam.yolbi.module.Module;
-import cn.yapeteam.yolbi.module.ModuleCategory;
-import cn.yapeteam.yolbi.module.ModuleInfo;
 import cn.yapeteam.yolbi.module.impl.misc.notebot.MidiReader;
 import cn.yapeteam.yolbi.module.impl.misc.notebot.Music;
 import cn.yapeteam.yolbi.module.impl.misc.notebot.MusicNote;
 import cn.yapeteam.yolbi.module.impl.misc.notebot.NBSReader;
-import cn.yapeteam.yolbi.module.values.impl.BooleanValue;
-import cn.yapeteam.yolbi.module.values.impl.ModeValue;
 import cn.yapeteam.yolbi.utils.misc.TimerUtil;
 import cn.yapeteam.yolbi.utils.player.RotationsUtil;
 import lombok.Getter;

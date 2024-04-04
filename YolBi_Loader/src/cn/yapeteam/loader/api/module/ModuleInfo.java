@@ -1,4 +1,4 @@
-package cn.yapeteam.yolbi.module;
+package cn.yapeteam.loader.api.module;
 
 import org.lwjgl.input.Keyboard;
 

@@ -111,8 +111,6 @@ public class Mapper {
      * @return ObfName
      */
     public static String map(@Nullable String owner, String name, @Nullable String desc, Type type) {
-        if (name.equals("getMinecraft"))
-            System.out.println(owner + "." + name + desc);
         return applyMode(mappings.stream().filter(m ->
                 (m.type == type) &&
                 (type == Type.Class || owner == null || m.owner.equals(owner.replace('.', '/'))) &&
