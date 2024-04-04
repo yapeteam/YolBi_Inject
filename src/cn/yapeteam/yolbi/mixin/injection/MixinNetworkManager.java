@@ -13,6 +13,7 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.INetHandlerPlayClient;
 import net.minecraft.network.play.INetHandlerPlayServer;
+import net.minecraft.util.IChatComponent;
 
 @Mixin(NetworkManager.class)
 @SuppressWarnings("UnnecessaryReturnStatement")
@@ -54,5 +55,15 @@ public class MixinNetworkManager {
             YolBi.instance.getEventManager().post(eventPacket);
             if (event.isCancelled() || eventPacket.isCancelled()) return;
         } else PacketUtil.remove(packet);
+    }
+
+    @Inject(
+            method = "closeChannel",
+            desc = "(Lnet/minecraft/util/IChatComponent;)V",
+            target = @Target("HEAD")
+    )
+    public void onChannelClose(IChatComponent reason) {
+        System.out.println(reason.getUnformattedText());
+        new Exception().printStackTrace();
     }
 }

@@ -514,11 +514,11 @@ public class RenderUtil {
         glDepthMask(false);
 
         final double x = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * partialTicks
-                         - getRenderPos(renderPosX, renderManager);
+                - getRenderPos(renderPosX, renderManager);
         final double y = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * partialTicks
-                         - getRenderPos(renderPosY, renderManager);
+                - getRenderPos(renderPosY, renderManager);
         final double z = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * partialTicks
-                         - getRenderPos(renderPosZ, renderManager);
+                - getRenderPos(renderPosZ, renderManager);
 
         final AxisAlignedBB entityBox = entity.getEntityBoundingBox();
         final AxisAlignedBB axisAlignedBB = new AxisAlignedBB(
@@ -528,6 +528,46 @@ public class RenderUtil {
                 entityBox.maxX - entity.posX + x + 0.05D,
                 entityBox.maxY - entity.posY + y + 0.15D,
                 entityBox.maxZ - entity.posZ + z + 0.05D
+        );
+
+        if (outline) {
+            glLineWidth(outlineWidth);
+            enableGlCap(GL_LINE_SMOOTH);
+            glColor(color.getRed(), color.getGreen(), color.getBlue(), box ? 170 : 255);
+            drawSelectionBoundingBox(axisAlignedBB);
+        }
+
+        if (box) {
+            glColor(color.getRed(), color.getGreen(), color.getBlue(), outline ? 26 : 35);
+            drawFilledBox(axisAlignedBB);
+        }
+
+        GlStateManager.resetColor();
+        glDepthMask(true);
+        resetCaps();
+    }
+
+    public static void drawEntityBox(AxisAlignedBB entityBox, double lastTickPosX, double lastTickPosY, double lastTickPosZ, double posX, double posY, double posZ, final Color color, final boolean outline, final boolean box, final float outlineWidth, float partialTicks) {
+        final RenderManager renderManager = mc.getRenderManager();
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        enableGlCap(GL_BLEND);
+        disableGlCap(GL_TEXTURE_2D, GL_DEPTH_TEST);
+        glDepthMask(false);
+
+        final double x = lastTickPosX + (posX - lastTickPosX) * partialTicks
+                - getRenderPos(renderPosX, renderManager);
+        final double y = lastTickPosY + (posY - lastTickPosY) * partialTicks
+                - getRenderPos(renderPosY, renderManager);
+        final double z = lastTickPosZ + (posZ - lastTickPosZ) * partialTicks
+                - getRenderPos(renderPosZ, renderManager);
+        ;
+        final AxisAlignedBB axisAlignedBB = new AxisAlignedBB(
+                entityBox.minX - posX + x - 0.05D,
+                entityBox.minY - posY + y,
+                entityBox.minZ - posZ + z - 0.05D,
+                entityBox.maxX - posX + x + 0.05D,
+                entityBox.maxY - posY + y + 0.15D,
+                entityBox.maxZ - posZ + z + 0.05D
         );
 
         if (outline) {

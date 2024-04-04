@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
+@Deprecated
 @ModuleInfo(name = "KillAura", category = ModuleCategory.COMBAT, key = Keyboard.KEY_R)
 public class KillAura extends Module {
     public KillAura() {
@@ -76,8 +77,8 @@ public class KillAura extends Module {
             List<Entity> entityList = new ArrayList<>(mc.theWorld.loadedEntityList);
             entityList = entityList.stream().filter(entity ->
                     entity != mc.thePlayer &&
-                    entity instanceof EntityLivingBase &&
-                    entity.getDistanceToEntity(mc.thePlayer) <= range.getValue()
+                            entity instanceof EntityLivingBase &&
+                            entity.getDistanceToEntity(mc.thePlayer) <= range.getValue()
             ).sorted(
                     Comparator.comparingInt(entity -> (int) (entity.getDistanceToEntity(mc.thePlayer) * 100))
             ).collect(Collectors.toList());

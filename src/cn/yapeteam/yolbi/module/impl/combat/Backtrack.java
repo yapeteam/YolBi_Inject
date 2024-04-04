@@ -4,14 +4,18 @@ import cn.yapeteam.loader.api.module.ModuleCategory;
 import cn.yapeteam.loader.api.module.ModuleInfo;
 import cn.yapeteam.loader.api.module.values.impl.BooleanValue;
 import cn.yapeteam.loader.api.module.values.impl.NumberValue;
+import cn.yapeteam.loader.logger.Logger;
 import cn.yapeteam.yolbi.YolBi;
 import cn.yapeteam.yolbi.event.Listener;
+import cn.yapeteam.yolbi.event.impl.game.EventLoop;
 import cn.yapeteam.yolbi.event.impl.network.EventPacketReceive;
 import cn.yapeteam.yolbi.event.impl.player.EventPostMotion;
+import cn.yapeteam.yolbi.event.impl.render.EventRender3D;
 import cn.yapeteam.yolbi.module.Module;
 import cn.yapeteam.yolbi.utils.network.DelayedPacket;
 import cn.yapeteam.yolbi.utils.player.PendingVelocity;
 import cn.yapeteam.yolbi.utils.reflect.ReflectUtil;
+import cn.yapeteam.yolbi.utils.render.RenderUtil;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.entity.Entity;
@@ -19,33 +23,29 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.network.Packet;
+import net.minecraft.network.play.INetHandlerPlayClient;
 import net.minecraft.network.play.client.C0FPacketConfirmTransaction;
 import net.minecraft.network.play.server.*;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.AxisAlignedBB;
 
+import java.awt.*;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
 
 @SuppressWarnings("DuplicatedCode")
 @ModuleInfo(name = "Backtrack", category = ModuleCategory.COMBAT)
 public class Backtrack extends Module {
-
     private final NumberValue<Integer> delay = new NumberValue<>("Delay", 500, 100, 2000, 50);
-    private final NumberValue<Double> minRange = new NumberValue<>("Min range", 2.8, 1.0, 6.0, 0.1);
-
     private final BooleanValue delayPing = new BooleanValue("Delay ping", true);
     private final BooleanValue delayVelocity = new BooleanValue("Delay velocity", delayPing::getValue, true);
 
     private final CopyOnWriteArrayList<DelayedPacket> delayedPackets = new CopyOnWriteArrayList<>();
 
-    private KillAura killauraModule;
-
     private EntityLivingBase lastTarget;
-
-    private EntityLivingBase lastCursorTarget;
-
-    private int cursorTargetTicks;
 
     private PendingVelocity lastVelocity;
     public Field S14PacketEntity$posX = ReflectUtil.getField(S14PacketEntity.class, "posX"),
@@ -56,111 +56,95 @@ public class Backtrack extends Module {
             NetHandlerPlayClient$clientWorldController = ReflectUtil.getField(NetHandlerPlayClient.class, "clientWorldController");
 
     public Backtrack() {
-        this.addValues(delay, minRange, delayPing, delayVelocity);
+        this.addValues(delay, delayPing, delayVelocity);
     }
 
-    @Override
-    public void onEnable() {
-        killauraModule = YolBi.instance.getModuleManager().getModule(KillAura.class);
-    }
-
-    public double getDistanceCustomPosition(double x, double y, double z, double eyeHeight) {
-        Vec3 playerVec = new Vec3(mc.thePlayer.posX, mc.thePlayer.posY + mc.thePlayer.getEyeHeight(), mc.thePlayer.posZ);
-
-        double yDiff = mc.thePlayer.posY - y;
-
-        double targetY = yDiff > 0 ? y + eyeHeight : -yDiff < mc.thePlayer.getEyeHeight() ? mc.thePlayer.posY + mc.thePlayer.getEyeHeight() : y;
-
-        Vec3 targetVec = new Vec3(x, targetY, z);
-
-        return playerVec.distanceTo(targetVec) - 0.3F;
-    }
+    private VirtualEntity virtualEntity = null;
 
     @Listener
     public void onReceive(EventPacketReceive event) {
-        if (mc.thePlayer == null || mc.thePlayer.ticksExisted < 5) {
-            if (!delayedPackets.isEmpty()) {
-                delayedPackets.clear();
+        try {
+            if (mc.thePlayer == null || mc.thePlayer.ticksExisted < 5) {
+                if (!delayedPackets.isEmpty())
+                    delayedPackets.clear();
             }
-        }
 
-        EntityLivingBase currentTarget = getCurrentTarget();
+            EntityLivingBase currentTarget = getCurrentTarget();
 
-        if (currentTarget != lastTarget) {
-            clearPackets();
-        }
+            if (currentTarget != lastTarget) {
+                clearPackets();
+                if (currentTarget != null) {
+                    virtualEntity = new VirtualEntity(currentTarget);
+                    YolBi.instance.getEventManager().register(virtualEntity);
+                }
+            }
+            if (currentTarget == null) {
+                clearPackets();
+                YolBi.instance.getEventManager().unregister(virtualEntity);
+                virtualEntity = null;
+            } else {
+                if (event.getPacket() instanceof S14PacketEntity) {
+                    S14PacketEntity packet = event.getPacket();
 
-        if (currentTarget == null) {
-            clearPackets();
-        } else {
-            if (event.getPacket() instanceof S14PacketEntity) {
-                S14PacketEntity packet = event.getPacket();
+                    if (packet.getEntity(ReflectUtil.getField(NetHandlerPlayClient$clientWorldController, mc.getNetHandler())) == currentTarget) {
+                        byte px = ReflectUtil.getField(S14PacketEntity$posX, packet),
+                                py = ReflectUtil.getField(S14PacketEntity$posY, packet),
+                                pz = ReflectUtil.getField(S14PacketEntity$posZ, packet);
 
-                if (packet.getEntity(ReflectUtil.getField(NetHandlerPlayClient$clientWorldController, mc.getNetHandler())) == currentTarget) {
-                    byte px = ReflectUtil.getField(S14PacketEntity$posX, packet),
-                            py = ReflectUtil.getField(S14PacketEntity$posY, packet),
-                            pz = ReflectUtil.getField(S14PacketEntity$posZ, packet);
+                        int x = currentTarget.serverPosX + px;
+                        int y = currentTarget.serverPosY + py;
+                        int z = currentTarget.serverPosZ + pz;
 
-                    int x = currentTarget.serverPosX + px;
-                    int y = currentTarget.serverPosY + py;
-                    int z = currentTarget.serverPosZ + pz;
+                        double posX = (double) x / 32.0D;
+                        double posY = (double) y / 32.0D;
+                        double posZ = (double) z / 32.0D;
 
-                    double posX = (double) x / 32.0D;
-                    double posY = (double) y / 32.0D;
-                    double posZ = (double) z / 32.0D;
-
-                    if (getDistanceCustomPosition(posX, posY, posZ, currentTarget.getEyeHeight()) >= minRange.getValue()) {
                         event.setCancelled(true);
                         delayedPackets.add(new DelayedPacket(packet));
+                        if (virtualEntity != null) virtualEntity.handleVirtualMovement(posX, posY, posZ);
                     }
-                }
-            } else if (event.getPacket() instanceof S18PacketEntityTeleport) {
-                S18PacketEntityTeleport packet = event.getPacket();
+                } else if (event.getPacket() instanceof S18PacketEntityTeleport) {
+                    S18PacketEntityTeleport packet = event.getPacket();
 
-                if (packet.getEntityId() == currentTarget.getEntityId()) {
-                    double serverX = packet.getX();
-                    double serverY = packet.getY();
-                    double serverZ = packet.getZ();
+                    if (packet.getEntityId() == currentTarget.getEntityId()) {
+                        double serverX = packet.getX();
+                        double serverY = packet.getY();
+                        double serverZ = packet.getZ();
 
-                    double d0 = serverX / 32.0D;
-                    double d1 = serverY / 32.0D;
-                    double d2 = serverZ / 32.0D;
-
-                    double x, y, z;
-
-                    if (Math.abs(serverX - d0) < 0.03125D && Math.abs(serverY - d1) < 0.015625D && Math.abs(serverZ - d2) < 0.03125D) {
-                        x = currentTarget.posX;
-                        y = currentTarget.posY;
-                        z = currentTarget.posZ;
-                    } else {
-                        x = d0;
-                        y = d1;
-                        z = d2;
-                    }
-
-                    if (getDistanceCustomPosition(x, y, z, currentTarget.getEyeHeight()) >= minRange.getValue()) {
                         event.setCancelled(true);
                         delayedPackets.add(new DelayedPacket(packet));
+                        if (virtualEntity != null) virtualEntity.handleVirtualTeleport(serverX, serverY, serverZ);
                     }
-                }
-            } else if (event.getPacket() instanceof S32PacketConfirmTransaction || event.getPacket() instanceof S00PacketKeepAlive) {
-                if (!delayedPackets.isEmpty() && delayPing.getValue()) {
-                    event.setCancelled(true);
-                    delayedPackets.add(new DelayedPacket(event.getPacket()));
-                }
-            } else if (event.getPacket() instanceof S12PacketEntityVelocity) {
-                S12PacketEntityVelocity packet = event.getPacket();
-
-                if (packet.getEntityID() == mc.thePlayer.getEntityId()) {
-                    if (!delayedPackets.isEmpty() && delayPing.getValue() && delayVelocity.getValue()) {
+                } else if (event.getPacket() instanceof S32PacketConfirmTransaction || event.getPacket() instanceof S00PacketKeepAlive) {
+                    if (!delayedPackets.isEmpty() && delayPing.getValue()) {
                         event.setCancelled(true);
-                        lastVelocity = new PendingVelocity(packet.getMotionX() / 8000.0, packet.getMotionY() / 8000.0, packet.getMotionZ() / 8000.0);
+                        delayedPackets.add(new DelayedPacket(event.getPacket()));
+                    }
+                } else if (event.getPacket() instanceof S12PacketEntityVelocity) {
+                    S12PacketEntityVelocity packet = event.getPacket();
+
+                    if (packet.getEntityID() == mc.thePlayer.getEntityId()) {
+                        if (!delayedPackets.isEmpty() && delayPing.getValue() && delayVelocity.getValue()) {
+                            event.setCancelled(true);
+                            lastVelocity = new PendingVelocity(packet.getMotionX() / 8000.0, packet.getMotionY() / 8000.0, packet.getMotionZ() / 8000.0);
+                        }
                     }
                 }
             }
-        }
 
-        lastTarget = currentTarget;
+            lastTarget = currentTarget;
+        } catch (Throwable e) {
+            Logger.exception(e);
+        }
+    }
+
+    @Listener
+    private void onRender(EventRender3D e) {
+        if (virtualEntity != null)
+            RenderUtil.drawEntityBox(
+                    virtualEntity.getEntityBoundingBox(), virtualEntity.cacheX, virtualEntity.cacheY, virtualEntity.cacheZ, virtualEntity.cacheX, virtualEntity.cacheY, virtualEntity.cacheZ,
+                    new Color(-1), true, true, 1, e.getPartialTicks()
+            );
     }
 
     @Listener
@@ -169,24 +153,16 @@ public class Backtrack extends Module {
     }
 
     public EntityLivingBase getCurrentTarget() {
-        if (killauraModule == null) {
-            killauraModule = YolBi.instance.getModuleManager().getModule(KillAura.class);
-        }
-
-        if (killauraModule.isEnabled() && killauraModule.getTarget() != null) {
-            return (EntityLivingBase) killauraModule.getTarget();
-        } else if (mc.objectMouseOver != null && mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY && mc.objectMouseOver.entityHit instanceof EntityLivingBase) {
-            lastCursorTarget = (EntityLivingBase) mc.objectMouseOver.entityHit;
-
-            return (EntityLivingBase) mc.objectMouseOver.entityHit;
-        } else if (lastCursorTarget != null) {
-            if (++cursorTargetTicks > 10) {
-                lastCursorTarget = null;
-            } else {
-                return lastCursorTarget;
-            }
-        }
-
+        if (mc.theWorld == null) return null;
+        List<Entity> entityList = new ArrayList<>(mc.theWorld.loadedEntityList);
+        entityList = entityList.stream().filter(entity ->
+                entity != mc.thePlayer &&
+                        entity instanceof EntityLivingBase &&
+                        entity.getDistanceToEntity(mc.thePlayer) <= 6
+        ).sorted(
+                Comparator.comparingInt(entity -> (int) (entity.getDistanceToEntity(mc.thePlayer) * 100))
+        ).collect(Collectors.toList());
+        if (!entityList.isEmpty()) return (EntityLivingBase) entityList.get(0);
         return null;
     }
 
@@ -218,14 +194,13 @@ public class Backtrack extends Module {
         }
 
         if (!delayedPackets.isEmpty()) {
-            for (DelayedPacket p : delayedPackets) {
+            for (DelayedPacket p : delayedPackets)
                 handlePacket(p.getPacket());
-            }
             delayedPackets.clear();
         }
     }
 
-    public void handlePacket(Packet packet) {
+    public void handlePacket(Packet<INetHandlerPlayClient> packet) {
         if (packet instanceof S14PacketEntity) {
             handleEntityMovement((S14PacketEntity) packet);
         } else if (packet instanceof S18PacketEntityTeleport) {
@@ -297,8 +272,51 @@ public class Backtrack extends Module {
         }
     }
 
+    private static class VirtualEntity {
+        private double posX, posY, posZ;
+        private double cacheX, cacheY, cacheZ;
+        private final float width, height;
+
+        public VirtualEntity(Entity entity) {
+            cacheX = this.posX = entity.posX;
+            cacheY = this.posY = entity.posY;
+            cacheZ = this.posZ = entity.posZ;
+            this.width = entity.width;
+            this.height = entity.height;
+        }
+
+        public void handleVirtualMovement(double posX, double posY, double posZ) {
+            this.posX = posX;
+            this.posY = posY;
+            this.posZ = posZ;
+        }
+
+        public void handleVirtualTeleport(double serverPosX, double serverPosY, double serverPosZ) {
+            double d0 = serverPosX / 32.0D;
+            double d1 = serverPosY / 32.0D;
+            double d2 = serverPosZ / 32.0D;
+
+            if (!(Math.abs(posX - d0) < 0.03125D && Math.abs(posY - d1) < 0.015625D && Math.abs(posZ - d2) < 0.03125D)) {
+                posX = d0;
+                posY = d1;
+                posZ = d2;
+            }
+        }
+
+        @Listener
+        private void onUpdate(EventLoop e) {
+            cacheX += (posX - cacheX) * 0.2;
+            cacheY += (posY - cacheY) * 0.2;
+            cacheZ += (posZ - cacheZ) * 0.2;
+        }
+
+        public AxisAlignedBB getEntityBoundingBox() {
+            float f = this.width / 2.0F;
+            return new AxisAlignedBB(cacheX - (double) f, cacheY, cacheZ - (double) f, cacheX + (double) f, cacheY + (double) this.height, cacheZ + (double) f);
+        }
+    }
+
     public boolean isDelaying() {
         return this.isEnabled() && !delayedPackets.isEmpty();
     }
-
 }
