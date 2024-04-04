@@ -19,7 +19,7 @@ import java.io.IOException;
 public class YolBi {
     public static final YolBi instance = new YolBi();
     public static final String name = "YolBi Lite";
-    public static final String version = "0.1.1";
+    public static final String version = "0.2.6";
     public static final File YOLBI_DIR = new File(System.getProperty("user.home"), ".yolbi");
     private EventManager eventManager;
     private CommandManager commandManager;
