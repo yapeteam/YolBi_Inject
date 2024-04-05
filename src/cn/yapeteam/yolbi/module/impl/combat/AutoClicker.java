@@ -2,6 +2,7 @@ package cn.yapeteam.yolbi.module.impl.combat;
 
 import cn.yapeteam.loader.api.module.ModuleCategory;
 import cn.yapeteam.loader.api.module.ModuleInfo;
+import cn.yapeteam.loader.api.module.values.impl.BooleanValue;
 import cn.yapeteam.loader.api.module.values.impl.NumberValue;
 import cn.yapeteam.yolbi.event.Listener;
 import cn.yapeteam.yolbi.event.impl.player.EventUpdate;
@@ -16,11 +17,13 @@ import java.util.Random;
 public class AutoClicker extends Module {
     private final NumberValue<Integer> min = new NumberValue<>("min", 8, 0, 100, 1);
     private final NumberValue<Integer> max = new NumberValue<>("max", 15, 0, 100, 1);
+    private final BooleanValue leftClick = new BooleanValue("leftClick", true),
+            rightClick = new BooleanValue("rightClick", false);
 
     public AutoClicker() {
         min.setCallback((oldV, newV) -> newV > max.getValue() ? oldV : newV);
         max.setCallback((oldV, newV) -> newV < min.getValue() ? oldV : newV);
-        addValues(min, max);
+        addValues(min, max, leftClick, rightClick);
     }
 
     private long delay = 0, time = 0;
@@ -34,11 +37,17 @@ public class AutoClicker extends Module {
     @Listener
     private void onUpdate(EventUpdate e) {
         delay = random(min.getValue(), max.getValue());
-        if (!Mouse.isButtonDown(0) || mc.currentScreen != null) return;
+        if (mc.currentScreen != null) return;
         if (System.currentTimeMillis() - time >= (1000 / delay)) {
-            time = System.currentTimeMillis();
-            mc.thePlayer.swingItem();
-            ReflectUtil.Minecraft$clickMouse(mc);
+            if (Mouse.isButtonDown(0) && leftClick.getValue()) {
+                time = System.currentTimeMillis();
+                mc.thePlayer.swingItem();
+                ReflectUtil.Minecraft$clickMouse(mc);
+            }
+            if (Mouse.isButtonDown(1) && rightClick.getValue()) {
+                time = System.currentTimeMillis();
+                ReflectUtil.Minecraft$rightClickMouse(mc);
+            }
         }
     }
 

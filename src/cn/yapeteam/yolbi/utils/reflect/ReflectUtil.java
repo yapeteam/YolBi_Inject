@@ -17,12 +17,15 @@ import java.util.Objects;
 @SuppressWarnings("unchecked")
 public class ReflectUtil {
     private static Field EntityRenderer$theShaderGroup, ShaderGroup$listShaders;
-    private static Method EntityRenderer$loadShader, Minecraft$clickMouse;
+    private static Method EntityRenderer$loadShader, Minecraft$clickMouse, Minecraft$rightClickMouse;
 
     static {
         try {
             Minecraft$clickMouse = Minecraft.class.getDeclaredMethod(Mapper.map("net/minecraft/client/Minecraft", "clickMouse", "()V", Mapper.Type.Method));
             Minecraft$clickMouse.setAccessible(true);
+
+            Minecraft$rightClickMouse = Minecraft.class.getDeclaredMethod(Mapper.map("net/minecraft/client/Minecraft", "rightClickMouse", "()V", Mapper.Type.Method));
+            Minecraft$rightClickMouse.setAccessible(true);
 
             EntityRenderer$theShaderGroup = EntityRenderer.class.getDeclaredField(Mapper.map("net/minecraft/client/renderer/EntityRenderer", "theShaderGroup", null, Mapper.Type.Field));
             EntityRenderer$loadShader = EntityRenderer.class.getDeclaredMethod(Mapper.map("net/minecraft/client/renderer/EntityRenderer", "loadShader", null, Mapper.Type.Method), ResourceLocation.class);
@@ -39,6 +42,14 @@ public class ReflectUtil {
     public static void Minecraft$clickMouse(Minecraft minecraft) {
         try {
             Minecraft$clickMouse.invoke(minecraft);
+        } catch (Exception e) {
+            Logger.exception(e);
+        }
+    }
+
+    public static void Minecraft$rightClickMouse(Minecraft minecraft) {
+        try {
+            Minecraft$rightClickMouse.invoke(minecraft);
         } catch (Exception e) {
             Logger.exception(e);
         }
