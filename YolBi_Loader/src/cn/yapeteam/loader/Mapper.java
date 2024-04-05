@@ -104,6 +104,7 @@ public class Mapper {
         readMapping(forge, getSearges());
     }
 
+    @Getter
     private static final java.util.Map<String, String> cache = new HashMap<>();
 
     /**

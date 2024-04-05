@@ -43,6 +43,7 @@ public class Loader {
             Logger.warn("Start Mapping Injection!");
             JarMapper.dispose(new File(yolbi_dir, "injection/injection.jar"), new File(yolbi_dir, "injection.jar"));
             Logger.success("Completed");
+            Mapper.getCache().clear();
         } catch (Throwable e) {
             Logger.exception(e);
             try {

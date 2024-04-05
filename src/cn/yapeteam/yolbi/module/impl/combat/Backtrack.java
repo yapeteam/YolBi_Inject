@@ -168,18 +168,18 @@ public class Backtrack extends Module {
 
     public void updatePackets() {
         if (!delayedPackets.isEmpty()) {
-            for (DelayedPacket p : delayedPackets) {
+            for (int i = 0; i < delayedPackets.size(); i++) {
+                DelayedPacket p = delayedPackets.get(i);
                 if (p.getTimer().getTimeElapsed() >= delay.getValue()) {
-                    clearPackets();
-
+                    handlePacket(p.getPacket());
                     if (lastVelocity != null) {
                         mc.thePlayer.motionX = lastVelocity.getX();
                         mc.thePlayer.motionY = lastVelocity.getY();
                         mc.thePlayer.motionZ = lastVelocity.getZ();
                         lastVelocity = null;
                     }
-
-                    return;
+                    delayedPackets.remove(i);
+                    i--;
                 }
             }
         }
