@@ -15,8 +15,8 @@ import java.util.Random;
 
 @ModuleInfo(name = "AutoClicker", category = ModuleCategory.COMBAT, key = Keyboard.KEY_F)
 public class AutoClicker extends Module {
-    private final NumberValue<Integer> min = new NumberValue<>("min", 8, 0, 100, 1);
-    private final NumberValue<Integer> max = new NumberValue<>("max", 15, 0, 100, 1);
+    private final NumberValue<Integer> min = new NumberValue<>("min", 8, 1, 100, 1);
+    private final NumberValue<Integer> max = new NumberValue<>("max", 15, 1, 100, 1);
     private final BooleanValue leftClick = new BooleanValue("leftClick", true),
             rightClick = new BooleanValue("rightClick", false);
 
