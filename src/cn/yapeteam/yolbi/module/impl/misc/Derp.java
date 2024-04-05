@@ -12,7 +12,7 @@ public class Derp extends Module {
     private float yaw;
     private long time;
     private final NumberValue<Float> speed = new NumberValue<>("speed", 1f, 0f, 10f, .1f);
-    private final NumberValue<Float> pitch = new NumberValue<>("pitch", 90f, -180f, 180f, .1f);
+    private final NumberValue<Float> pitch = new NumberValue<>("pitch", 90f, -90f, 90f, .1f);
 
     {
         addValues(speed, pitch);
