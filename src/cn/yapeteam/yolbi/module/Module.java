@@ -118,7 +118,7 @@ public abstract class Module {
                     else if (value instanceof ModeValue)
                         ((ModeValue<?>) value).setMode(val.getAsString());
                     else if (value instanceof NumberValue)
-                        ((NumberValue<?>) value).setValue(val.getAsNumber());
+                        ((NumberValue<?>) value).setValue(val.getAsNumber(), false);
                     else if (value instanceof TextValue)
                         ((TextValue) value).setValue(val.getAsString());
                 }

@@ -66,6 +66,10 @@ public class NumberValue<T extends Number> extends Value<T> {
         this.value = (T) convertValue(type, getCallback() != null ? getCallback().run(this.value, (T) convertValue(type, value)) : value);
     }
 
+    public void setValue(Number value, boolean callback) {
+        this.value = (T) convertValue(type, (getCallback() != null && callback) ? getCallback().run(this.value, (T) convertValue(type, value)) : value);
+    }
+
     private Object convertValue(Class<? extends Number> type, Number value) {
         if (type.equals(Integer.class))
             return Integer.parseInt(String.valueOf(value.intValue()));
