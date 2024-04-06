@@ -46,7 +46,7 @@ public class HeadUpDisplay extends Module {
                 double y = i * height;
                 {
                     RenderUtil.drawRect2(x, y, width, height, 0x80000000);
-                    font.drawString(text, x + 2, y + (height - font.getHeight()) / 2f, theme.getColor(i * 10));
+                    font.drawString(text, x + 2, y + (height - font.getHeight()) / 2f, theme.getColor(i * 100));
                 }
             }
         }

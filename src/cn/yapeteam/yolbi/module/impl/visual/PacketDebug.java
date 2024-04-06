@@ -1,6 +1,5 @@
 package cn.yapeteam.yolbi.module.impl.visual;
 
-import cn.yapeteam.loader.Mapper;
 import cn.yapeteam.loader.api.module.ModuleCategory;
 import cn.yapeteam.loader.api.module.ModuleInfo;
 import cn.yapeteam.loader.logger.Logger;
@@ -20,7 +19,7 @@ import java.util.Optional;
 
 @ModuleInfo(name = "PacketDebug", category = ModuleCategory.VISUAL)
 public class PacketDebug extends Module {
-    ArrayList<Pair<Packet<? extends INetHandler>, Long>> list = new ArrayList<>();
+    ArrayList<Group<Class<?>, String, Long>> list = new ArrayList<>();
 
     @Listener
     private void onLoadWorld(EventLoadWorld e) {
@@ -31,27 +30,28 @@ public class PacketDebug extends Module {
     @Listener
     private void onSend(EventPacketSend e) {
         Packet<? extends INetHandler> packet = e.getPacket();
-        Optional<Pair<Packet<? extends INetHandler>, Long>> optional = list.stream().filter(p -> p.a.getClass().equals(packet.getClass())).findFirst();
+        Optional<Group<Class<?>, String, Long>> optional = list.stream().filter(p -> p.a.equals(packet.getClass())).findFirst();
         if (optional.isPresent()) {
-            Pair<Packet<? extends INetHandler>, Long> pair = optional.get();
-            pair.b++;
-            pair.a = packet;
-        } else list.add(new Pair<>(packet, 1L));
+            Group<Class<?>, String, Long> group = optional.get();
+            group.c++;
+            group.b = group.a.getSimpleName() + ": " + group.c + " - " + packetToString(packet);
+        } else
+            list.add(new Group<>(packet.getClass(), packet.getClass().getSimpleName() + ": " + 1 + " - " + packetToString(packet), 1L));
     }
 
     @Listener
     private void onRender2D(EventRender2D e) {
-        AbstractFontRenderer font = YolBi.instance.getFontManager().getDefault18();
+        AbstractFontRenderer font = YolBi.instance.getFontManager().getPingFang12();
         for (int i = 0; i < list.size(); i++) {
-            Pair<Packet<? extends INetHandler>, Long> pair = list.get(i);
-            font.drawString(Mapper.getFriendlyClass(pair.a.getClass().getSimpleName()) + ": " + pair.b + " - " + packetToString(pair.a) + ":" + pair.b, 10, 10 + i * font.getHeight(), -1);
+            Group<Class<?>, String, Long> group = list.get(i);
+            font.drawString(group.b, 10, 20 + i * font.getHeight(), -1);
         }
     }
 
     private String packetToString(Packet<? extends INetHandler> packet) {
         StringBuilder sb = new StringBuilder();
         sb.append("{");
-        for (Field field : packet.getClass().getFields()) {
+        for (Field field : packet.getClass().getDeclaredFields()) {
             field.setAccessible(true);
             try {
                 if (field.getType().isPrimitive() || field.getType() == String.class)
@@ -64,13 +64,15 @@ public class PacketDebug extends Module {
         return sb.toString();
     }
 
-    static class Pair<A, B> {
+    static class Group<A, B, C> {
         A a;
         B b;
+        C c;
 
-        public Pair(A a, B b) {
+        public Group(A a, B b, C c) {
             this.a = a;
             this.b = b;
+            this.c = c;
         }
     }
 }
