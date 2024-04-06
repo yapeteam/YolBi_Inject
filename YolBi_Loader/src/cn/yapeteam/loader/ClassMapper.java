@@ -151,7 +151,7 @@ public class ClassMapper {
     public static void main(String[] args) throws Throwable {
         Mapper.setMode(Mapper.Mode.Vanilla);
         Mapper.readMappings();
-        map(readStream(Files.newInputStream(Paths.get("PacketDebug.class"))));
+        map(readStream(Files.newInputStream(Paths.get("AimAssist.class"))));
     }
 
     public static void method(MethodNode source, ClassNode parent, String targetName) throws Throwable {
@@ -209,7 +209,7 @@ public class ClassMapper {
                     Object bsmArg = invokeDynamicInsnNode.bsmArgs[i];
                     if (bsmArg instanceof Handle) {
                         Handle handle = (Handle) bsmArg;
-                        invokeDynamicInsnNode.bsmArgs[i] = new Handle(handle.getTag(), handle.getOwner(), handle.getName(), DescParser.mapDesc(handle.getDesc()), handle.isInterface());
+                        invokeDynamicInsnNode.bsmArgs[i] = new Handle(handle.getTag(), Mapper.getObfClass(handle.getOwner()), Mapper.map(handle.getOwner(), handle.getName(), handle.getDesc(), Mapper.Type.Method), DescParser.mapDesc(handle.getDesc()), handle.isInterface());
                     } else if (bsmArg instanceof Type) {
                         Type type = (Type) bsmArg;
                         String desc = type.toString();

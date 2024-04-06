@@ -8,6 +8,7 @@ import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.client.shader.Shader;
 import net.minecraft.client.shader.ShaderGroup;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Timer;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -16,7 +17,7 @@ import java.util.Objects;
 
 @SuppressWarnings("unchecked")
 public class ReflectUtil {
-    private static Field EntityRenderer$theShaderGroup, ShaderGroup$listShaders;
+    private static Field EntityRenderer$theShaderGroup, ShaderGroup$listShaders, Minecraft$timer;
     private static Method EntityRenderer$loadShader, Minecraft$clickMouse, Minecraft$rightClickMouse;
 
     static {
@@ -34,6 +35,9 @@ public class ReflectUtil {
 
             ShaderGroup$listShaders = ShaderGroup.class.getDeclaredField(Mapper.map("net/minecraft/client/shader/ShaderGroup", "listShaders", null, Mapper.Type.Field));
             ShaderGroup$listShaders.setAccessible(true);
+
+            Minecraft$timer = Minecraft.class.getDeclaredField(Mapper.map("net/minecraft/client/Minecraft", "timer", null, Mapper.Type.Field));
+            Minecraft$timer.setAccessible(true);
         } catch (NoSuchFieldException | NoSuchMethodException e) {
             Logger.exception(e);
         }
@@ -53,6 +57,15 @@ public class ReflectUtil {
         } catch (Exception e) {
             Logger.exception(e);
         }
+    }
+
+    public static Timer Minecraft$getTimer(Minecraft minecraft) {
+        try {
+            return (Timer) Minecraft$timer.get(minecraft);
+        } catch (Exception e) {
+            Logger.exception(e);
+        }
+        return null;
     }
 
     public static ShaderGroup GetEntityRenderer$theShaderGroup(EntityRenderer entityRenderer) {
