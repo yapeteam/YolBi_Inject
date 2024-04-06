@@ -12,6 +12,8 @@ import org.objectweb.asm_9_2.tree.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -146,6 +148,12 @@ public class ClassMapper {
         public String name, desc;
     }
 
+    public static void main(String[] args) throws Throwable {
+        Mapper.setMode(Mapper.Mode.Vanilla);
+        Mapper.readMappings();
+        map(readStream(Files.newInputStream(Paths.get("PacketDebug.class"))));
+    }
+
     public static void method(MethodNode source, ClassNode parent, String targetName) throws Throwable {
         if (source.visibleAnnotations != null) {
             for (AnnotationNode visibleAnnotation : source.visibleAnnotations) {
@@ -196,6 +204,7 @@ public class ClassMapper {
                 }
             } else if (instruction instanceof InvokeDynamicInsnNode) {
                 InvokeDynamicInsnNode invokeDynamicInsnNode = (InvokeDynamicInsnNode) instruction;
+                invokeDynamicInsnNode.desc = DescParser.mapDesc(invokeDynamicInsnNode.desc);
                 for (int i = 0; i < invokeDynamicInsnNode.bsmArgs.length; i++) {
                     Object bsmArg = invokeDynamicInsnNode.bsmArgs[i];
                     if (bsmArg instanceof Handle) {
