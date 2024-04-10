@@ -15,28 +15,54 @@ import java.util.Random;
 
 @ModuleInfo(name = "AutoClicker", category = ModuleCategory.COMBAT, key = Keyboard.KEY_F)
 public class AutoClicker extends Module {
-    private final NumberValue<Integer> min = new NumberValue<>("min", 8, 1, 100, 1);
-    private final NumberValue<Integer> max = new NumberValue<>("max", 15, 1, 100, 1);
+    private final NumberValue<Integer> cps = new NumberValue<>("cps", 17, 1, 100, 1);
+    private final NumberValue<Double> range = new NumberValue<>("cps range", 1.5, 0.1d, 2.5d, 0.1);
     private final BooleanValue leftClick = new BooleanValue("leftClick", true),
             rightClick = new BooleanValue("rightClick", false);
 
     public AutoClicker() {
-        min.setCallback((oldV, newV) -> newV > max.getValue() ? oldV : newV);
-        max.setCallback((oldV, newV) -> newV < min.getValue() ? oldV : newV);
-        addValues(min, max, leftClick, rightClick);
+        addValues(cps, range, leftClick, rightClick);
     }
 
-    private long delay = 0, time = 0;
+    private double delay = 0, time = 0;
 
     @Override
     public void onEnable() {
-        delay = random(min.getValue(), max.getValue());
+        delay = generate(cps.getValue(), range.getValue());
         time = System.currentTimeMillis();
+    }
+
+    private final Random random = new Random();
+
+    public double generateNoise(double min, double max) {
+        double u1, u2, v1, v2, s;
+        do {
+            u1 = random.nextDouble() * 2 - 1;
+            u2 = random.nextDouble() * 2 - 1;
+            s = u1 * u1 + u2 * u2;
+        } while (s >= 1 || s == 0);
+
+        double multiplier = Math.sqrt(-2 * Math.log(s) / s);
+        v1 = u1 * multiplier;
+        v2 = u2 * multiplier;
+        // 将生成的噪声值缩放到指定范围内
+        return (v1 + v2) / 2 * (max - min) / 4 + (max + min) / 2;
+    }
+
+    private double generate(double cps, double range) {
+        double noise = cps;
+        for (int j = 0; j < 10; j++) {
+            double newNoise = generateNoise(0, cps * 2);
+            if (Math.abs(noise - newNoise) < range)
+                noise = (noise + newNoise) / 2;
+            else j--;
+        }
+        return noise;
     }
 
     @Listener
     private void onUpdate(EventUpdate e) {
-        delay = random(min.getValue(), max.getValue());
+        delay = generate(cps.getValue(), range.getValue());
         if (mc.currentScreen != null) return;
         if (System.currentTimeMillis() - time >= (1000 / delay)) {
             if (Mouse.isButtonDown(0) && leftClick.getValue()) {
@@ -51,18 +77,8 @@ public class AutoClicker extends Module {
         }
     }
 
-    public static long random(double minCPS, double maxCPS) {
-        int min = (int) minCPS, max = (int) maxCPS;
-        if (maxCPS - minCPS <= 0) return min;
-        return newRandom().nextInt((max - min + 1)) + min;
-    }
-
-    private static Random newRandom() {
-        return new Random((long) (Math.random() * Math.random() * 114514000L));
-    }
-
     @Override
     public String getSuffix() {
-        return min.getValue() + "~" + max.getValue() + ":" + delay;
+        return cps.getValue() + ":" + delay;
     }
 }
