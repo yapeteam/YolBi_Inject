@@ -3,6 +3,7 @@
 /.idea/
 /YolBi_Inject.iml
 /YolBi_Loader/YolBi_Loader.iml
+/injector/.idea/
 /injector/cmake-build-debug/
 /injector/main.o
 /injector/agent.o
