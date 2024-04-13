@@ -12,6 +12,6 @@ add_library(
         jni.h
         jni_md.h
         jvmti.h
-        main_b.c
+        main.c
         obfuscate.h
 )
