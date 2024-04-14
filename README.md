@@ -1,5 +1,10 @@
 # YolBi Lite
 
+# Warning
+
+This repo is out-of-date.
+Please move to https://github.com/yapeteam/YolBi_Lite_Recode
+
 # Development:
 
 Add these to ClassPath:
