@@ -1,5 +1,7 @@
 # YolBi Lite
 
+A hot-injected client
+
 # Warning
 
 This repo is out-of-date.
